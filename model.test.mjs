@@ -23,6 +23,8 @@ test('levers move the score in the believable direction', () => {
   assert.ok(withOverride({ monthlySpending: 8000 }) < base, 'spend more -> runs out sooner');
   assert.ok(withOverride({ retirementAge: 69 }) > base, 'retire later -> lasts longer');
   assert.ok(withOverride({ retirementAge: 62 }) < base, 'retire earlier -> runs out sooner');
+  assert.ok(withOverride({ spouseRetiresAt: 72 }) > base, 'spouse retires later -> lasts longer');
+  assert.ok(withOverride({ spouseRetiresAt: 63 }) < base, 'spouse retires earlier -> runs out sooner');
   assert.ok(withOverride({ addedIncomeMonthly: 2000 }) > base, 'more income -> lasts longer');
   assert.ok(withOverride({ netWorth: 1500000 }) > base, 'more savings -> lasts longer');
   assert.ok(withOverride({ ssElectionAge: 62 }) <= base, 'electing at 62 is worse than 67 (matches impact copy)');

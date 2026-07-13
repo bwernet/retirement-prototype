@@ -88,7 +88,8 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
   transform:translateX(calc(-50% + var(--tail-dx,0px)));
   border:5px solid transparent;border-top:6px solid var(--gold);border-bottom:none;}
 .chart-note.show{opacity:1}
-.age-marker{fill:#fff;transition:x .25s ease-out,y .25s ease-out;}
+.age-marker{fill:#fff;transform-box:fill-box;transform-origin:center;transform:rotate(45deg);
+  transition:x .25s ease-out,y .25s ease-out;}
 .hover-zone{fill:transparent;transition:x .25s ease-out;}
 .chart-spend-label{position:absolute;right:28px;top:44px;font-size:13px;color:#fff;}
 .score{padding:22px 24px 0;}
@@ -105,10 +106,7 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
 .pill{border-radius:999px;color:#fff;font-weight:500;white-space:nowrap;}
 .pill-gold{background:var(--gold);padding:5px 12px;}
 .pill-green{background:var(--pill-green);padding:6px 14px;font-size:16px;}
-.dots{display:flex;gap:7px;justify-content:center;padding:18px 0 0;}
-.dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35);}
-.dots i.on{background:#fff;}
-.caption{padding:16px 28px 0;font-size:15px;line-height:1.5;color:rgba(255,255,255,.9);}
+.caption{padding:22px 28px 0;font-size:15px;line-height:1.5;color:rgba(255,255,255,.9);}
 .sheet{margin-top:auto;background:#fff;border-radius:28px 28px 0 0;padding:10px 22px 26px;color:var(--ink);}
 .sheet::before{content:'';display:block;width:44px;height:5px;border-radius:999px;
   background:#D7DCE6;margin:2px auto 14px;}
@@ -143,9 +141,9 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
         </button>
       </div>
       <ul class="legend">
-        <li><i class="sw sw-green"></i>Non-guaranteed Income</li>
-        <li><i class="sw sw-purple"></i>Guaranteed Income</li>
-        <li><i class="sw sw-blue"></i>Withdrawals from Savings</li>
+        <li><i class="sw sw-green"></i>Non-guaranteed income</li>
+        <li><i class="sw sw-purple"></i>Guaranteed income</li>
+        <li><i class="sw sw-blue"></i>Withdrawals from savings</li>
       </ul>
       <div class="chart-wrap">
         <svg id="chart" viewBox="0 0 344 160" preserveAspectRatio="none"></svg>
@@ -165,7 +163,6 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
         <span>Money lasts until:</span>
         <span class="pill pill-green" id="readout-lasts">82y 5m</span>
       </div>
-      <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
       <p class="caption">Retirement score doesn&rsquo;t only map changes in your net worth, it also considers your income sources over time.</p>
       <div class="sheet" id="sheet"></div>
     </div></div></div>

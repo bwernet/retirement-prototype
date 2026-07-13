@@ -7,9 +7,8 @@ export const CONSTANTS = {
   returnRate: 0.02,         // annual growth on savings
   inflation: 0.025,         // applied to spending, medicare, and non-guaranteed income
   userSalary: 72000,        // annual, while age < retirementAge (non-guaranteed)
-  garySalary: 36000,        // spouse annual, while age < garyRetiresAt (non-guaranteed)
-  garyRetiresAt: 68,        // on the user's age axis
-  garySSAnnual: 7000,       // spouse guaranteed income from garyRetiresAt
+  garySalary: 36000,        // spouse annual, while age < spouseRetiresAt (non-guaranteed)
+  garySSAnnual: 7000,       // spouse guaranteed income from spouseRetiresAt
   ssBaseMonthlyAt62: 1000,  // user Social Security if elected at 62
   ssDelayBonusPerYear: 0.12, // benefit increase per year of delay past 62
   medicareStartAge: 65,
@@ -17,6 +16,7 @@ export const CONSTANTS = {
 
 export const DEFAULT_INPUTS = {
   retirementAge: 66,
+  spouseRetiresAt: 68,      // Gary, on the user's age axis
   monthlySpending: 6240,
   netWorth: 1093293,
   addedIncomeMonthly: 1000,
@@ -29,6 +29,7 @@ export const DEFAULT_INPUTS = {
 // value off its step grid (e.g. spending can always step back to $6,240).
 export const INPUT_LIMITS = {
   retirementAge:      { min: 62, max: 75, step: 1 },
+  spouseRetiresAt:    { min: 62, max: 75, step: 1 },
   monthlySpending:    { min: 1240, max: 20240, step: 250 },
   netWorth:           { min: 93293, max: 4993293, step: 50000 },
   addedIncomeMonthly: { min: 0, max: 10000, step: 250 },
@@ -54,12 +55,12 @@ export function simulate(inputs, c = CONSTANTS) {
     // Non-guaranteed income (salaries, added income) rises with inflation;
     // guaranteed income (Social Security) stays flat.
     const salary = (age < inputs.retirementAge ? c.userSalary : 0) * infl;
-    const gary = (age < c.garyRetiresAt ? c.garySalary : 0) * infl;
+    const gary = (age < inputs.spouseRetiresAt ? c.garySalary : 0) * infl;
     const added =
       (age >= inputs.retirementAge && age < inputs.retirementAge + inputs.addedIncomeYears
         ? inputs.addedIncomeMonthly * 12 : 0) * infl;
     const ss = age >= inputs.ssElectionAge ? ssAnnual : 0;
-    const garySS = age >= c.garyRetiresAt ? c.garySSAnnual : 0;
+    const garySS = age >= inputs.spouseRetiresAt ? c.garySSAnnual : 0;
 
     const nonGuaranteed = salary + gary + added;
     const guaranteed = ss + garySS;

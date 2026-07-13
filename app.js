@@ -12,6 +12,8 @@ const RAILS = {
     { title: 'Retirement Date', chip: 'High Impact', rows: [
       { type: 'stepper', key: 'retirementAge', label: 'You plan to retire at age:',
         fmt: v => v, sub: v => `in ${C.baseYear + v - C.currentAge}` },
+      { type: 'stepper', key: 'spouseRetiresAt', label: 'Your spouse plans to retire at age:',
+        fmt: v => v, sub: v => `in ${C.baseYear + v - C.currentAge}` },
       { type: 'impact', text: 'Average members add up to 3-4 years to their score each year they delay retirement.' },
     ]},
     { title: 'Spending', chip: 'High Impact', rows: [
@@ -28,7 +30,7 @@ const RAILS = {
   ],
   right: [
     { title: 'Income', chip: 'High Impact', rows: [
-      { type: 'stepper', key: 'addedIncomeMonthly', label: 'Add Income in Retirement',
+      { type: 'stepper', key: 'addedIncomeMonthly', label: 'Add income in retirement',
         fmt: formatMoney, sub: () => 'per month' },
       { type: 'stepper', key: 'addedIncomeYears', label: 'You plan to make this for:',
         fmt: v => `${v} years`, sub: v => `until ${C.baseYear + (state.retirementAge - C.currentAge) + v}` },
@@ -38,13 +40,13 @@ const RAILS = {
     { title: 'Social Security', rows: [
       { type: 'stepper', key: 'ssElectionAge', label: 'Your election age',
         fmt: v => v, sub: v => `in ${C.baseYear + v - C.currentAge}` },
-      { type: 'link', text: 'Social Security Calculator', icon: 'calc' },
+      { type: 'link', text: 'Social Security calculator', icon: 'calc' },
       { type: 'impact', text: 'The average member adds 1-2 years to their score by electing at 67 instead of 62.' },
     ]},
     { title: 'Healthcare', rows: [
-      { type: 'stepper', key: 'medicareMonthly', label: 'Medicare Premiums', icon: 'cross',
+      { type: 'stepper', key: 'medicareMonthly', label: 'Medicare premiums', icon: 'cross',
         fmt: formatMoney, sub: () => `per month starting in ${C.baseYear + C.medicareStartAge - C.currentAge}` },
-      { type: 'link', text: 'Medicare Calculator', icon: 'calc' },
+      { type: 'link', text: 'Medicare calculator', icon: 'calc' },
     ]},
   ],
 };
@@ -124,8 +126,8 @@ function initChart() {
   for (const id of ['note-retire', 'note-gary']) {
     const marker = document.createElementNS(SVGNS, 'rect');
     marker.setAttribute('class', 'age-marker');
-    marker.setAttribute('width', 3); marker.setAttribute('height', 8);
-    marker.setAttribute('rx', 1.5);
+    marker.setAttribute('width', 6); marker.setAttribute('height', 6);
+    marker.setAttribute('rx', 1);
     svg.appendChild(marker);
     ageMarkers[id] = marker;
 
@@ -157,8 +159,8 @@ function placeAnnotation(id, age, text, sim, yPix, bw) {
   const cxSvg = (i + 0.5) * bw;
 
   const marker = ageMarkers[id];
-  marker.setAttribute('x', (cxSvg - 1.5).toFixed(2));
-  marker.setAttribute('y', (stackTop - 12).toFixed(2));
+  marker.setAttribute('x', (cxSvg - 3).toFixed(2));
+  marker.setAttribute('y', (stackTop - 13).toFixed(2));
   hoverZones[id].setAttribute('x', ((i - 1) * bw).toFixed(2));
 
   const note = document.getElementById(id);
@@ -190,7 +192,7 @@ function updateChart(sim) {
   spendLine.setAttribute('points',
     sim.years.map((y, i) => `${((i + 0.5) * bw).toFixed(2)},${yPix(y.spending).toFixed(2)}`).join(' '));
   const a = placeAnnotation('note-retire', state.retirementAge, `You retire at ${state.retirementAge}`, sim, yPix, bw);
-  const b = placeAnnotation('note-gary', C.garyRetiresAt, `Gary retires at ${C.garyRetiresAt}`, sim, yPix, bw);
+  const b = placeAnnotation('note-gary', state.spouseRetiresAt, `Gary retires at ${state.spouseRetiresAt}`, sim, yPix, bw);
   // If the two pills would collide, lift Gary's clear of the retire pill.
   if (Math.abs(a.x - b.x) < (a.note.offsetWidth + b.note.offsetWidth) / 2 + 8 &&
       Math.abs(a.top - b.top) < 26) {
