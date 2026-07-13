@@ -93,4 +93,81 @@ function updateInputs() {
     document.querySelectorAll(`[data-sub="${key}"]`).forEach(el => { el.textContent = row.sub(state[key]); });
   }
 }
-updateInputs();
+/* ---------- live rendering ---------- */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const AGES = Array.from({ length: C.endAge - C.currentAge + 1 }, (_, i) => C.currentAge + i);
+const CH = { w: 344, h: 160, top: 12 };
+let chartBars, spendLine;
+
+function initChart() {
+  const svg = document.getElementById('chart');
+  const bw = CH.w / AGES.length;
+  chartBars = AGES.map((_, i) => {
+    const g = {};
+    for (const part of ['green', 'purple', 'blue']) {
+      const r = document.createElementNS(SVGNS, 'rect');
+      r.setAttribute('x', (i * bw + 1).toFixed(2));
+      r.setAttribute('width', (bw - 2).toFixed(2));
+      r.setAttribute('y', CH.h); r.setAttribute('height', 0);
+      r.setAttribute('class', `bar bar-${part}`);
+      svg.appendChild(r); g[part] = r;
+    }
+    return g;
+  });
+  spendLine = document.createElementNS(SVGNS, 'polyline');
+  spendLine.setAttribute('class', 'spend-line');
+  svg.appendChild(spendLine); // appended last so the white line renders on top
+}
+
+function agePct(age) {
+  return ((age - C.currentAge) / (C.endAge - C.currentAge)) * 100;
+}
+
+function positionNote(id, age, text) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  const pct = Math.min(Math.max(agePct(age + 0.5), 10), 90) / 100; // clamp inside chart
+  el.style.left = `${24 + pct * document.getElementById('chart').clientWidth}px`; // 24 = chart-wrap side padding
+}
+
+function updateChart(sim) {
+  const yMax = Math.max(...sim.years.map(y =>
+    Math.max(y.spending, y.nonGuaranteed + y.guaranteed + y.withdrawal))) * 1.06;
+  const yPix = v => CH.h - (v / yMax) * (CH.h - CH.top);
+  sim.years.forEach((y, i) => {
+    let acc = 0;
+    for (const [part, val] of [['green', y.nonGuaranteed], ['purple', y.guaranteed], ['blue', y.withdrawal]]) {
+      const yTop = yPix(acc + val), yBot = yPix(acc);
+      chartBars[i][part].setAttribute('y', yTop.toFixed(2));
+      chartBars[i][part].setAttribute('height', Math.max(0, yBot - yTop).toFixed(2));
+      acc += val;
+    }
+  });
+  const bw = CH.w / AGES.length;
+  spendLine.setAttribute('points',
+    sim.years.map((y, i) => `${((i + 0.5) * bw).toFixed(2)},${yPix(y.spending).toFixed(2)}`).join(' '));
+  positionNote('note-retire', state.retirementAge, `You retire at ${state.retirementAge}`);
+  positionNote('note-gary', C.garyRetiresAt, `Gary retires at ${C.garyRetiresAt}`);
+}
+
+function updateScore(sim) {
+  const lasts = sim.moneyLastsAge ?? C.endAge;
+  const retireDot = document.getElementById('score-retire');
+  const lastsDot = document.getElementById('score-lasts');
+  retireDot.style.left = `${agePct(state.retirementAge)}%`;
+  retireDot.textContent = state.retirementAge;
+  lastsDot.style.left = `${agePct(lasts)}%`;
+  lastsDot.textContent = Math.floor(lasts);
+  document.getElementById('readout-retire').textContent = state.retirementAge;
+  document.getElementById('readout-lasts').textContent = formatAge(sim.moneyLastsAge);
+}
+
+function renderAll() {
+  updateInputs();
+  const sim = simulate(state);
+  updateChart(sim);
+  updateScore(sim);
+}
+
+initChart();
+renderAll();
