@@ -39,6 +39,8 @@ const RAILS = {
     { title: 'Social Security', rows: [
       { type: 'stepper', key: 'ssElectionAge', label: 'Your election age',
         fmt: v => v, sub: v => `in ${C.baseYear + v - C.currentAge}` },
+      { type: 'stepper', key: 'spouseSsElectionAge', label: 'Your spouse’s election age',
+        fmt: v => v, sub: v => `in ${C.baseYear + v - C.currentAge}` },
       { type: 'link', text: 'Social Security calculator', icon: 'calc' },
       { type: 'impact', text: 'The average member adds 1-2 years to their score by electing at 67 instead of 62.' },
     ]},
