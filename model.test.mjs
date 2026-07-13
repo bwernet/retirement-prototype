@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { simulate, formatAge, formatMoney, clampInput, DEFAULT_INPUTS } from './model.js';
+import { simulate, formatAge, formatMoney, clampInput, DEFAULT_INPUTS, INPUT_LIMITS } from './model.js';
 
 test('default scenario runs out roughly where the mockup says (~82)', () => {
   const { moneyLastsAge, ranOut } = simulate(DEFAULT_INPUTS);
@@ -52,4 +52,10 @@ test('clampInput respects limits', () => {
   assert.equal(clampInput('ssElectionAge', 75), 70);
   assert.equal(clampInput('ssElectionAge', 55), 62);
   assert.equal(clampInput('retirementAge', 50), 62);
+});
+
+test('defaults stay on the step grid even after clamping at the limits', () => {
+  for (const [key, { min, step }] of Object.entries(INPUT_LIMITS)) {
+    assert.equal((DEFAULT_INPUTS[key] - min) % step, 0, `${key}: default unreachable from min`);
+  }
 });

@@ -171,3 +171,15 @@ function renderAll() {
 
 initChart();
 renderAll();
+
+/* ---------- interactivity ---------- */
+document.body.addEventListener('click', e => {
+  const btn = e.target.closest('.step');
+  if (!btn) return;
+  const key = btn.dataset.key;
+  const next = clampInput(key, state[key] + Number(btn.dataset.dir) * INPUT_LIMITS[key].step);
+  if (next === state[key]) return;
+  state[key] = next;
+  renderAll();
+});
+window.addEventListener('resize', () => renderAll()); // keeps pixel-positioned chart notes aligned

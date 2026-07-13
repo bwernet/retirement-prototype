@@ -25,14 +25,16 @@ export const DEFAULT_INPUTS = {
   medicareMonthly: 1093,
 };
 
+// min/max are grid-aligned with each default so clamping never knocks a
+// value off its step grid (e.g. spending can always step back to $6,240).
 export const INPUT_LIMITS = {
   retirementAge:      { min: 62, max: 75, step: 1 },
-  monthlySpending:    { min: 1000, max: 20000, step: 250 },
-  netWorth:           { min: 0, max: 5000000, step: 50000 },
+  monthlySpending:    { min: 1240, max: 20240, step: 250 },
+  netWorth:           { min: 93293, max: 4993293, step: 50000 },
   addedIncomeMonthly: { min: 0, max: 10000, step: 250 },
   addedIncomeYears:   { min: 0, max: 30, step: 1 },
   ssElectionAge:      { min: 62, max: 70, step: 1 },
-  medicareMonthly:    { min: 0, max: 3000, step: 50 },
+  medicareMonthly:    { min: 93, max: 3093, step: 50 },
 };
 
 export function clampInput(key, value) {
