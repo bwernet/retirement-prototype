@@ -4,7 +4,6 @@ const state = { ...DEFAULT_INPUTS };
 
 const ICONS = {
   calc: `<svg class="row-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="1" width="14" height="16" rx="2" stroke="#27356B" stroke-width="1.4"/><rect x="4.5" y="3.5" width="9" height="3.5" rx="1" fill="#B3A0EE"/><circle cx="6" cy="10.5" r="1" fill="#27356B"/><circle cx="9" cy="10.5" r="1" fill="#27356B"/><circle cx="12" cy="10.5" r="1" fill="#27356B"/><circle cx="6" cy="13.5" r="1" fill="#27356B"/><circle cx="9" cy="13.5" r="1" fill="#27356B"/><circle cx="12" cy="13.5" r="1" fill="#27356B"/></svg>`,
-  cross: `<svg class="row-icon" width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#E5484D"/><path d="M9.2 5h3.6v4.2H17v3.6h-4.2V17H9.2v-4.2H5V9.2h4.2z" fill="#fff"/></svg>`,
 };
 
 const RAILS = {
@@ -44,7 +43,7 @@ const RAILS = {
       { type: 'impact', text: 'The average member adds 1-2 years to their score by electing at 67 instead of 62.' },
     ]},
     { title: 'Healthcare', rows: [
-      { type: 'stepper', key: 'medicareMonthly', label: 'Medicare premiums', icon: 'cross',
+      { type: 'stepper', key: 'medicareMonthly', label: 'Medicare premiums',
         fmt: formatMoney, sub: () => `per month starting in ${C.baseYear + C.medicareStartAge - C.currentAge}` },
       { type: 'link', text: 'Medicare calculator', icon: 'calc' },
     ]},
@@ -207,7 +206,8 @@ function updateScore(sim) {
   retireDot.style.left = `${agePct(state.retirementAge)}%`;
   retireDot.textContent = state.retirementAge;
   lastsDot.style.left = `${agePct(lasts)}%`;
-  lastsDot.textContent = Math.floor(lasts);
+  lastsDot.textContent = sim.ranOut ? Math.floor(lasts) : '95+';
+  document.getElementById('score-fill').style.width = `${agePct(lasts)}%`;
   document.getElementById('readout-retire').textContent = state.retirementAge;
   document.getElementById('readout-lasts').textContent = formatAge(sim.moneyLastsAge);
 }
