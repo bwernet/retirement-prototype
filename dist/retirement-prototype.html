@@ -23,7 +23,7 @@
 body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var(--ink);
   -webkit-font-smoothing:antialiased;}
 .stage{display:grid;grid-template-columns:340px auto 340px;gap:44px;justify-content:center;
-  align-items:start;padding:56px 32px;min-height:100vh;}
+  align-items:start;padding:40px 32px;}
 .rail{display:flex;flex-direction:column;gap:28px;}
 .rail-left{margin-top:8px}.rail-right{margin-top:8px}
 
@@ -120,8 +120,11 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
   background:#D7DCE6;margin:2px auto 14px;}
 .sheet .card{box-shadow:none;padding:0;border-radius:0;}
 
-/* ---------- responsive ---------- */
-@media (max-width:1180px){
+/* ---------- responsive ----------
+   Above 700px the whole composition scales uniformly (CSS zoom, set in
+   app.js) instead of reflowing; below 700px it stacks, controls under
+   the phone. */
+@media (max-width:700px){
   .stage{grid-template-columns:minmax(0,440px);}
   .phone-wrap{order:0}
   .rail{order:1;margin-top:0}
@@ -521,7 +524,29 @@ document.body.addEventListener('click', e => {
   state[key] = next;
   renderAll();
 });
-window.addEventListener('resize', () => renderAll()); // keeps pixel-positioned chart notes aligned
+/* ---------- responsive scaling ----------
+   Above the mobile breakpoint the whole composition scales down uniformly
+   to fit the viewport (no reflow); below it, the stacked layout scales so
+   the phone always fits. Also reports document height to a parent frame
+   so an embedding page can auto-size the iframe. */
+const DESIGN_W = 1224;  // full three-column composition width
+const MOBILE_BP = 700;  // below this, layout stacks (see CSS media query)
+const MOBILE_W = 504;   // stacked-layout design width
+
+function fitScale() {
+  const w = window.innerWidth;
+  const design = w >= MOBILE_BP ? DESIGN_W : MOBILE_W;
+  document.querySelector('.stage').style.zoom = Math.min(1, w / design);
+  renderAll(); // keeps pixel-positioned chart notes aligned
+  requestAnimationFrame(() => {
+    if (window.parent !== window) {
+      window.parent.postMessage(
+        { type: 'retirement-prototype:height', height: document.documentElement.scrollHeight }, '*');
+    }
+  });
+}
+window.addEventListener('resize', fitScale);
+fitScale();
 </script>
 </body>
 </html>

@@ -234,4 +234,26 @@ document.body.addEventListener('click', e => {
   state[key] = next;
   renderAll();
 });
-window.addEventListener('resize', () => renderAll()); // keeps pixel-positioned chart notes aligned
+/* ---------- responsive scaling ----------
+   Above the mobile breakpoint the whole composition scales down uniformly
+   to fit the viewport (no reflow); below it, the stacked layout scales so
+   the phone always fits. Also reports document height to a parent frame
+   so an embedding page can auto-size the iframe. */
+const DESIGN_W = 1224;  // full three-column composition width
+const MOBILE_BP = 700;  // below this, layout stacks (see CSS media query)
+const MOBILE_W = 504;   // stacked-layout design width
+
+function fitScale() {
+  const w = window.innerWidth;
+  const design = w >= MOBILE_BP ? DESIGN_W : MOBILE_W;
+  document.querySelector('.stage').style.zoom = Math.min(1, w / design);
+  renderAll(); // keeps pixel-positioned chart notes aligned
+  requestAnimationFrame(() => {
+    if (window.parent !== window) {
+      window.parent.postMessage(
+        { type: 'retirement-prototype:height', height: document.documentElement.scrollHeight }, '*');
+    }
+  });
+}
+window.addEventListener('resize', fitScale);
+fitScale();
