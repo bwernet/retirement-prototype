@@ -4,19 +4,19 @@ export const CONSTANTS = {
   currentAge: 62,           // "Today" on the score bar
   endAge: 95,
   baseYear: 2023,           // calendar year at currentAge (retire at 63 -> "in 2024")
-  returnRate: 0.025,        // annual growth on savings
-  inflation: 0.034,         // applied to spending + medicare
-  userSalary: 84000,        // annual, while age < retirementAge (non-guaranteed)
+  returnRate: 0.02,         // annual growth on savings
+  inflation: 0.025,         // applied to spending, medicare, and non-guaranteed income
+  userSalary: 72000,        // annual, while age < retirementAge (non-guaranteed)
   garySalary: 36000,        // spouse annual, while age < garyRetiresAt (non-guaranteed)
   garyRetiresAt: 68,        // on the user's age axis
-  garySSAnnual: 12000,      // spouse guaranteed income from garyRetiresAt
-  ssBaseMonthlyAt62: 1500,  // user Social Security if elected at 62
+  garySSAnnual: 7000,       // spouse guaranteed income from garyRetiresAt
+  ssBaseMonthlyAt62: 1000,  // user Social Security if elected at 62
   ssDelayBonusPerYear: 0.12, // benefit increase per year of delay past 62
   medicareStartAge: 65,
 };
 
 export const DEFAULT_INPUTS = {
-  retirementAge: 63,
+  retirementAge: 66,
   monthlySpending: 6240,
   netWorth: 1093293,
   addedIncomeMonthly: 1000,
@@ -51,11 +51,13 @@ export function simulate(inputs, c = CONSTANTS) {
 
   for (let age = c.currentAge; age <= c.endAge; age++) {
     const infl = Math.pow(1 + c.inflation, age - c.currentAge);
-    const salary = age < inputs.retirementAge ? c.userSalary : 0;
-    const gary = age < c.garyRetiresAt ? c.garySalary : 0;
+    // Non-guaranteed income (salaries, added income) rises with inflation;
+    // guaranteed income (Social Security) stays flat.
+    const salary = (age < inputs.retirementAge ? c.userSalary : 0) * infl;
+    const gary = (age < c.garyRetiresAt ? c.garySalary : 0) * infl;
     const added =
-      age >= inputs.retirementAge && age < inputs.retirementAge + inputs.addedIncomeYears
-        ? inputs.addedIncomeMonthly * 12 : 0;
+      (age >= inputs.retirementAge && age < inputs.retirementAge + inputs.addedIncomeYears
+        ? inputs.addedIncomeMonthly * 12 : 0) * infl;
     const ss = age >= inputs.ssElectionAge ? ssAnnual : 0;
     const garySS = age >= c.garyRetiresAt ? c.garySSAnnual : 0;
 

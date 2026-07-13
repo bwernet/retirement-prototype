@@ -85,11 +85,14 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
 .spend-line{fill:none;stroke:#fff;stroke-width:2;}
 .chart-note{position:absolute;transform:translateX(-50%);background:var(--gold);color:#fff;
   font-size:12px;font-weight:500;padding:4px 10px;border-radius:999px;white-space:nowrap;
-  opacity:0;pointer-events:none;transition:left .25s ease-out,opacity .18s ease-out;}
+  opacity:0;pointer-events:none;
+  transition:left .25s ease-out,top .25s ease-out,opacity .18s ease-out;}
+.chart-note::after{content:'';position:absolute;left:50%;bottom:-5px;
+  transform:translateX(calc(-50% + var(--tail-dx,0px)));
+  border:5px solid transparent;border-top:6px solid var(--gold);border-bottom:none;}
 .chart-note.show{opacity:1}
+.age-marker{fill:#fff;transition:x .25s ease-out,y .25s ease-out;}
 .hover-zone{fill:transparent;transition:x .25s ease-out;}
-#note-retire{top:6px}
-#note-gary{top:34px}
 .chart-spend-label{position:absolute;right:28px;top:44px;font-size:13px;color:#fff;}
 .score{padding:22px 24px 0;}
 .score-track{position:relative;height:14px;border-radius:999px;
@@ -101,10 +104,10 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
   box-shadow:0 4px 12px rgba(0,0,0,.25);}
 .score-ends{display:flex;justify-content:space-between;font-size:14px;padding-top:14px;
   color:rgba(255,255,255,.95);}
-.readout{display:flex;align-items:center;gap:8px;padding:18px 24px 0;font-size:16px;white-space:nowrap;}
+.readout{display:flex;align-items:center;gap:7px;padding:18px 34px 0 24px;font-size:15px;white-space:nowrap;}
 .pill{border-radius:999px;color:#fff;font-weight:500;white-space:nowrap;}
 .pill-gold{background:var(--gold);padding:5px 12px;}
-.pill-green{background:var(--pill-green);padding:7px 16px;font-size:17px;}
+.pill-green{background:var(--pill-green);padding:6px 14px;font-size:16px;}
 .dots{display:flex;gap:7px;justify-content:center;padding:18px 0 0;}
 .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35);}
 .dots i.on{background:#fff;}
@@ -179,19 +182,19 @@ const CONSTANTS = {
   currentAge: 62,           // "Today" on the score bar
   endAge: 95,
   baseYear: 2023,           // calendar year at currentAge (retire at 63 -> "in 2024")
-  returnRate: 0.025,        // annual growth on savings
-  inflation: 0.034,         // applied to spending + medicare
-  userSalary: 84000,        // annual, while age < retirementAge (non-guaranteed)
+  returnRate: 0.02,         // annual growth on savings
+  inflation: 0.025,         // applied to spending, medicare, and non-guaranteed income
+  userSalary: 72000,        // annual, while age < retirementAge (non-guaranteed)
   garySalary: 36000,        // spouse annual, while age < garyRetiresAt (non-guaranteed)
   garyRetiresAt: 68,        // on the user's age axis
-  garySSAnnual: 12000,      // spouse guaranteed income from garyRetiresAt
-  ssBaseMonthlyAt62: 1500,  // user Social Security if elected at 62
+  garySSAnnual: 7000,       // spouse guaranteed income from garyRetiresAt
+  ssBaseMonthlyAt62: 1000,  // user Social Security if elected at 62
   ssDelayBonusPerYear: 0.12, // benefit increase per year of delay past 62
   medicareStartAge: 65,
 };
 
 const DEFAULT_INPUTS = {
-  retirementAge: 63,
+  retirementAge: 66,
   monthlySpending: 6240,
   netWorth: 1093293,
   addedIncomeMonthly: 1000,
@@ -226,11 +229,13 @@ function simulate(inputs, c = CONSTANTS) {
 
   for (let age = c.currentAge; age <= c.endAge; age++) {
     const infl = Math.pow(1 + c.inflation, age - c.currentAge);
-    const salary = age < inputs.retirementAge ? c.userSalary : 0;
-    const gary = age < c.garyRetiresAt ? c.garySalary : 0;
+    // Non-guaranteed income (salaries, added income) rises with inflation;
+    // guaranteed income (Social Security) stays flat.
+    const salary = (age < inputs.retirementAge ? c.userSalary : 0) * infl;
+    const gary = (age < c.garyRetiresAt ? c.garySalary : 0) * infl;
     const added =
-      age >= inputs.retirementAge && age < inputs.retirementAge + inputs.addedIncomeYears
-        ? inputs.addedIncomeMonthly * 12 : 0;
+      (age >= inputs.retirementAge && age < inputs.retirementAge + inputs.addedIncomeYears
+        ? inputs.addedIncomeMonthly * 12 : 0) * infl;
     const ss = age >= inputs.ssElectionAge ? ssAnnual : 0;
     const garySS = age >= c.garyRetiresAt ? c.garySSAnnual : 0;
 
@@ -370,7 +375,7 @@ function updateInputs() {
 const SVGNS = 'http://www.w3.org/2000/svg';
 const AGES = Array.from({ length: C.endAge - C.currentAge + 1 }, (_, i) => C.currentAge + i);
 const CH = { w: 344, h: 160, top: 12 };
-let chartBars, spendLine, hoverZones;
+let chartBars, spendLine, hoverZones, ageMarkers;
 
 function initChart() {
   const svg = document.getElementById('chart');
@@ -391,9 +396,17 @@ function initChart() {
   spendLine.setAttribute('class', 'spend-line');
   svg.appendChild(spendLine); // appended last so the white line renders on top
 
-  // Invisible hover targets: hovering a marked year-column fades in its label.
-  hoverZones = {};
+  // Always-visible markers at the top of the two retirement-year bars, plus
+  // invisible hover targets that fade in the corresponding label.
+  hoverZones = {}; ageMarkers = {};
   for (const id of ['note-retire', 'note-gary']) {
+    const marker = document.createElementNS(SVGNS, 'rect');
+    marker.setAttribute('class', 'age-marker');
+    marker.setAttribute('width', 3); marker.setAttribute('height', 8);
+    marker.setAttribute('rx', 1.5);
+    svg.appendChild(marker);
+    ageMarkers[id] = marker;
+
     const zone = document.createElementNS(SVGNS, 'rect');
     zone.setAttribute('class', 'hover-zone');
     zone.setAttribute('y', 0); zone.setAttribute('height', CH.h);
@@ -410,11 +423,32 @@ function agePct(age) {
   return ((age - C.currentAge) / (C.endAge - C.currentAge)) * 100;
 }
 
-function positionNote(id, age, text) {
-  const el = document.getElementById(id);
-  el.textContent = text;
-  const pct = Math.min(Math.max(agePct(age + 0.5), 10), 90) / 100; // clamp inside chart
-  el.style.left = `${24 + pct * document.getElementById('chart').clientWidth}px`; // 24 = chart-wrap side padding
+// Places one annotation set — bar-top marker, hover zone, and label pill.
+// The pill sits just above its bar with the tail pointing at the marker;
+// when clamped at a chart edge, the tail shifts to keep pointing at the bar.
+function placeAnnotation(id, age, text, sim, yPix, bw) {
+  const i = age - C.currentAge;
+  const y = sim.years[i];
+  const stackTop = yPix(y.nonGuaranteed + y.guaranteed + y.withdrawal);
+  const chartEl = document.getElementById('chart');
+  const sx = chartEl.clientWidth / CH.w, sy = chartEl.clientHeight / CH.h;
+  const cxSvg = (i + 0.5) * bw;
+
+  const marker = ageMarkers[id];
+  marker.setAttribute('x', (cxSvg - 1.5).toFixed(2));
+  marker.setAttribute('y', (stackTop - 12).toFixed(2));
+  hoverZones[id].setAttribute('x', ((i - 1) * bw).toFixed(2));
+
+  const note = document.getElementById(id);
+  note.textContent = text;
+  const rawX = 24 + cxSvg * sx; // 24 = chart-wrap side padding
+  const half = note.offsetWidth / 2 + 4;
+  const clampedX = Math.min(Math.max(rawX, 24 + half), 24 + chartEl.clientWidth - half);
+  note.style.left = `${clampedX.toFixed(1)}px`;
+  note.style.setProperty('--tail-dx', `${(rawX - clampedX).toFixed(1)}px`);
+  const top = 30 + (stackTop - 12) * sy - note.offsetHeight - 7; // 30 = chart-wrap top padding
+  note.style.top = `${top.toFixed(1)}px`;
+  return { note, top, x: clampedX };
 }
 
 function updateChart(sim) {
@@ -433,10 +467,13 @@ function updateChart(sim) {
   const bw = CH.w / AGES.length;
   spendLine.setAttribute('points',
     sim.years.map((y, i) => `${((i + 0.5) * bw).toFixed(2)},${yPix(y.spending).toFixed(2)}`).join(' '));
-  positionNote('note-retire', state.retirementAge, `You retire at ${state.retirementAge}`);
-  positionNote('note-gary', C.garyRetiresAt, `Gary retires at ${C.garyRetiresAt}`);
-  hoverZones['note-retire'].setAttribute('x', ((state.retirementAge - C.currentAge - 1) * bw).toFixed(2));
-  hoverZones['note-gary'].setAttribute('x', ((C.garyRetiresAt - C.currentAge - 1) * bw).toFixed(2));
+  const a = placeAnnotation('note-retire', state.retirementAge, `You retire at ${state.retirementAge}`, sim, yPix, bw);
+  const b = placeAnnotation('note-gary', C.garyRetiresAt, `Gary retires at ${C.garyRetiresAt}`, sim, yPix, bw);
+  // If the two pills would collide, lift Gary's clear of the retire pill.
+  if (Math.abs(a.x - b.x) < (a.note.offsetWidth + b.note.offsetWidth) / 2 + 8 &&
+      Math.abs(a.top - b.top) < 26) {
+    b.note.style.top = `${(Math.min(a.top, b.top) - 28).toFixed(1)}px`;
+  }
 }
 
 function updateScore(sim) {

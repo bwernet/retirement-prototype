@@ -82,11 +82,14 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
 .spend-line{fill:none;stroke:#fff;stroke-width:2;}
 .chart-note{position:absolute;transform:translateX(-50%);background:var(--gold);color:#fff;
   font-size:12px;font-weight:500;padding:4px 10px;border-radius:999px;white-space:nowrap;
-  opacity:0;pointer-events:none;transition:left .25s ease-out,opacity .18s ease-out;}
+  opacity:0;pointer-events:none;
+  transition:left .25s ease-out,top .25s ease-out,opacity .18s ease-out;}
+.chart-note::after{content:'';position:absolute;left:50%;bottom:-5px;
+  transform:translateX(calc(-50% + var(--tail-dx,0px)));
+  border:5px solid transparent;border-top:6px solid var(--gold);border-bottom:none;}
 .chart-note.show{opacity:1}
+.age-marker{fill:#fff;transition:x .25s ease-out,y .25s ease-out;}
 .hover-zone{fill:transparent;transition:x .25s ease-out;}
-#note-retire{top:6px}
-#note-gary{top:34px}
 .chart-spend-label{position:absolute;right:28px;top:44px;font-size:13px;color:#fff;}
 .score{padding:22px 24px 0;}
 .score-track{position:relative;height:14px;border-radius:999px;
@@ -98,10 +101,10 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
   box-shadow:0 4px 12px rgba(0,0,0,.25);}
 .score-ends{display:flex;justify-content:space-between;font-size:14px;padding-top:14px;
   color:rgba(255,255,255,.95);}
-.readout{display:flex;align-items:center;gap:8px;padding:18px 24px 0;font-size:16px;white-space:nowrap;}
+.readout{display:flex;align-items:center;gap:7px;padding:18px 34px 0 24px;font-size:15px;white-space:nowrap;}
 .pill{border-radius:999px;color:#fff;font-weight:500;white-space:nowrap;}
 .pill-gold{background:var(--gold);padding:5px 12px;}
-.pill-green{background:var(--pill-green);padding:7px 16px;font-size:17px;}
+.pill-green{background:var(--pill-green);padding:6px 14px;font-size:16px;}
 .dots{display:flex;gap:7px;justify-content:center;padding:18px 0 0;}
 .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35);}
 .dots i.on{background:#fff;}

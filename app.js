@@ -97,7 +97,7 @@ function updateInputs() {
 const SVGNS = 'http://www.w3.org/2000/svg';
 const AGES = Array.from({ length: C.endAge - C.currentAge + 1 }, (_, i) => C.currentAge + i);
 const CH = { w: 344, h: 160, top: 12 };
-let chartBars, spendLine, hoverZones;
+let chartBars, spendLine, hoverZones, ageMarkers;
 
 function initChart() {
   const svg = document.getElementById('chart');
@@ -118,9 +118,17 @@ function initChart() {
   spendLine.setAttribute('class', 'spend-line');
   svg.appendChild(spendLine); // appended last so the white line renders on top
 
-  // Invisible hover targets: hovering a marked year-column fades in its label.
-  hoverZones = {};
+  // Always-visible markers at the top of the two retirement-year bars, plus
+  // invisible hover targets that fade in the corresponding label.
+  hoverZones = {}; ageMarkers = {};
   for (const id of ['note-retire', 'note-gary']) {
+    const marker = document.createElementNS(SVGNS, 'rect');
+    marker.setAttribute('class', 'age-marker');
+    marker.setAttribute('width', 3); marker.setAttribute('height', 8);
+    marker.setAttribute('rx', 1.5);
+    svg.appendChild(marker);
+    ageMarkers[id] = marker;
+
     const zone = document.createElementNS(SVGNS, 'rect');
     zone.setAttribute('class', 'hover-zone');
     zone.setAttribute('y', 0); zone.setAttribute('height', CH.h);
@@ -137,11 +145,32 @@ function agePct(age) {
   return ((age - C.currentAge) / (C.endAge - C.currentAge)) * 100;
 }
 
-function positionNote(id, age, text) {
-  const el = document.getElementById(id);
-  el.textContent = text;
-  const pct = Math.min(Math.max(agePct(age + 0.5), 10), 90) / 100; // clamp inside chart
-  el.style.left = `${24 + pct * document.getElementById('chart').clientWidth}px`; // 24 = chart-wrap side padding
+// Places one annotation set — bar-top marker, hover zone, and label pill.
+// The pill sits just above its bar with the tail pointing at the marker;
+// when clamped at a chart edge, the tail shifts to keep pointing at the bar.
+function placeAnnotation(id, age, text, sim, yPix, bw) {
+  const i = age - C.currentAge;
+  const y = sim.years[i];
+  const stackTop = yPix(y.nonGuaranteed + y.guaranteed + y.withdrawal);
+  const chartEl = document.getElementById('chart');
+  const sx = chartEl.clientWidth / CH.w, sy = chartEl.clientHeight / CH.h;
+  const cxSvg = (i + 0.5) * bw;
+
+  const marker = ageMarkers[id];
+  marker.setAttribute('x', (cxSvg - 1.5).toFixed(2));
+  marker.setAttribute('y', (stackTop - 12).toFixed(2));
+  hoverZones[id].setAttribute('x', ((i - 1) * bw).toFixed(2));
+
+  const note = document.getElementById(id);
+  note.textContent = text;
+  const rawX = 24 + cxSvg * sx; // 24 = chart-wrap side padding
+  const half = note.offsetWidth / 2 + 4;
+  const clampedX = Math.min(Math.max(rawX, 24 + half), 24 + chartEl.clientWidth - half);
+  note.style.left = `${clampedX.toFixed(1)}px`;
+  note.style.setProperty('--tail-dx', `${(rawX - clampedX).toFixed(1)}px`);
+  const top = 30 + (stackTop - 12) * sy - note.offsetHeight - 7; // 30 = chart-wrap top padding
+  note.style.top = `${top.toFixed(1)}px`;
+  return { note, top, x: clampedX };
 }
 
 function updateChart(sim) {
@@ -160,10 +189,13 @@ function updateChart(sim) {
   const bw = CH.w / AGES.length;
   spendLine.setAttribute('points',
     sim.years.map((y, i) => `${((i + 0.5) * bw).toFixed(2)},${yPix(y.spending).toFixed(2)}`).join(' '));
-  positionNote('note-retire', state.retirementAge, `You retire at ${state.retirementAge}`);
-  positionNote('note-gary', C.garyRetiresAt, `Gary retires at ${C.garyRetiresAt}`);
-  hoverZones['note-retire'].setAttribute('x', ((state.retirementAge - C.currentAge - 1) * bw).toFixed(2));
-  hoverZones['note-gary'].setAttribute('x', ((C.garyRetiresAt - C.currentAge - 1) * bw).toFixed(2));
+  const a = placeAnnotation('note-retire', state.retirementAge, `You retire at ${state.retirementAge}`, sim, yPix, bw);
+  const b = placeAnnotation('note-gary', C.garyRetiresAt, `Gary retires at ${C.garyRetiresAt}`, sim, yPix, bw);
+  // If the two pills would collide, lift Gary's clear of the retire pill.
+  if (Math.abs(a.x - b.x) < (a.note.offsetWidth + b.note.offsetWidth) / 2 + 8 &&
+      Math.abs(a.top - b.top) < 26) {
+    b.note.style.top = `${(Math.min(a.top, b.top) - 28).toFixed(1)}px`;
+  }
 }
 
 function updateScore(sim) {
