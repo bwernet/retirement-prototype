@@ -97,7 +97,7 @@ function updateInputs() {
 const SVGNS = 'http://www.w3.org/2000/svg';
 const AGES = Array.from({ length: C.endAge - C.currentAge + 1 }, (_, i) => C.currentAge + i);
 const CH = { w: 344, h: 160, top: 12 };
-let chartBars, spendLine;
+let chartBars, spendLine, hoverZones;
 
 function initChart() {
   const svg = document.getElementById('chart');
@@ -117,6 +117,20 @@ function initChart() {
   spendLine = document.createElementNS(SVGNS, 'polyline');
   spendLine.setAttribute('class', 'spend-line');
   svg.appendChild(spendLine); // appended last so the white line renders on top
+
+  // Invisible hover targets: hovering a marked year-column fades in its label.
+  hoverZones = {};
+  for (const id of ['note-retire', 'note-gary']) {
+    const zone = document.createElementNS(SVGNS, 'rect');
+    zone.setAttribute('class', 'hover-zone');
+    zone.setAttribute('y', 0); zone.setAttribute('height', CH.h);
+    zone.setAttribute('width', (bw * 3).toFixed(2)); // 3 columns wide, easy to hit
+    svg.appendChild(zone);
+    const note = document.getElementById(id);
+    zone.addEventListener('mouseenter', () => note.classList.add('show'));
+    zone.addEventListener('mouseleave', () => note.classList.remove('show'));
+    hoverZones[id] = zone;
+  }
 }
 
 function agePct(age) {
@@ -148,6 +162,8 @@ function updateChart(sim) {
     sim.years.map((y, i) => `${((i + 0.5) * bw).toFixed(2)},${yPix(y.spending).toFixed(2)}`).join(' '));
   positionNote('note-retire', state.retirementAge, `You retire at ${state.retirementAge}`);
   positionNote('note-gary', C.garyRetiresAt, `Gary retires at ${C.garyRetiresAt}`);
+  hoverZones['note-retire'].setAttribute('x', ((state.retirementAge - C.currentAge - 1) * bw).toFixed(2));
+  hoverZones['note-gary'].setAttribute('x', ((C.garyRetiresAt - C.currentAge - 1) * bw).toFixed(2));
 }
 
 function updateScore(sim) {

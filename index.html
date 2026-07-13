@@ -82,7 +82,9 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
 .spend-line{fill:none;stroke:#fff;stroke-width:2;}
 .chart-note{position:absolute;transform:translateX(-50%);background:var(--gold);color:#fff;
   font-size:12px;font-weight:500;padding:4px 10px;border-radius:999px;white-space:nowrap;
-  transition:left .25s ease-out;}
+  opacity:0;pointer-events:none;transition:left .25s ease-out,opacity .18s ease-out;}
+.chart-note.show{opacity:1}
+.hover-zone{fill:transparent;transition:x .25s ease-out;}
 #note-retire{top:6px}
 #note-gary{top:34px}
 .chart-spend-label{position:absolute;right:28px;top:44px;font-size:13px;color:#fff;}
