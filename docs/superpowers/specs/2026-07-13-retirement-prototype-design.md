@@ -76,6 +76,24 @@ Year-by-year cash-flow simulation from retirement age forward:
 Levers move it believably: retire later, spend less, add more income, or elect
 Social Security later → money lasts longer.
 
+## Chart integrity rules
+
+The chart is rendered directly from the simulation output (not drawn decoratively),
+which enforces these invariants:
+
+- **Withdrawals never exceed spending:** post-retirement, each year's withdrawal is
+  computed as `min(spending − other income, remaining savings)`, so the stacked bar
+  (guaranteed income + withdrawals) can never rise above the white spending line.
+- **Reducing spending redistributes withdrawals to later years:** smaller annual
+  withdrawals deplete savings slower, so the blue area gets shorter but extends
+  further right — visually showing the money lasting longer. The green
+  "money lasts until" marker moves in lockstep.
+- **Pre-retirement bars may exceed the spending line** (salary surplus being saved),
+  matching the mockup.
+- **Transitions:** bar heights and the depletion edge animate (~250ms ease-out) so
+  changes read as money moving, not a redraw. The spending line renders on top; the
+  blue area ends in a clean edge where savings run out.
+
 ## Non-goals (YAGNI)
 
 - Not a financially rigorous / advice-grade calculator.
