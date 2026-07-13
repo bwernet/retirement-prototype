@@ -109,7 +109,10 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
 .pill{border-radius:999px;color:#fff;font-weight:500;white-space:nowrap;}
 .pill-gold{background:var(--gold);padding:5px 12px;}
 .pill-green{background:var(--pill-green);padding:6px 14px;font-size:16px;}
-.caption{padding:22px 28px 0;font-size:15px;line-height:1.5;color:rgba(255,255,255,.9);}
+.dots{display:flex;gap:6px;justify-content:center;padding:18px 0 0;}
+.dots i{width:5px;height:5px;border-radius:50%;background:rgba(15,10,60,.35);}
+.dots i.on{background:rgba(255,255,255,.5);}
+.caption{padding:16px 28px 0;font-size:15px;line-height:1.4;color:rgba(255,255,255,.9);}
 .sheet{margin-top:auto;background:#fff;border-radius:28px 28px 0 0;padding:10px 22px 26px;color:var(--ink);}
 .sheet::before{content:'';display:block;width:44px;height:5px;border-radius:999px;
   background:#D7DCE6;margin:2px auto 14px;}
@@ -139,8 +142,8 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
       </div>
       <div class="screen-head">
         <h1>Retirement Income</h1>
-        <button class="expand" aria-label="Expand">
-          <svg width="15" height="15" viewBox="0 0 15 15" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"><path d="M9 6l4.5-4.5M13.5 5V1.5H10M6 9l-4.5 4.5M1.5 10v3.5H5"/></svg>
+        <button class="expand" aria-label="Collapse">
+          <svg width="15" height="15" viewBox="0 0 15 15" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 1.5L9 6M9 2.8V6h3.2M1.5 13.5L6 9M6 12.2V9H2.8"/></svg>
         </button>
       </div>
       <ul class="legend">
@@ -166,6 +169,7 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
         <span>Money lasts until:</span>
         <span class="pill pill-green" id="readout-lasts">82y 5m</span>
       </div>
+      <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
       <p class="caption">Retirement score doesn&rsquo;t only map changes in your net worth, it also considers your income sources over time.</p>
       <div class="sheet" id="sheet"></div>
     </div></div></div>
