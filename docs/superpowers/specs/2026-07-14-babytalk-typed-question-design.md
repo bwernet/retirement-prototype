@@ -100,10 +100,10 @@ about. Two registers, two honesty rules:
 
 | Beat | Topic | Notification (representative copy) | Typed quote (verbatim) | Attribution |
 |---|---|---|---|---|
-| 1 | movement | HER PREGNANCY APP · "Your baby is the size of a banana. Those little kicks are getting stronger!" | "Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?" | P5 · 33 weeks · asked Reddit, very late at night |
+| 1 | movement | HER PREGNANCY APP · "Your baby is the size of a banana. Those little kicks are getting stronger!" | "Is she in fetal distress, or — because I had four donuts that day — is she just having a sugar party in there?" | P5 · 33 weeks · asked Reddit, very late at night |
 | 2 | reassurance | HER PREGNANCY APP · "Halfway there — you've got this, mama!" | "Can I? Could I? Is it OK?" | P4 · first pregnancy · "every 30 minutes" |
 | 3 | her real life | HER PREGNANCY APP · "You might be experiencing skin changes — try treating yourself to a spa day!" | "How am I supposed to keep working for six more months when my brain feels like mush?" | P7 · prototype interviews · describing the same app |
-| 4 | the timeline | HER PREGNANCY APP · WEEK 40 · "Congratulations, mama! Is your little one here yet?" | "It was so demoralizing when I was 40 weeks along and all of the pregnancy apps were like, you should be done." | P2 · 40 weeks |
+| 4 | the timeline | HER PREGNANCY APP · WEEK 40 · "Congratulations, mama! Is your little one here yet?" | "It was so demoralizing when I was 40 weeks along and each day was ticking by, and all of the pregnancy apps were like, you should be done." | P2 · 40 weeks |
 | — | | Standing thesis: "It should know me." | | P1 · new mom |
 
 Beat evidence notes (what anchors each reconstruction):
@@ -134,9 +134,10 @@ Honest-reporting constraints:
   not verbatim).
 - "very late at night" is the participant's own phrasing — no invented clock
   times ("2am" appears nowhere in the artifact).
-- No fabricated counts, percentages, or composite narratives. The four
-  questions are attributed to their real (coded) speakers; two share a speaker
-  and that is shown, not hidden.
+- No fabricated counts, percentages, or composite narratives. Each of the
+  four typed quotes has a distinct speaker; the beat-3 speaker was
+  author-verified (2026-07-14, against the research record) as a different
+  person from P1.
 
 ## Anonymization
 
@@ -151,8 +152,10 @@ research roster.
   the quote + attribution crossfade in (350ms) at the same moment — one
   synchronized arrival per beat, then stillness (reduces total motion; user
   direction 2026-07-14). The headline pulses once (~650ms) as the beat
-  settles; hold ~3.4s (final beat ~4.2s); quote and notification fade out
-  (320-380ms); next beat. Full cycle ≈ 21s.
+  settles; hold ~4.2s (final beat ~5.2s); then the notification AND the
+  quote + attribution fade out together — synchronized exit matching the
+  synchronized arrival; gap ~1s of empty canvas; next beat. Full cycle ≈ 25s
+  (slowed slightly; user direction 2026-07-14).
 - Starts only when scrolled into view (IntersectionObserver), cycles
   indefinitely while visible, pauses when offscreen. Long holds are sliced so
   pausing (button or offscreen) takes effect within ~150ms during holds.
