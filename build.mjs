@@ -19,3 +19,10 @@ if (out.includes('href="fonts.css"') || out.includes('src="app.js"')) throw new 
 fs.mkdirSync('dist', { recursive: true });
 fs.writeFileSync('dist/retirement-prototype.html', out);
 console.log(`Wrote dist/retirement-prototype.html (${(out.length / 1024).toFixed(0)} KB)`);
+
+// decision-web is a single page with inline script — only the font link needs inlining.
+const web = fs.readFileSync('decision-web.html', 'utf8')
+  .replace('<link rel="stylesheet" href="fonts.css">', () => `<style>\n${fonts}</style>`);
+if (web.includes('href="fonts.css"')) throw new Error('decision-web inline failed');
+fs.writeFileSync('dist/decision-web.html', web);
+console.log(`Wrote dist/decision-web.html (${(web.length / 1024).toFixed(0)} KB)`);

@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Retirement Decision Web — Research Synthesis</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root{
+  --font:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;
+  --serif:Georgia,'Times New Roman',serif;
+  --ink:#27356B; --ink-soft:#5A6B8C; --ink-faint:#8A97B5;
+  --paper:#FBFAF7; --paper-edge:#EFEAE0; --page-bg:#F7F8FA;
+  --card-bg:#fff; --stroke:#E3E7EF;
+  --fin:#1FA97C; --emo:#E0785A; --log:#8A97B5;
+  --gold:#E0A33A; --check:#29B57C;
+  --seg-bg:#E9EDF3; --mark:#FBEFD3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;}
+.wrap{max-width:960px;margin:0 auto;padding:28px 20px 24px;}
+
+.eyebrow-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:18px;}
+.eyebrow{font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);}
+.stamp{font-size:12px;color:var(--ink-faint);white-space:nowrap;}
+
+.controls{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;}
+.seg{display:inline-flex;background:var(--seg-bg);border-radius:12px;padding:3px;}
+.seg button{font-family:var(--font);font-size:14px;font-weight:500;color:var(--ink-soft);
+  border:none;background:none;padding:8px 16px;border-radius:9px;cursor:pointer;transition:color .2s;}
+.seg button.active{background:#fff;color:var(--ink);
+  box-shadow:0 2px 6px rgba(39,53,107,.12),0 1px 2px rgba(39,53,107,.08);}
+.hint{font-size:13px;color:var(--ink-faint);min-height:18px;}
+
+.canvas{background:var(--paper);border:1px solid var(--paper-edge);border-radius:24px;
+  background-image:radial-gradient(rgba(39,53,107,.06) 1px,transparent 1px);
+  background-size:22px 22px;overflow:hidden;
+  box-shadow:0 10px 30px rgba(39,53,107,.07),0 2px 6px rgba(39,53,107,.04);}
+.canvas svg{display:block;width:100%;height:auto;}
+
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0;transition:opacity .35s;}
+.legend.off{opacity:.35;pointer-events:none;}
+.chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-size:12.5px;
+  font-weight:500;color:var(--ink-soft);background:#fff;border:1px solid var(--stroke);
+  border-radius:999px;padding:6px 14px;cursor:pointer;transition:border-color .2s,background .2s;}
+.chip:hover{border-color:var(--ink-faint);}
+.chip.on{border-color:var(--ink);background:#F2F4F9;color:var(--ink);}
+
+.quote-card{background:var(--card-bg);border-radius:16px;padding:18px 22px 16px;margin-top:16px;
+  box-shadow:0 10px 30px rgba(39,53,107,.08),0 2px 6px rgba(39,53,107,.05);min-height:112px;}
+.quote-card blockquote{font-family:var(--serif);font-size:17px;line-height:1.6;color:var(--ink);}
+.quote-card mark{background:var(--mark);color:inherit;padding:1px 3px;border-radius:2px;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;}
+.quote-card mark.plain{background:none;padding:0;color:var(--ink-soft);}
+.quote-card figcaption{font-size:12.5px;color:var(--ink-faint);margin-top:10px;}
+.quote-card figcaption b{font-weight:500;color:var(--ink-soft);}
+
+.caption{font-family:var(--serif);font-style:italic;font-size:13.5px;color:var(--ink-soft);
+  text-align:center;margin-top:18px;}
+
+.node{cursor:pointer;outline:none;}
+.node:focus-visible rect{stroke:var(--gold);stroke-width:2.5;}
+@media (max-width:700px){
+  .wrap{padding:20px 14px 20px;}
+  .eyebrow-row{flex-direction:column;gap:2px;}
+  .quote-card blockquote{font-size:15.5px;}
+}
+@media (prefers-reduced-motion:reduce){
+  .rm *{transition:none !important;}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <header class="eyebrow-row">
+    <span class="eyebrow">Research synthesis</span>
+    <span class="stamp">8 facilitated interviews &middot; ages 51&ndash;65</span>
+  </header>
+
+  <div class="controls">
+    <div class="seg" role="tablist" aria-label="View">
+      <button id="seg-web" class="active" role="tab" aria-selected="true">How people experience it</button>
+      <button id="seg-line" role="tab" aria-selected="false">How today&rsquo;s tools treat it</button>
+    </div>
+    <span class="hint" id="hint"></span>
+  </div>
+
+  <div class="canvas" id="canvas">
+    <svg id="viz" role="img" aria-label="Seven interconnected retirement decisions drawn from user interviews. Toggle shows how existing tools flatten them into a linear checklist.">
+      <title>The retirement decision web</title>
+    </svg>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <figure class="quote-card">
+    <blockquote id="q"><mark></mark></blockquote>
+    <figcaption id="qa"></figcaption>
+  </figure>
+
+  <p class="caption">Every tool answered a box. No tool answered the lines between them &mdash;
+  that became Silvur&rsquo;s product thesis.</p>
+</div>
+
+<script>
+'use strict';
+/* Anonymized per consent review: participant codes are not in roster order. */
+const NODES = [
+  { id:'retire',  label:'When can we retire?',    short:'When can we retire?', rv:'re-opened “a lot lately”',
+    d:[430,70],  m:[200,80],
+    q:'It’s really weighing on us quite heavily right now… when, when, when are we going to be able to retire when we have all this student debt?',
+    a:'P2 · 59 · married, 5+ years from retirement' },
+  { id:'ss',      label:'Social Security',        short:'Social Security', rv:'revisited each time the answers conflicted',
+    d:[762,120], m:[303,215],
+    q:'I’ve been told conflicting things about if I will continue to get disability or have to switch to Social Security.',
+    a:'P1 · 60 · single, 3–5 years from retirement' },
+  { id:'health',  label:'Medicare & healthcare',  short:'Medicare', rv:null,
+    d:[828,282], m:[313,375],
+    q:'Which parts of Medicare do I need if I’m still working at 65?',
+    a:'P6 · credit union member' },
+  { id:'income',  label:'Retirement income',      short:'Income', rv:null,
+    d:[600,392], m:[253,525],
+    q:'What my income would be exactly… it’s based on so many variants, you really don’t know what you’re getting.',
+    a:'P4 · 54 · married, 3–5 years from retirement' },
+  { id:'savings', label:'Savings & investments',  short:'Savings', rv:'re-opened with every market swing',
+    d:[278,386], m:[113,462],
+    q:'What are the strategies for your savings and investments in a down market?',
+    a:'P5 · 56 · married, 1–2 years from retirement' },
+  { id:'family',  label:'Family & debt',          short:'Family & debt', rv:null,
+    d:[118,268], m:[80,320],
+    q:'What happens to your bills, what happens to your student loans that you’ve had forever?',
+    a:'P4 · 54 · married, 3–5 years from retirement' },
+  { id:'fear',    label:'Life after work',        short:'Life after work', rv:'a fear that resurfaced throughout the interviews',
+    d:[162,102], m:[98,168],
+    q:'Thinking about it scares me… I’m scared I won’t have people to talk to, I won’t have money to do the things I wanna do, and that my life is gonna change.',
+    a:'Shared in interviews' },
+];
+const EDGES = [
+  ['family','retire','fin'], ['fear','retire','emo'],  ['ss','health','log'],
+  ['health','retire','log'], ['income','ss','fin'],    ['savings','income','fin'],
+  ['savings','ss','fin'],    ['fear','income','emo'],  ['income','retire','fin'],
+  ['family','savings','fin'],['fear','family','emo'],
+];
+const TOOLS = {
+  retire:'Google, “from time to time”', ss:'SSA — conflicting answers',
+  health:'Medicare.gov', income:'guesswork', savings:'a 401k advisor, “hard to reach”',
+  family:'kitchen-table conversations', fear:'nothing',
+};
+const TYPES = {
+  fin:{color:'#1FA97C', dash:'',    name:'financial',
+       blurb:'Money decisions cascade: a claiming age changes income, income changes how long savings last.'},
+  emo:{color:'#E0785A', dash:'7 5', name:'emotional',
+       blurb:'The connections no calculator touches — fear, identity, family — pulled on every financial choice.'},
+  log:{color:'#8A97B5', dash:'2 5', name:'logistical',
+       blurb:'Enrollment windows, eligibility rules, and timing traps chained one decision to the next.'},
+};
+const DEFAULT_Q = {
+  q:'It’s like information overload… so much information that it makes it hard to look for the pieces that you want to look for.',
+  a:'P3 · 65 · less than a year from retirement',
+};
+const HINTS = {
+  web:'Hover or tap a decision — ↻ marks the ones people kept re-opening.',
+  line:'One decision per step. Decide, check it off, move on.',
+};
+const LINE_Q = {
+  q:'One pass, in order, check the box. Nothing connects — and nothing comes back. Our participants kept coming back.',
+  a:'How every tool we audited framed it',
+};
+
+const svg = document.getElementById('viz');
+const NS = 'http://www.w3.org/2000/svg';
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (RM) document.getElementById('wrap').classList.add('rm');
+
+const byId = {};
+NODES.forEach(n => byId[n.id] = n);
+
+let bp = null;          // 'd' | 'm'
+let mode = 'web';       // 'web' | 'line'
+let focused = null;     // node id
+let pinned = null;      // node id, survives mouseleave (tap/click/keyboard)
+let filter = null;      // edge type
+let parts = null;       // rebuilt per layout
+
+function el(tag, attrs) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+function trans(e, props) { if (!RM) e.style.transition = props; return e; }
+
+function layout() {
+  const desk = bp === 'd';
+  return {
+    desk,
+    vb: desk ? '0 0 960 460' : '0 0 400 600',
+    font: desk ? 14 : 13,
+    cw: desk ? 7.5 : 7.0,
+    pad: desk ? 38 : 28,
+    lineLeft: desk ? 330 : 120,
+    lineY: i => desk ? 62 + i * 56 : 58 + i * 79,
+    pos: n => desk ? n.d : n.m,
+    name: n => desk ? n.label : n.short,
+  };
+}
+
+function edgePath(a, b, i) {
+  const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+  const k = Math.min(30, Math.max(14, len * .12)) * (i % 2 ? 1 : -1);
+  const mx = (a.x + b.x) / 2 - dy / len * k, my = (a.y + b.y) / 2 + dx / len * k;
+  return `M${a.x} ${a.y} Q${mx} ${my} ${b.x} ${b.y}`;
+}
+
+function build() {
+  const L = layout();
+  svg.setAttribute('viewBox', L.vb);
+  while (svg.childNodes.length > 1) svg.removeChild(svg.lastChild); // keep <title>
+  parts = { edges: [], nodes: [], spine: null };
+
+  const defs = el('defs', {});
+  defs.innerHTML = '<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">' +
+    '<feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#27356B" flood-opacity=".22"/></filter>';
+  svg.appendChild(defs);
+
+  parts.spine = trans(el('line', {
+    x1: L.lineLeft - 22, y1: L.lineY(0) - 14, x2: L.lineLeft - 22, y2: L.lineY(NODES.length - 1) + 14,
+    stroke: '#D9D3C7', 'stroke-width': 1.5, opacity: 0,
+  }), 'opacity .45s');
+  svg.appendChild(parts.spine);
+
+  const eg = el('g', { fill: 'none', 'stroke-linecap': 'round' });
+  EDGES.forEach((e, i) => {
+    const a = { ...byId[e[0]], ...xy(byId[e[0]], L) }, b = { ...byId[e[1]], ...xy(byId[e[1]], L) };
+    const t = TYPES[e[2]];
+    const p = trans(el('path', {
+      d: edgePath(a, b, i), stroke: t.color, 'stroke-width': 2, opacity: .85,
+    }), 'opacity .35s, stroke-width .35s');
+    if (t.dash) p.setAttribute('stroke-dasharray', t.dash);
+    p.dataset.a = e[0]; p.dataset.b = e[1]; p.dataset.t = e[2];
+    eg.appendChild(p); parts.edges.push(p);
+  });
+  svg.appendChild(eg);
+
+  const ng = el('g', {});
+  NODES.forEach((n, i) => {
+    const { x, y } = xy(n, L);
+    const name = L.name(n);
+    const w = Math.round(name.length * L.cw + L.pad);
+    const g = trans(el('g', { class: 'node', tabindex: 0, role: 'button',
+      'aria-label': name + '. ' + n.q }), 'transform .55s ease, opacity .35s');
+    g.dataset.id = n.id; g.dataset.i = i; g.dataset.w = w; g.dataset.x = x; g.dataset.y = y;
+
+    g.appendChild(el('rect', { x: x - w / 2, y: y - 18, width: w, height: 36, rx: 18,
+      fill: '#27356B', filter: 'url(#soft)' }));
+    const t = el('text', { x, y: y + (L.desk ? 5 : 4.5), 'text-anchor': 'middle',
+      fill: '#fff', 'font-size': L.font, 'font-weight': 500, 'font-family': 'DM Sans, sans-serif' });
+    t.textContent = name;
+    g.appendChild(t);
+
+    if (n.rv) {
+      const bg = trans(el('g', { opacity: 1 }), 'opacity .35s'); bg.dataset.rv = 1;
+      bg.appendChild(el('circle', { cx: x + w / 2 - 4, cy: y - 16, r: 9.5, fill: '#E0A33A' }));
+      const rt = el('text', { x: x + w / 2 - 4, y: y - 12, 'text-anchor': 'middle',
+        fill: '#fff', 'font-size': 11 });
+      rt.textContent = '↻';
+      bg.appendChild(rt);
+      g.appendChild(bg);
+    }
+
+    const ck = trans(el('g', { opacity: 0 }), 'opacity .35s'); ck.dataset.ck = 1;
+    ck.appendChild(el('circle', { cx: x - w / 2 - 22, cy: y, r: 10.5, fill: '#fff',
+      stroke: '#29B57C', 'stroke-width': 1.5 }));
+    const cktxt = el('text', { x: x - w / 2 - 22, y: y + 4, 'text-anchor': 'middle',
+      fill: '#29B57C', 'font-size': 12, 'font-weight': 500 });
+    cktxt.textContent = '✓';
+    ck.appendChild(cktxt);
+    g.appendChild(ck);
+
+    const tl = trans(el('text', {
+      x: L.desk ? x + w / 2 + 14 : x, y: L.desk ? y + 4.5 : y + 32,
+      'text-anchor': L.desk ? 'start' : 'middle',
+      fill: '#8A97B5', 'font-size': L.desk ? 13.5 : 11.5,
+      'font-family': 'Georgia, serif', 'font-style': 'italic', opacity: 0,
+    }), 'opacity .35s');
+    tl.dataset.tl = 1;
+    tl.textContent = TOOLS[n.id];
+    g.appendChild(tl);
+
+    g.addEventListener('mouseenter', () => { if (!pinned) setFocus(n.id); });
+    g.addEventListener('mouseleave', () => { if (!pinned) setFocus(null); });
+    g.addEventListener('click', ev => { ev.stopPropagation(); togglePin(n.id); });
+    g.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); togglePin(n.id); }
+    });
+    ng.appendChild(g); parts.nodes.push(g);
+  });
+  svg.appendChild(ng);
+  applyMode();
+}
+
+function xy(n, L) { const p = L.pos(n); return { x: p[0], y: p[1] }; }
+
+function setQuote(q, a, plain) {
+  const m = document.querySelector('#q mark');
+  m.textContent = plain ? q : '“' + q + '”';
+  m.classList.toggle('plain', !!plain);
+  document.getElementById('qa').innerHTML = a;
+}
+function quoteFor(n) {
+  let a = '<b>' + n.a + '</b>';
+  if (n.rv) a += ' &nbsp;·&nbsp; ↻ ' + n.rv;
+  setQuote(n.q, a);
+}
+
+function togglePin(id) {
+  pinned = pinned === id ? null : id;
+  setFocus(pinned);
+}
+
+function setFocus(id) {
+  focused = id;
+  if (mode === 'line') {
+    if (id) {
+      const n = byId[id];
+      setQuote(LINE_Q.q, 'The checklist marks “' + n.label.toLowerCase().replace('?','') +
+        '” as done. Our participants said it never stayed done.', true);
+    } else setQuote(LINE_Q.q, LINE_Q.a, true);
+    return;
+  }
+  filter = null; syncChips();
+  parts.edges.forEach(p => {
+    const on = !id || p.dataset.a === id || p.dataset.b === id;
+    p.style.opacity = on ? .9 : .1;
+    p.setAttribute('stroke-width', id && on ? 3 : 2);
+  });
+  const near = new Set(id ? [id] : []);
+  if (id) EDGES.forEach(e => { if (e[0] === id) near.add(e[1]); if (e[1] === id) near.add(e[0]); });
+  parts.nodes.forEach(g => {
+    g.style.opacity = !id || near.has(g.dataset.id) ? 1 : .35;
+  });
+  if (id) quoteFor(byId[id]); else setQuote(DEFAULT_Q.q, '<b>' + DEFAULT_Q.a + '</b>');
+}
+
+function setFilter(t) {
+  filter = filter === t ? null : t;
+  focused = null;
+  pinned = null;
+  syncChips();
+  parts.edges.forEach(p => {
+    const on = !filter || p.dataset.t === filter;
+    p.style.opacity = on ? .9 : .08;
+    p.setAttribute('stroke-width', 2);
+  });
+  parts.nodes.forEach(g => g.style.opacity = 1);
+  if (filter) setQuote(TYPES[filter].blurb, '<b>' + TYPES[filter].name + ' connections</b>', true);
+  else setQuote(DEFAULT_Q.q, '<b>' + DEFAULT_Q.a + '</b>');
+}
+function syncChips() {
+  document.querySelectorAll('.chip').forEach(c =>
+    c.classList.toggle('on', c.dataset.t === filter));
+}
+
+function applyMode() {
+  const L = layout();
+  const line = mode === 'line';
+  parts.nodes.forEach((g, i) => {
+    g.style.transform = line
+      ? `translate(${L.lineLeft + g.dataset.w / 2 - g.dataset.x}px, ${L.lineY(i) - g.dataset.y}px)` : '';
+    g.querySelectorAll('[data-rv]').forEach(x => x.style.opacity = line ? 0 : 1);
+    g.querySelectorAll('[data-ck]').forEach(x => x.style.opacity = line ? 1 : 0);
+    g.querySelectorAll('[data-tl]').forEach(x => x.style.opacity = line ? 1 : 0);
+  });
+  parts.edges.forEach(p => { p.style.opacity = line ? 0 : .85; p.setAttribute('stroke-width', 2); });
+  if (line) parts.nodes.forEach(g => g.style.opacity = 1);
+  parts.spine.style.opacity = line ? 1 : 0;
+  document.getElementById('legend').classList.toggle('off', line);
+  document.getElementById('seg-web').classList.toggle('active', !line);
+  document.getElementById('seg-web').setAttribute('aria-selected', !line);
+  document.getElementById('seg-line').classList.toggle('active', line);
+  document.getElementById('seg-line').setAttribute('aria-selected', line);
+  document.getElementById('hint').textContent = HINTS[line ? 'line' : 'web'];
+  if (line) setQuote(LINE_Q.q, LINE_Q.a, true);
+  else { filter = null; syncChips(); setFocus(null); }
+  reportHeight();
+}
+
+function setMode(m) { if (mode !== m) { mode = m; focused = null; pinned = null; applyMode(); } }
+
+const legend = document.getElementById('legend');
+Object.entries(TYPES).forEach(([t, def]) => {
+  const b = document.createElement('button');
+  b.className = 'chip'; b.dataset.t = t;
+  b.innerHTML = `<svg width="24" height="6" aria-hidden="true"><line x1="1" y1="3" x2="23" y2="3"
+    stroke="${def.color}" stroke-width="2.5" stroke-linecap="round"
+    ${def.dash ? `stroke-dasharray="${def.dash}"` : ''}/></svg>${def.name}`;
+  b.addEventListener('click', () => { if (mode === 'web') setFilter(t); });
+  legend.appendChild(b);
+});
+
+document.getElementById('seg-web').addEventListener('click', () => setMode('web'));
+document.getElementById('seg-line').addEventListener('click', () => setMode('line'));
+document.getElementById('canvas').addEventListener('click', () => {
+  if (mode === 'web' && (focused || filter)) { pinned = null; filter = null; setFocus(null); }
+});
+
+function reportHeight() {
+  if (window.parent === window) return;
+  requestAnimationFrame(() => window.parent.postMessage(
+    { type: 'decision-web:height', height: document.documentElement.scrollHeight }, '*'));
+}
+
+function fit() {
+  const next = window.innerWidth > 700 ? 'd' : 'm';
+  if (next !== bp) { bp = next; build(); }
+  reportHeight();
+}
+window.addEventListener('resize', fit);
+fit();
+</script>
+</body>
+</html>
