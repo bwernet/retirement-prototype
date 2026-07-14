@@ -12,8 +12,8 @@
   --ink:#27356B; --ink-soft:#5A6B8C; --ink-faint:#8A97B5;
   --paper:#FBFAF7; --paper-edge:#EFEAE0; --page-bg:#F7F8FA;
   --card-bg:#fff; --stroke:#E3E7EF;
-  --fin:#1FA97C; --emo:#E0785A; --log:#8A97B5;
-  --gold:#E0A33A; --check:#29B57C;
+  --fin:#0ABFAB; --emo:#E0785A; --log:#8A97B5;
+  --gold:#E0A33A; --check:#0ABFAB;
   --seg-bg:#E9EDF3; --mark:#FBEFD3;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -148,7 +148,7 @@ const TOOLS = {
   family:'kitchen-table conversations', fear:'nothing',
 };
 const TYPES = {
-  fin:{color:'#1FA97C', dash:'',    name:'financial',
+  fin:{color:'#0ABFAB', dash:'',    name:'financial',
        blurb:'Money decisions cascade: a claiming age changes income, income changes how long savings last.'},
   emo:{color:'#E0785A', dash:'7 5', name:'emotional',
        blurb:'The connections no calculator touches — fear, identity, family — pulled on every financial choice.'},
@@ -270,9 +270,9 @@ function build() {
 
     const ck = trans(el('g', { opacity: 0 }), 'opacity .35s'); ck.dataset.ck = 1;
     ck.appendChild(el('circle', { cx: x - w / 2 - 22, cy: y, r: 10.5, fill: '#fff',
-      stroke: '#29B57C', 'stroke-width': 1.5 }));
+      stroke: '#0ABFAB', 'stroke-width': 1.5 }));
     const cktxt = el('text', { x: x - w / 2 - 22, y: y + 4, 'text-anchor': 'middle',
-      fill: '#29B57C', 'font-size': 12, 'font-weight': 500 });
+      fill: '#0ABFAB', 'font-size': 12, 'font-weight': 500 });
     cktxt.textContent = '✓';
     ck.appendChild(cktxt);
     g.appendChild(ck);
