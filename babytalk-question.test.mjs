@@ -30,7 +30,7 @@ const ATTRS = [
   'P5 · 33 weeks · asked Reddit, very late at night',
   'P4 · first pregnancy · “every 30 minutes”',
   'P7 · prototype interviews · describing the same app',
-  'P2 · 40 weeks',
+  'P2 · recalling week 40',
   'P1 · new mom',
 ];
 for (const a of ATTRS) assert.ok(html.includes(a), `missing attribution: ${a}`);

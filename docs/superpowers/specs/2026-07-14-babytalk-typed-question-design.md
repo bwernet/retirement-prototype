@@ -103,7 +103,7 @@ about. Two registers, two honesty rules:
 | 1 | movement | HER PREGNANCY APP · "Your baby is the size of a banana. Those little kicks are getting stronger!" | "Is she in fetal distress, or — because I had four donuts that day — is she just having a sugar party in there?" | P5 · 33 weeks · asked Reddit, very late at night |
 | 2 | reassurance | HER PREGNANCY APP · "Halfway there — you've got this, mama!" | "Can I? Could I? Is it OK?" | P4 · first pregnancy · "every 30 minutes" |
 | 3 | her real life | HER PREGNANCY APP · "You might be experiencing skin changes — try treating yourself to a spa day!" | "How am I supposed to keep working for six more months when my brain feels like mush?" | P7 · prototype interviews · describing the same app |
-| 4 | the timeline | HER PREGNANCY APP · WEEK 40 · "Congratulations, mama! Is your little one here yet?" | "It was so demoralizing when I was 40 weeks along and each day was ticking by, and all of the pregnancy apps were like, you should be done." | P2 · 40 weeks |
+| 4 | the timeline | HER PREGNANCY APP · WEEK 40 · "Congratulations, mama! Is your little one here yet?" | "It was so demoralizing when I was 40 weeks along and each day was ticking by, and all of the pregnancy apps were like, you should be done." | P2 · recalling week 40 |
 | — | | Standing thesis: "It should know me." | | P1 · new mom |
 
 Beat evidence notes (what anchors each reconstruction):
