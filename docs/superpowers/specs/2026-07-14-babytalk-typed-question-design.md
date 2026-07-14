@@ -46,33 +46,53 @@ surrounding case-study page.
 ## Structure (top to bottom)
 
 1. **Eyebrow stamp:** `RESEARCH SYNTHESIS · 8 DISCOVERY INTERVIEWS · 7
-   PROTOTYPE TESTS` — both studies named because one cycled quote comes from
-   prototype testing.
-2. **The app notification** (static, muted, slightly transparent):
-   `HER PREGNANCY APP · WEEK 20` / `Your baby is the size of a banana 🍌`.
-   Its job is to read as cheerful, generic, and ignored.
-3. **Divider label:** `MEANWHILE, WHAT SHE WAS ASKING —`
-4. **Typing area** (fixed min-height so nothing reflows): her real questions
-   type themselves out one at a time, serif italic, with a blinking Lavender
-   cursor; the participant attribution fades in after each completes.
+   PROTOTYPE TESTS` — both studies named because quotes come from both.
+2. **Notification slot** (fixed min-height): app notifications *ping in*
+   iOS-style (slide-down + slight overshoot, ~520ms) one per beat, muted
+   blue-gray styling. Their job is to read as cheerful, generic, and
+   irrelevant — the artifact recreates the experience of being told something
+   that doesn't feel relevant or deep enough.
+3. **Divider label:** `MEANWHILE, WHAT SHE WAS ASKING —` (keeps the two
+   tracks parallel; the pairs are thematic, not literal dialogue).
+4. **Typing area** (fixed min-height so nothing reflows): after each
+   notification lands, her real question types out beneath it, serif italic,
+   blinking Lavender cursor; participant attribution fades in after.
 5. **Standing thesis** (always visible, separated by a thin lavender rule):
    `"It should know me."` in Lemon Bricolage 800, with sub-line
    `P1 · new mom — every question above is this sentence. It became the
-   product brief.` Each completed question pulses the thesis glow once
-   (~650ms) — evidence visibly feeding the conclusion.
+   product brief.` Each completed beat pulses the thesis glow once (~650ms) —
+   evidence visibly feeding the conclusion.
 
-Any still frame contains the complete argument: useless notification → real
+Any still frame contains the complete argument: irrelevant notification → real
 question → thesis. The animation rewards attention but is never required.
 
-## Content (all verbatim, trimmed only)
+## Content — call-and-response beats (all participant-evidenced)
 
-| # | Typed quote | Attribution |
-|---|---|---|
-| 1 | "Can I? Could I? Is it OK?" | P4 · first pregnancy · "every 30 minutes" |
-| 2 | "Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?" | P5 · 33 weeks · asked Reddit, very late at night |
-| 3 | "How am I supposed to keep working for six more months when my brain feels like mush?" | P7 · prototype interviews |
-| 4 | "Okay, week 35 — I need to start eating dates every day." | P5 · googling the old wives' tales |
-| — | "It should know me." (standing thesis) | P1 · new mom |
+| Beat | Notification (app-speak, as participants reported it) | Typed question | Attribution |
+|---|---|---|---|
+| 1 | HER PREGNANCY APP · "Your baby is the size of a banana 🍌" | "Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?" | P5 · 33 weeks · asked Reddit, very late at night |
+| 2 | HER PREGNANCY APP · "You go, mama!" | "Can I? Could I? Is it OK?" | P4 · first pregnancy · "every 30 minutes" |
+| 3 | HER PREGNANCY APP · "You might be experiencing skin changes — try treating yourself to a spa day!" | "How am I supposed to keep working for six more months when my brain feels like mush?" | P7 · prototype interviews · describing the same app |
+| 4 | HER PREGNANCY APP · WEEK 40 · "You should be done. Did you have your baby?" | *(nothing types — the cursor blinks alone ~3.5s, then the thesis pulses)* | — |
+| — | Standing thesis: "It should know me." | | P1 · new mom |
+
+Beat evidence notes:
+
+- Banana size-trope: participants discussed it verbatim ("What does it mean
+  that the fetus is the size of a banana? In what dimension?").
+- "You go, mama!": quoted by a participant as app language she "personally
+  hated."
+- Beat 3 is one testing participant's own sentence split into its two halves —
+  the spa-day app-speak and the real question are her verbatim contrast, hence
+  the attribution "describing the same app."
+- Beat 4 is the participant-reported app copy at 40 weeks ("all of the
+  pregnancy apps were like, you should be done. Did you have your baby?").
+  No celebratory emoji — nothing beyond what she reported. The silent cursor
+  is the beat: she has nothing left to ask the app.
+- Only weeks that are evidenced get week labels (beat 4). Others say
+  `HER PREGNANCY APP` only.
+- The week-35 dates quote was cut in this revision (weakest of the pool);
+  it remains available to the case-study prose.
 
 Honest-reporting constraints:
 
@@ -93,16 +113,20 @@ research roster.
 
 ## Animation behavior
 
-- Typing: ~26ms/char with ±40ms jitter; +220ms pause at commas and em-dashes,
-  +150ms at terminal punctuation. Attribution fades in 300ms after the quote
-  completes; hold ~2.4s; clear; next question. Full cycle ≈ 35s.
+- Per beat: notification pings in (520ms, cubic-bezier overshoot), holds
+  ~1.1s, then the question types: ~26ms/char with ±40ms jitter; +220ms pause
+  at commas and em-dashes, +150ms at terminal punctuation. Attribution fades
+  in 300ms after the quote completes; thesis pulses; hold ~2.3s; notification
+  exits (320ms fade-up); next beat. Beat 4: notification in, cursor blinks
+  alone ~3.6s, thesis pulses, longer hold. Full cycle ≈ 40s.
 - Starts only when scrolled into view (IntersectionObserver), cycles
   indefinitely while visible, pauses when offscreen.
 - A small unobtrusive pause/play control (bottom corner) satisfies WCAG 2.2.2
   for auto-updating content.
-- `prefers-reduced-motion`: no typing, no pulse, no cycling — a static frame
-  showing the notification, question #1 fully rendered with attribution, and
-  the thesis. This static frame is also the design's five-second skim state.
+- `prefers-reduced-motion`: no typing, no pulse, no cycling, no notification
+  animation — a static frame showing beat 1 fully rendered (banana
+  notification, donuts question with attribution) and the thesis. This static
+  frame is also the design's five-second skim state.
 
 ## Accessibility
 
