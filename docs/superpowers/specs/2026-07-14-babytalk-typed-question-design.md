@@ -34,7 +34,7 @@ surrounding case-study page.
 - One expressive element only: the Lemon headline. Everything else is quiet.
 - Type: **Bricolage Grotesque** weight 800 for the headline ONLY;
   **Instrument Sans** for everything else — labels, attributions, footer, and
-  the typed quotes (italic, weight 400). The Georgia-serif verbatim
+  the quotes (italic, weight 400). The Georgia-serif verbatim
   convention shared with the Silvur artifact is CONSCIOUSLY DROPPED here (it
   competed with the headline for emotional emphasis); quotation marks,
   P-codes, and the footer disclosure carry the verbatim signal instead.
@@ -61,11 +61,15 @@ surrounding case-study page.
      iOS-style (slide-down + slight overshoot, ~520ms) one per beat, muted
      blue-gray. Beat 4's card carries a small `WEEK 40` tag inside it — the
      timestamp is the irony and stays.
-   - **Right column** (flexible): her real quote types out, Instrument Sans
-     italic 19px, blinking Lavender cursor; attribution fades in after. No
-     column label — the quotation marks and P-code attributions identify the
-     voice; the layout carries the relationship (no "MEANWHILE" divider).
-   - Both columns have fixed min-heights so nothing reflows.
+   - **Right column** (flexible), labeled `WHAT SHE FELT` (matching the left
+     label): her real quote crossfades in whole (350ms), Instrument Sans
+     italic 19px, with a blinking Lavender cursor as the ambient late-night
+     cue; attribution fades in after. (A typing animation was prototyped and
+     scan-tested against the crossfade; crossfade won — evidence must be
+     readable at any moment a skimmer lands.)
+   - Both columns have FIXED heights, pre-measured against the longest
+     quote/notification per breakpoint — the artifact never changes height
+     between beats.
 3. **Footer** (single quiet row, `#8A97B5`, thin lavender rule above):
    left, the rigor stamp `RESEARCH SYNTHESIS · 8 DISCOVERY INTERVIEWS · 7
    PROTOTYPE TESTS`; right, the disclosure `App notifications are
@@ -138,16 +142,15 @@ research roster.
 
 ## Animation behavior
 
-- Per beat: notification pings in (520ms, cubic-bezier overshoot), holds
-  ~1.1s, then the question types: ~26ms/char with ±40ms jitter; +220ms pause
-  at commas and em-dashes, +150ms at terminal punctuation. Attribution fades
-  in 300ms after the quote completes; thesis pulses; hold ~2.3s (final beat
-  ~3.2s); notification exits (320ms fade-up); next beat. Full cycle ≈ 40s.
+- Per beat: notification pings in (520ms, cubic-bezier overshoot); after
+  ~600ms the quote crossfades in whole (350ms); ~500ms later the attribution
+  fades in and the headline pulses; hold ~3.4s (final beat ~4.2s); quote and
+  notification fade out (320-380ms); next beat. Full cycle ≈ 25s.
 - Starts only when scrolled into view (IntersectionObserver), cycles
   indefinitely while visible, pauses when offscreen.
 - A small unobtrusive pause/play control (bottom corner) satisfies WCAG 2.2.2
   for auto-updating content.
-- `prefers-reduced-motion`: no typing, no pulse, no cycling, no notification
+- `prefers-reduced-motion`: no pulse, no cycling, no notification/crossfade
   animation — a static frame: headline, then beat 1 fully rendered in both
   columns (banana notification, donuts quote with attribution), footer. This
   static frame is also the design's five-second skim state.
@@ -164,8 +167,8 @@ research roster.
 
 - Max-width 760px, centered. Below ~560px the two columns stack
   (notification above quote — call before response), headline 40px → 28px,
-  typed quote 19px → 17px, padding reduced; min-heights adjusted per
-  breakpoint so the iframe height stays stable (no per-character chatter).
+  quote 19px → 17px, padding reduced; fixed slot heights re-measured per
+  breakpoint so the iframe height stays stable at all times.
 - Height reported to parent on load and resize only — content height is
   constant by design.
 
