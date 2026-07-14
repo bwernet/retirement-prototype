@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>It should know me — research synthesis</title>
+<link rel="stylesheet" href="babytalk-fonts.css">
+<style>
+  :root {
+    --canvas: #02103A; --ink: #F8F7FD; --lemon: #E9DA02; --cursor: #C2BAF1;
+    --attr: #8373E3; --note-text: #99A6C4; --note-meta: #8A97B5;
+    --label: #67708B; --foot: #8A97B5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--canvas); }
+  .artifact {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: 'Instrument Sans', system-ui, sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 44px 24px;
+    position: relative;
+  }
+  .headline {
+    font-family: 'Bricolage Grotesque', 'Instrument Sans', sans-serif;
+    font-weight: 800;
+    font-size: 40px;
+    line-height: 1.05;
+    color: var(--lemon);
+    text-shadow: 0 0 16px rgba(233, 218, 2, 0.10);
+    transition: text-shadow 600ms ease;
+  }
+  .headline.pulse { text-shadow: 0 0 36px rgba(233, 218, 2, 0.45); }
+  .headsub { font-size: 12.5px; color: var(--note-meta); margin-top: 10px; }
+
+  .cols {
+    display: grid;
+    grid-template-columns: 270px 1fr;
+    gap: 34px;
+    margin-top: 34px;
+    align-items: start;
+  }
+  .col-label {
+    font-size: 10.5px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--label); margin-bottom: 12px;
+  }
+  .note-slot { position: relative; }
+  .app-note {
+    background: rgba(103, 112, 139, 0.14);
+    border: 1px solid rgba(103, 112, 139, 0.4);
+    border-radius: 12px;
+    padding: 12px 14px;
+    position: absolute; top: 0; left: 0; right: 0;
+  }
+  .app-note.in { animation: notifIn 520ms cubic-bezier(0.2, 0.9, 0.3, 1.15) forwards; opacity: 0; }
+  .app-note.out { animation: notifOut 320ms ease forwards; }
+  @keyframes notifIn {
+    from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+    70%  { opacity: 1; transform: translateY(2px) scale(1.003); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes notifOut {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-12px); }
+  }
+  .an-week {
+    font-size: 9.5px; font-weight: 600; letter-spacing: 1.6px;
+    color: var(--note-meta); margin-bottom: 4px;
+  }
+  .an-text { font-size: 13.5px; line-height: 1.4; color: var(--note-text); }
+
+  .quote-slot { position: relative; }
+  .quote {
+    font-style: italic; font-weight: 400;
+    font-size: 19px; line-height: 1.5; color: var(--ink);
+    opacity: 1; transition: opacity 350ms ease;
+  }
+  .quote.hide { opacity: 0; }
+  .cursor {
+    display: inline-block; width: 2.5px; height: 1.05em;
+    background: var(--cursor); vertical-align: text-bottom; margin-left: 2px;
+    animation: blink 1.06s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .attr {
+    font-size: 12px; color: var(--attr); margin-top: 10px;
+    opacity: 1; transition: opacity 500ms ease;
+  }
+  .attr.hide { opacity: 0; }
+
+  .foot {
+    margin-top: 32px; padding-top: 14px;
+    border-top: 1px solid rgba(131, 115, 227, 0.18);
+    display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    font-size: 10.5px; color: var(--foot);
+  }
+  .stamp { letter-spacing: 1.6px; font-weight: 600; text-transform: uppercase; }
+
+  .pause {
+    position: absolute; right: 14px; bottom: 14px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: none; border: 1px solid rgba(131, 115, 227, 0.35);
+    color: var(--attr); font-size: 9px; line-height: 1; cursor: pointer;
+  }
+  .pause:focus-visible { outline: 2px solid var(--cursor); outline-offset: 2px; }
+  /* Icon drawn in CSS: pictographic characters would trip the no-emoji test. */
+  .pause .icon {
+    display: block; width: 8px; height: 9px; margin: 0 auto;
+    border-left: 2.5px solid currentColor; border-right: 2.5px solid currentColor;
+  }
+  .pause[aria-pressed="true"] .icon {
+    width: 0; height: 0; border: 0; margin-left: 9px;
+    border-left: 8px solid currentColor;
+    border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+
+  @media (max-width: 560px) {
+    .artifact { padding: 28px 22px 18px; }
+    .headline { font-size: 28px; }
+    .cols { grid-template-columns: 1fr; gap: 22px; margin-top: 26px; }
+    .quote { font-size: 17px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .headline, .quote, .attr, .app-note { transition: none; animation: none; }
+    .cursor { animation: none; }
+    .pause { display: none; }
+  }
+</style>
+</head>
+<body>
+<main class="artifact">
+  <h1 class="headline" id="headline">"It should know me."</h1>
+  <p class="headsub">One participant's words for what every participant was asking.</p>
+
+  <div class="cols" aria-hidden="true">
+    <section>
+      <h2 class="col-label">What her apps said</h2>
+      <div class="note-slot" id="noteSlot">
+        <div class="app-note" id="staticNote" style="position:static;">
+          <p class="an-text">Your baby is the size of a banana. Those little kicks are getting stronger!</p>
+        </div>
+      </div>
+    </section>
+    <section>
+      <h2 class="col-label">What she felt</h2>
+      <div class="quote-slot" id="quoteSlot">
+        <blockquote class="quote" id="quote"><span id="quoteText">"Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?"</span><span class="cursor"></span></blockquote>
+        <p class="attr" id="attr">P5 · 33 weeks · asked Reddit, very late at night</p>
+      </div>
+    </section>
+  </div>
+
+  <ul class="sr-only">
+    <li>Research synthesis: what her apps said, versus what she felt.</li>
+    <li>Her app said: Your baby is the size of a banana. Those little kicks are getting stronger! She said: "Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?" — P5 · 33 weeks · asked Reddit, very late at night.</li>
+    <li>Her app said: Halfway there — you've got this, mama! She said: "Can I? Could I? Is it OK?" — P4 · first pregnancy · "every 30 minutes".</li>
+    <li>Her app said: You might be experiencing skin changes — try treating yourself to a spa day! She said: "How am I supposed to keep working for six more months when my brain feels like mush?" — P7 · prototype interviews · describing the same app.</li>
+    <li>At WEEK 40 her app said: Congratulations, mama! Is your little one here yet? She said: "It was so demoralizing when I was 40 weeks along and all of the pregnancy apps were like, you should be done." — P2 · 40 weeks.</li>
+    <li>"It should know me." — P1 · new mom. One participant's words for what every participant was asking.</li>
+  </ul>
+
+  <footer class="foot">
+    <p class="stamp">Research synthesis · 8 discovery interviews · 7 prototype tests</p>
+    <p>App notifications are representative copy, reconstructed from participants' descriptions. All quotes are verbatim.</p>
+  </footer>
+
+  <button id="pauseBtn" class="pause" aria-pressed="false" aria-label="Pause animation" hidden><span class="icon"></span></button>
+</main>
+</body>
+</html>
