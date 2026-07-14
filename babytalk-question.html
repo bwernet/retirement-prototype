@@ -172,5 +172,148 @@
 
   <button id="pauseBtn" class="pause" aria-pressed="false" aria-label="Pause animation" hidden><span class="icon"></span></button>
 </main>
+<script>
+(function () {
+  'use strict';
+  var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var BEATS = [
+    { week: null, note: 'Your baby is the size of a banana. Those little kicks are getting stronger!',
+      q: '“Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?”',
+      attr: 'P5 · 33 weeks · asked Reddit, very late at night' },
+    { week: null, note: 'Halfway there — you’ve got this, mama!',
+      q: '“Can I? Could I? Is it OK?”',
+      attr: 'P4 · first pregnancy · “every 30 minutes”' },
+    { week: null, note: 'You might be experiencing skin changes — try treating yourself to a spa day!',
+      q: '“How am I supposed to keep working for six more months when my brain feels like mush?”',
+      attr: 'P7 · prototype interviews · describing the same app' },
+    { week: 'WEEK 40', note: 'Congratulations, mama! Is your little one here yet?',
+      q: '“It was so demoralizing when I was 40 weeks along and all of the pregnancy apps were like, you should be done.”',
+      attr: 'P2 · 40 weeks' }
+  ];
+  var NOTE_LEAD = 600, QUOTE_FADE = 350, ATTR_DELAY = 500, PULSE = 650,
+      HOLD = 3400, HOLD_LAST = 4200, NOTE_OUT = 380, GAP = 400;
+
+  var headline = document.getElementById('headline');
+  var noteSlot = document.getElementById('noteSlot');
+  var quoteSlot = document.getElementById('quoteSlot');
+  var quoteEl = document.getElementById('quote');
+  var quoteText = document.getElementById('quoteText');
+  var attrEl = document.getElementById('attr');
+  var pauseBtn = document.getElementById('pauseBtn');
+
+  function reportHeight() {
+    if (window.parent === window) return;
+    requestAnimationFrame(function () {
+      window.parent.postMessage(
+        { type: 'babytalk-question:height', height: document.documentElement.scrollHeight }, '*');
+    });
+  }
+
+  // Fixed heights: measure every beat's content at the current column width,
+  // hard-set both slots to the max so the artifact never changes height.
+  function measureHeights() {
+    var probe = document.createElement('div');
+    probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;left:-9999px;top:0;';
+    document.querySelector('.artifact').appendChild(probe);
+    var maxNote = 0, maxQuote = 0;
+    probe.style.width = noteSlot.getBoundingClientRect().width + 'px';
+    BEATS.forEach(function (b) {
+      probe.innerHTML = '<div class="app-note" style="position:static;">' +
+        (b.week ? '<p class="an-week"></p>' : '') + '<p class="an-text"></p></div>';
+      if (b.week) probe.querySelector('.an-week').textContent = b.week;
+      probe.querySelector('.an-text').textContent = b.note;
+      maxNote = Math.max(maxNote, probe.firstChild.getBoundingClientRect().height);
+    });
+    probe.style.width = quoteSlot.getBoundingClientRect().width + 'px';
+    BEATS.forEach(function (b) {
+      probe.innerHTML = '<blockquote class="quote"><span></span></blockquote><p class="attr"></p>';
+      probe.querySelector('span').textContent = b.q;
+      probe.querySelector('.attr').textContent = b.attr;
+      maxQuote = Math.max(maxQuote, probe.getBoundingClientRect().height);
+    });
+    probe.remove();
+    noteSlot.style.height = Math.ceil(maxNote) + 'px';
+    quoteSlot.style.height = Math.ceil(maxQuote) + 'px';
+  }
+
+  if (RM) { measureHeights(); reportHeight(); window.addEventListener('resize', function () { measureHeights(); reportHeight(); }); return; }
+
+  // --- Animated mode ---
+  var userPaused = false, visible = false, gen = 0;
+
+  function running() { return visible && !userPaused; }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  async function gate(myGen) {
+    while (!running()) { if (myGen !== gen) return false; await sleep(150); }
+    return myGen === gen;
+  }
+
+  function makeNote(b) {
+    var el = document.createElement('div');
+    el.className = 'app-note in';
+    el.innerHTML = (b.week ? '<p class="an-week"></p>' : '') + '<p class="an-text"></p>';
+    if (b.week) el.querySelector('.an-week').textContent = b.week;
+    el.querySelector('.an-text').textContent = b.note;
+    noteSlot.appendChild(el);
+    return el;
+  }
+
+  async function cycle() {
+    var myGen = ++gen;
+    var i = 0;
+    while (true) {
+      if (!(await gate(myGen))) return;
+      var b = BEATS[i];
+      quoteEl.classList.add('hide');
+      attrEl.classList.add('hide');
+      await sleep(QUOTE_FADE + 30);
+      quoteText.textContent = b.q;
+      attrEl.textContent = b.attr;
+      var note = makeNote(b);
+      await sleep(NOTE_LEAD);
+      quoteEl.classList.remove('hide');
+      await sleep(ATTR_DELAY);
+      attrEl.classList.remove('hide');
+      headline.classList.add('pulse');
+      await sleep(PULSE);
+      headline.classList.remove('pulse');
+      await sleep(i === BEATS.length - 1 ? HOLD_LAST : HOLD);
+      if (myGen !== gen) { note.remove(); return; }
+      note.classList.remove('in');
+      note.classList.add('out');
+      await sleep(NOTE_OUT);
+      note.remove();
+      await sleep(GAP);
+      i = (i + 1) % BEATS.length;
+    }
+  }
+
+  // Take over from the static frame.
+  document.getElementById('staticNote').remove();
+  measureHeights();
+  pauseBtn.hidden = false;
+
+  pauseBtn.addEventListener('click', function () {
+    userPaused = !userPaused;
+    pauseBtn.setAttribute('aria-pressed', String(userPaused));
+    pauseBtn.setAttribute('aria-label', userPaused ? 'Play animation' : 'Pause animation');
+    // Icon swap is pure CSS via [aria-pressed] — no pictographic characters.
+  });
+
+  new IntersectionObserver(function (entries) {
+    visible = entries[0].isIntersecting;
+  }, { threshold: 0.3 }).observe(document.querySelector('.artifact'));
+
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () { measureHeights(); reportHeight(); }, 150);
+  });
+
+  reportHeight();
+  cycle();
+})();
+</script>
 </body>
 </html>

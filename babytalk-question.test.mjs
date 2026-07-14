@@ -49,4 +49,9 @@ assert.ok(html.includes('WEEK 40'), 'beat 4 week tag');
 // One expressive voice: no serif families anywhere.
 assert.equal(/Georgia|Times/i.test(html), false, 'no serif font families');
 
+// Script invariants (Task 3+): behavior hooks the spec requires.
+assert.ok(html.includes("babytalk-question:height"), 'height postMessage type string');
+assert.ok(html.includes('IntersectionObserver'), 'visibility gating');
+assert.ok(html.includes('prefers-reduced-motion'), 'reduced-motion gate in script');
+assert.ok(html.includes('aria-pressed'), 'pause button state handling');
 console.log('babytalk-question content-integrity: all checks passed');
