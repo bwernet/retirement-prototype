@@ -208,10 +208,8 @@
 
   function reportHeight() {
     if (window.parent === window) return;
-    requestAnimationFrame(function () {
-      window.parent.postMessage(
-        { type: 'babytalk-question:height', height: document.documentElement.scrollHeight }, '*');
-    });
+    window.parent.postMessage(
+      { type: 'babytalk-question:height', height: document.documentElement.scrollHeight }, '*');
   }
 
   // Fixed heights: measure every beat's content at the current column width,
