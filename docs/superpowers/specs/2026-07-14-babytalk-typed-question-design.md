@@ -147,10 +147,12 @@ research roster.
 
 ## Animation behavior
 
-- Per beat: notification pings in (520ms, cubic-bezier overshoot); after
-  ~600ms the quote crossfades in whole (350ms); ~500ms later the attribution
-  fades in and the headline pulses; hold ~3.4s (final beat ~4.2s); quote and
-  notification fade out (320-380ms); next beat. Full cycle ≈ 25s.
+- Per beat: the notification pings in (520ms, cubic-bezier overshoot) and
+  the quote + attribution crossfade in (350ms) at the same moment — one
+  synchronized arrival per beat, then stillness (reduces total motion; user
+  direction 2026-07-14). The headline pulses once (~650ms) as the beat
+  settles; hold ~3.4s (final beat ~4.2s); quote and notification fade out
+  (320-380ms); next beat. Full cycle ≈ 21s.
 - Starts only when scrolled into view (IntersectionObserver), cycles
   indefinitely while visible, pauses when offscreen. Long holds are sliced so
   pausing (button or offscreen) takes effect within ~150ms during holds.
