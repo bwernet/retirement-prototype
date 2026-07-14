@@ -59,8 +59,9 @@ surrounding case-study page.
    blinking Lavender cursor; participant attribution fades in after.
 5. **Standing thesis** (always visible, separated by a thin lavender rule):
    `"It should know me."` in Lemon Bricolage 800, with sub-line
-   `P1 · new mom — every question above is this sentence. It became the
-   product brief.` Each completed beat pulses the thesis glow once (~650ms) —
+   `P1 · new mom — one participant's words for what every participant was
+   asking.` The sub-line must stand alone without any surrounding context —
+   it names the thesis as the synthesis of the study. Each completed beat pulses the thesis glow once (~650ms) —
    evidence visibly feeding the conclusion.
 
 Any still frame contains the complete argument: irrelevant notification → real
@@ -73,7 +74,7 @@ question → thesis. The animation rewards attention but is never required.
 | 1 | HER PREGNANCY APP · "Your baby is the size of a banana 🍌" | "Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?" | P5 · 33 weeks · asked Reddit, very late at night |
 | 2 | HER PREGNANCY APP · "You go, mama!" | "Can I? Could I? Is it OK?" | P4 · first pregnancy · "every 30 minutes" |
 | 3 | HER PREGNANCY APP · "You might be experiencing skin changes — try treating yourself to a spa day!" | "How am I supposed to keep working for six more months when my brain feels like mush?" | P7 · prototype interviews · describing the same app |
-| 4 | HER PREGNANCY APP · WEEK 40 · "You should be done. Did you have your baby?" | "It was so demoralizing." | P2 · 40 weeks · describing that notification |
+| 4 | HER PREGNANCY APP · WEEK 40 · "You should be done. Did you have your baby?" | "It was so demoralizing when I was 40 weeks along and all of the pregnancy apps were like, you should be done." | P2 · 40 weeks |
 | — | Standing thesis: "It should know me." | | P1 · new mom |
 
 Beat evidence notes:
@@ -86,12 +87,11 @@ Beat evidence notes:
   the spa-day app-speak and the real question are her verbatim contrast, hence
   the attribution "describing the same app."
 - Beat 4 is one participant's moment split into its two halves, like beat 3:
-  the notification is the app copy she reported ("all of the pregnancy apps
-  were like, you should be done. Did you have your baby?") and the typed line
-  is her verbatim reaction from the same quote ("It was so demoralizing").
-  No celebratory emoji — nothing beyond what she reported. It's the only
-  typed line that isn't a question — three questions, then a toll — and it
-  hands directly into the thesis.
+  the notification is the app copy she reported, and the typed line is her
+  fuller verbatim sentiment about it, trimmed only at the tail (the
+  notification card already carries "Did you have your baby?"). No
+  celebratory emoji — nothing beyond what she reported. It's the only typed
+  line that isn't a question; it carries how the app-speak actually felt.
 - Only weeks that are evidenced get week labels (beat 4). Others say
   `HER PREGNANCY APP` only.
 - The week-35 dates quote was cut in this revision (weakest of the pool);
