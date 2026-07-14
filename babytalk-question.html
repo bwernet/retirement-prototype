@@ -237,16 +237,29 @@
     quoteSlot.style.height = Math.ceil(maxQuote) + 'px';
   }
 
-  if (RM) { measureHeights(); reportHeight(); window.addEventListener('resize', function () { measureHeights(); reportHeight(); }); return; }
+  if (RM) {
+    measureHeights(); reportHeight();
+    window.addEventListener('resize', function () { measureHeights(); reportHeight(); });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { measureHeights(); reportHeight(); });
+    }
+    return;
+  }
 
   // --- Animated mode ---
-  var userPaused = false, visible = false, gen = 0;
+  var userPaused = false, visible = false;
 
   function running() { return visible && !userPaused; }
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-  async function gate(myGen) {
-    while (!running()) { if (myGen !== gen) return false; await sleep(150); }
-    return myGen === gen;
+  async function gate() { while (!running()) await sleep(150); }
+
+  // Pause-aware wait: freezes the countdown while paused or offscreen.
+  async function hold(ms) {
+    var left = ms;
+    while (left > 0) {
+      await sleep(Math.min(150, left));
+      if (running()) left -= 150;
+    }
   }
 
   function makeNote(b) {
@@ -260,10 +273,9 @@
   }
 
   async function cycle() {
-    var myGen = ++gen;
     var i = 0;
     while (true) {
-      if (!(await gate(myGen))) return;
+      await gate();
       var b = BEATS[i];
       quoteEl.classList.add('hide');
       attrEl.classList.add('hide');
@@ -271,20 +283,19 @@
       quoteText.textContent = b.q;
       attrEl.textContent = b.attr;
       var note = makeNote(b);
-      await sleep(NOTE_LEAD);
+      await hold(NOTE_LEAD);
       quoteEl.classList.remove('hide');
-      await sleep(ATTR_DELAY);
+      await hold(ATTR_DELAY);
       attrEl.classList.remove('hide');
       headline.classList.add('pulse');
       await sleep(PULSE);
       headline.classList.remove('pulse');
-      await sleep(i === BEATS.length - 1 ? HOLD_LAST : HOLD);
-      if (myGen !== gen) { note.remove(); return; }
+      await hold(i === BEATS.length - 1 ? HOLD_LAST : HOLD);
       note.classList.remove('in');
       note.classList.add('out');
       await sleep(NOTE_OUT);
       note.remove();
-      await sleep(GAP);
+      await hold(GAP);
       i = (i + 1) % BEATS.length;
     }
   }
@@ -301,15 +312,28 @@
     // Icon swap is pure CSS via [aria-pressed] — no pictographic characters.
   });
 
-  new IntersectionObserver(function (entries) {
-    visible = entries[0].isIntersecting;
-  }, { threshold: 0.3 }).observe(document.querySelector('.artifact'));
+  // IntersectionObserver visibility gating, with a fallback for embed contexts
+  // where the first callback never arrives (leaving the artifact frozen).
+  var ioReported = false;
+  if (typeof IntersectionObserver === 'function') {
+    new IntersectionObserver(function (entries) {
+      ioReported = true;
+      visible = entries[0].isIntersecting;
+    }, { threshold: 0.3 }).observe(document.querySelector('.artifact'));
+    setTimeout(function () { if (!ioReported) visible = true; }, 1000);
+  } else {
+    visible = true;
+  }
 
   var resizeTimer;
   window.addEventListener('resize', function () {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () { measureHeights(); reportHeight(); }, 150);
   });
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { measureHeights(); reportHeight(); });
+  }
 
   reportHeight();
   cycle();
