@@ -67,35 +67,46 @@ surrounding case-study page.
 Any still frame contains the complete argument: irrelevant notification → real
 question → thesis. The animation rewards attention but is never required.
 
-## Content — call-and-response beats (all participant-evidenced)
+## Content — call-and-response beats
 
-| Beat | Notification (app-speak, as participants reported it) | Typed question | Attribution |
-|---|---|---|---|
-| 1 | HER PREGNANCY APP · "Your baby is the size of a banana 🍌" | "Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?" | P5 · 33 weeks · asked Reddit, very late at night |
-| 2 | HER PREGNANCY APP · "You go, mama!" | "Can I? Could I? Is it OK?" | P4 · first pregnancy · "every 30 minutes" |
-| 3 | HER PREGNANCY APP · "You might be experiencing skin changes — try treating yourself to a spa day!" | "How am I supposed to keep working for six more months when my brain feels like mush?" | P7 · prototype interviews · describing the same app |
-| 4 | HER PREGNANCY APP · WEEK 40 · "You should be done. Did you have your baby?" | "It was so demoralizing when I was 40 weeks along and all of the pregnancy apps were like, you should be done." | P2 · 40 weeks |
-| — | Standing thesis: "It should know me." | | P1 · new mom |
+Each beat pairs a notification with a typed quote on the SAME topic, so her
+line reads as the deeper, anxious version of the thing the app just chirped
+about. Two registers, two honesty rules:
 
-Beat evidence notes:
+- **Notifications are representative app copy** — realistic reconstructions
+  anchored in participant reports and universal app tropes, NOT verbatim
+  quotes. A permanent footnote inside the artifact discloses this.
+- **Typed quotes are strictly verbatim** (trimmed only).
 
-- Banana size-trope: participants discussed it verbatim ("What does it mean
-  that the fetus is the size of a banana? In what dimension?").
-- "You go, mama!": quoted by a participant as app language she "personally
-  hated."
-- Beat 3 is one testing participant's own sentence split into its two halves —
-  the spa-day app-speak and the real question are her verbatim contrast, hence
-  the attribution "describing the same app."
-- Beat 4 is one participant's moment split into its two halves, like beat 3:
-  the notification is the app copy she reported, and the typed line is her
-  fuller verbatim sentiment about it, trimmed only at the tail (the
-  notification card already carries "Did you have your baby?"). No
-  celebratory emoji — nothing beyond what she reported. It's the only typed
-  line that isn't a question; it carries how the app-speak actually felt.
-- Only weeks that are evidenced get week labels (beat 4). Others say
+| Beat | Topic | Notification (representative copy) | Typed quote (verbatim) | Attribution |
+|---|---|---|---|---|
+| 1 | movement | HER PREGNANCY APP · "Your baby is the size of a banana 🍌 Those little kicks are getting stronger!" | "Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?" | P5 · 33 weeks · asked Reddit, very late at night |
+| 2 | reassurance | HER PREGNANCY APP · "Halfway there — you've got this, mama! 💪" | "Can I? Could I? Is it OK?" | P4 · first pregnancy · "every 30 minutes" |
+| 3 | her real life | HER PREGNANCY APP · "You might be experiencing skin changes — try treating yourself to a spa day!" | "How am I supposed to keep working for six more months when my brain feels like mush?" | P7 · prototype interviews · describing the same app |
+| 4 | the timeline | HER PREGNANCY APP · WEEK 40 · "Congratulations, mama! 🎉 Is your little one here yet?" | "It was so demoralizing when I was 40 weeks along and all of the pregnancy apps were like, you should be done." | P2 · 40 weeks |
+| — | | Standing thesis: "It should know me." | | P1 · new mom |
+
+Beat evidence notes (what anchors each reconstruction):
+
+- Beat 1: banana size-trope discussed verbatim by participants ("What does it
+  mean that the fetus is the size of a banana? In what dimension?"); kicks
+  copy is universal app boilerplate. Pairs with her movement anxiety.
+- Beat 2: "you go, mama!" cheerleading language quoted by a participant as
+  app copy she "personally hated"; rendered as a realistic encouragement push.
+- Beat 3: one testing participant's own sentence split into its two halves —
+  the spa-day app-speak and the real question are her verbatim contrast,
+  hence "describing the same app." Notification kept as she phrased it.
+- Beat 4: participant reported apps at 40 weeks asking whether she'd had the
+  baby; rendered as the realistic congratulatory version (apps presume the
+  birth). Her typed line is her fuller verbatim sentiment. The only typed
+  line that isn't a question; it carries how the copy actually felt.
+- Only evidenced weeks get week labels (beat 4). Others say
   `HER PREGNANCY APP` only.
-- The week-35 dates quote was cut in this revision (weakest of the pool);
-  it remains available to the case-study prose.
+- The week-35 dates quote was cut (weakest of the pool); it remains available
+  to the case-study prose.
+- **Artifact footnote (permanent, 10px, `#4D5878`):** "App notifications are
+  representative copy, reconstructed from participants' descriptions of their
+  apps. All typed quotes are verbatim."
 
 Honest-reporting constraints:
 
