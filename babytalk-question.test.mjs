@@ -8,10 +8,10 @@ const html = fs.readFileSync('babytalk-question.html', 'utf8');
 
 // Verbatim quotes — exact, typographic punctuation included.
 const QUOTES = [
-  '“Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?”',
+  '“Is she in fetal distress, or — because I had four donuts that day — is she just having a sugar party in there?”',
   '“Can I? Could I? Is it OK?”',
   '“How am I supposed to keep working for six more months when my brain feels like mush?”',
-  '“It was so demoralizing when I was 40 weeks along and all of the pregnancy apps were like, you should be done.”',
+  '“It was so demoralizing when I was 40 weeks along and each day was ticking by, and all of the pregnancy apps were like, you should be done.”',
   '“It should know me.”',
 ];
 for (const q of QUOTES) assert.ok(html.includes(q), `missing verbatim quote: ${q.slice(0, 40)}…`);

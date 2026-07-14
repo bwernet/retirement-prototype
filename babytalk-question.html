@@ -150,7 +150,7 @@
     <section>
       <h2 class="col-label">What she felt</h2>
       <div class="quote-slot" id="quoteSlot">
-        <blockquote class="quote" id="quote"><span id="quoteText">“Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?”</span><span class="cursor"></span></blockquote>
+        <blockquote class="quote" id="quote"><span id="quoteText">“Is she in fetal distress, or — because I had four donuts that day — is she just having a sugar party in there?”</span><span class="cursor"></span></blockquote>
         <p class="attr" id="attr">P5 · 33 weeks · asked Reddit, very late at night</p>
       </div>
     </section>
@@ -158,10 +158,10 @@
 
   <ul class="sr-only">
     <li>Research synthesis: what her apps said, versus what she felt.</li>
-    <li>Her app said: Your baby is the size of a banana. Those little kicks are getting stronger! She said: “Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?” — P5 · 33 weeks · asked Reddit, very late at night.</li>
+    <li>Her app said: Your baby is the size of a banana. Those little kicks are getting stronger! She said: “Is she in fetal distress, or — because I had four donuts that day — is she just having a sugar party in there?” — P5 · 33 weeks · asked Reddit, very late at night.</li>
     <li>Her app said: Halfway there — you’ve got this, mama! She said: “Can I? Could I? Is it OK?” — P4 · first pregnancy · “every 30 minutes”.</li>
     <li>Her app said: You might be experiencing skin changes — try treating yourself to a spa day! She said: “How am I supposed to keep working for six more months when my brain feels like mush?” — P7 · prototype interviews · describing the same app.</li>
-    <li>At WEEK 40 her app said: Congratulations, mama! Is your little one here yet? She said: “It was so demoralizing when I was 40 weeks along and all of the pregnancy apps were like, you should be done.” — P2 · 40 weeks.</li>
+    <li>At WEEK 40 her app said: Congratulations, mama! Is your little one here yet? She said: “It was so demoralizing when I was 40 weeks along and each day was ticking by, and all of the pregnancy apps were like, you should be done.” — P2 · 40 weeks.</li>
     <li>“It should know me.” — P1 · new mom. One participant’s words for what every participant was asking.</li>
   </ul>
 
@@ -179,7 +179,7 @@
 
   var BEATS = [
     { week: null, note: 'Your baby is the size of a banana. Those little kicks are getting stronger!',
-      q: '“Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?”',
+      q: '“Is she in fetal distress, or — because I had four donuts that day — is she just having a sugar party in there?”',
       attr: 'P5 · 33 weeks · asked Reddit, very late at night' },
     { week: null, note: 'Halfway there — you’ve got this, mama!',
       q: '“Can I? Could I? Is it OK?”',
@@ -188,11 +188,11 @@
       q: '“How am I supposed to keep working for six more months when my brain feels like mush?”',
       attr: 'P7 · prototype interviews · describing the same app' },
     { week: 'WEEK 40', note: 'Congratulations, mama! Is your little one here yet?',
-      q: '“It was so demoralizing when I was 40 weeks along and all of the pregnancy apps were like, you should be done.”',
+      q: '“It was so demoralizing when I was 40 weeks along and each day was ticking by, and all of the pregnancy apps were like, you should be done.”',
       attr: 'P2 · 40 weeks' }
   ];
   var QUOTE_FADE = 350, PULSE = 650,
-      HOLD = 3400, HOLD_LAST = 4200, NOTE_OUT = 380, GAP = 400;
+      HOLD = 4200, HOLD_LAST = 5200, NOTE_OUT = 380, GAP = 600;
 
   var headline = document.getElementById('headline');
   var noteSlot = document.getElementById('noteSlot');
@@ -291,6 +291,8 @@
       await hold(i === BEATS.length - 1 ? HOLD_LAST : HOLD);
       note.classList.remove('in');
       note.classList.add('out');
+      quoteEl.classList.add('hide');
+      attrEl.classList.add('hide');
       await sleep(NOTE_OUT);
       note.remove();
       await hold(GAP);
