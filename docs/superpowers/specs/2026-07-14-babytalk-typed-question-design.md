@@ -56,8 +56,10 @@ surrounding case-study page.
    study's synthesis. Attribution P1 · new mom lives in the screen-reader
    list and spec, keeping the visible sub-line clean.)
 2. **Two-column evidence area** beneath the headline:
-   - **Left column** (~280px), labeled `WHAT THE APP SAID` (10.5px
-     letterspaced, `#67708B`): compact notification cards *ping in*
+   - **Left column** (~280px), labeled `WHAT HER APPS SAID` (10.5px
+     letterspaced, `#67708B` — possessive + plural is load-bearing: these
+     are the incumbent apps she already had, never our product): compact
+     notification cards *ping in*
      iOS-style (slide-down + slight overshoot, ~520ms) one per beat, muted
      blue-gray. Beat 4's card carries a small `WEEK 40` tag inside it — the
      timestamp is the irony and stays.
