@@ -26,3 +26,11 @@ const web = fs.readFileSync('decision-web.html', 'utf8')
 if (web.includes('href="fonts.css"')) throw new Error('decision-web inline failed');
 fs.writeFileSync('dist/decision-web.html', web);
 console.log(`Wrote dist/decision-web.html (${(web.length / 1024).toFixed(0)} KB)`);
+
+// babytalk-question is a single page with inline script — only the font link needs inlining.
+const btFonts = fs.readFileSync('babytalk-fonts.css', 'utf8');
+const bt = fs.readFileSync('babytalk-question.html', 'utf8')
+  .replace('<link rel="stylesheet" href="babytalk-fonts.css">', () => `<style>\n${btFonts}</style>`);
+if (bt.includes('href="babytalk-fonts.css"')) throw new Error('babytalk-question inline failed');
+fs.writeFileSync('dist/babytalk-question.html', bt);
+console.log(`Wrote dist/babytalk-question.html (${(bt.length / 1024).toFixed(0)} KB)`);
