@@ -57,7 +57,7 @@ surrounding case-study page.
    list and spec, keeping the visible sub-line clean.)
 2. **Two-column evidence area** beneath the headline:
    - **Left column** (~280px), labeled `WHAT HER APPS SAID` (10.5px
-     letterspaced, `#67708B` — possessive + plural is load-bearing: these
+     letterspaced, `#8A97B5` — possessive + plural is load-bearing: these
      are the incumbent apps she already had, never our product): compact
      notification cards *ping in*
      iOS-style (slide-down + slight overshoot, ~520ms) one per beat, muted
