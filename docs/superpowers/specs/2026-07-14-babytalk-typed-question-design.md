@@ -64,9 +64,9 @@ surrounding case-study page.
      blue-gray. Beat 4's card carries a small `WEEK 40` tag inside it — the
      timestamp is the irony and stays.
    - **Right column** (flexible), labeled `WHAT SHE FELT` (matching the left
-     label): her real quote crossfades in whole (350ms), Instrument Sans
-     italic 19px, with a blinking Lavender cursor as the ambient late-night
-     cue; attribution fades in after. (A typing animation was prototyped and
+     label): her real quote and its attribution crossfade in whole (350ms),
+     simultaneous with the notification's ping, Instrument Sans italic 19px,
+     with a blinking Lavender cursor as the ambient late-night cue. (A typing animation was prototyped and
      scan-tested against the crossfade; crossfade won — evidence must be
      readable at any moment a skimmer lands.)
    - Both columns have FIXED heights, pre-measured against the longest
