@@ -73,7 +73,7 @@ question → thesis. The animation rewards attention but is never required.
 | 1 | HER PREGNANCY APP · "Your baby is the size of a banana 🍌" | "Is she in fetal distress — or, because I had four donuts, is she just having a sugar party in there?" | P5 · 33 weeks · asked Reddit, very late at night |
 | 2 | HER PREGNANCY APP · "You go, mama!" | "Can I? Could I? Is it OK?" | P4 · first pregnancy · "every 30 minutes" |
 | 3 | HER PREGNANCY APP · "You might be experiencing skin changes — try treating yourself to a spa day!" | "How am I supposed to keep working for six more months when my brain feels like mush?" | P7 · prototype interviews · describing the same app |
-| 4 | HER PREGNANCY APP · WEEK 40 · "You should be done. Did you have your baby?" | *(nothing types — the cursor blinks alone ~3.5s, then the thesis pulses)* | — |
+| 4 | HER PREGNANCY APP · WEEK 40 · "You should be done. Did you have your baby?" | "It was so demoralizing." | P2 · 40 weeks · describing that notification |
 | — | Standing thesis: "It should know me." | | P1 · new mom |
 
 Beat evidence notes:
@@ -85,10 +85,13 @@ Beat evidence notes:
 - Beat 3 is one testing participant's own sentence split into its two halves —
   the spa-day app-speak and the real question are her verbatim contrast, hence
   the attribution "describing the same app."
-- Beat 4 is the participant-reported app copy at 40 weeks ("all of the
-  pregnancy apps were like, you should be done. Did you have your baby?").
-  No celebratory emoji — nothing beyond what she reported. The silent cursor
-  is the beat: she has nothing left to ask the app.
+- Beat 4 is one participant's moment split into its two halves, like beat 3:
+  the notification is the app copy she reported ("all of the pregnancy apps
+  were like, you should be done. Did you have your baby?") and the typed line
+  is her verbatim reaction from the same quote ("It was so demoralizing").
+  No celebratory emoji — nothing beyond what she reported. It's the only
+  typed line that isn't a question — three questions, then a toll — and it
+  hands directly into the thesis.
 - Only weeks that are evidenced get week labels (beat 4). Others say
   `HER PREGNANCY APP` only.
 - The week-35 dates quote was cut in this revision (weakest of the pool);
@@ -116,9 +119,8 @@ research roster.
 - Per beat: notification pings in (520ms, cubic-bezier overshoot), holds
   ~1.1s, then the question types: ~26ms/char with ±40ms jitter; +220ms pause
   at commas and em-dashes, +150ms at terminal punctuation. Attribution fades
-  in 300ms after the quote completes; thesis pulses; hold ~2.3s; notification
-  exits (320ms fade-up); next beat. Beat 4: notification in, cursor blinks
-  alone ~3.6s, thesis pulses, longer hold. Full cycle ≈ 40s.
+  in 300ms after the quote completes; thesis pulses; hold ~2.3s (final beat
+  ~3.2s); notification exits (320ms fade-up); next beat. Full cycle ≈ 40s.
 - Starts only when scrolled into view (IntersectionObserver), cycles
   indefinitely while visible, pauses when offscreen.
 - A small unobtrusive pause/play control (bottom corner) satisfies WCAG 2.2.2
