@@ -195,7 +195,7 @@
       q: '“It was so demoralizing when I was 40 weeks along and all of the pregnancy apps were like, you should be done.”',
       attr: 'P2 · 40 weeks' }
   ];
-  var NOTE_LEAD = 600, QUOTE_FADE = 350, ATTR_DELAY = 500, PULSE = 650,
+  var QUOTE_FADE = 350, PULSE = 650,
       HOLD = 3400, HOLD_LAST = 4200, NOTE_OUT = 380, GAP = 400;
 
   var headline = document.getElementById('headline');
@@ -284,10 +284,10 @@
       await sleep(QUOTE_FADE + 30);
       quoteText.textContent = b.q;
       attrEl.textContent = b.attr;
+      // One synchronized arrival: notification, quote, and attribution all
+      // land together (no staggered waits between them).
       var note = makeNote(b);
-      await hold(NOTE_LEAD);
       quoteEl.classList.remove('hide');
-      await hold(ATTR_DELAY);
       attrEl.classList.remove('hide');
       headline.classList.add('pulse');
       await sleep(PULSE);
