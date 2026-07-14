@@ -28,44 +28,55 @@ Dark canvas — the register of the finding (these questions live late at night)
 and a deliberate contrast with both the Silvur artifact's warm paper and the
 surrounding case-study page.
 
-- Canvas: brand Dark `#02103A` with a faint dot grid (`#0a1d52`, 22px), pill
-  radii, generous padding. Max content width ~720px.
-- Type: **Bricolage Grotesque** (thesis only, weight 800) + **Instrument
-  Sans** (eyebrow, labels, attributions) as the web stand-ins for GT Flexa;
-  **Georgia serif italic** for verbatim participant quotes — the
-  portfolio-wide "a participant said this" convention shared with Silvur.
+- Canvas: brand Dark `#02103A`, flat — NO dot grid (removed: visual activity
+  without comprehension value). Pill radii, generous padding. Max content
+  width ~760px.
+- One expressive element only: the Lemon headline. Everything else is quiet.
+- Type: **Bricolage Grotesque** weight 800 for the headline ONLY;
+  **Instrument Sans** for everything else — labels, attributions, footer, and
+  the typed quotes (italic, weight 400). The Georgia-serif verbatim
+  convention shared with the Silvur artifact is CONSCIOUSLY DROPPED here (it
+  competed with the headline for emotional emphasis); quotation marks,
+  P-codes, and the footer disclosure carry the verbatim signal instead.
   Fonts subset and inlined at build time (same approach as `fonts.css` /
   `build-fonts.mjs`).
-- Color roles: Lavender `#C2BAF1` typing cursor and quote glow
-  (`rgba(194,186,241,0.4)` text-shadow); Lavender-600 `#8373E3` eyebrow +
-  attributions; Lemon `#E9DA02` thesis (with soft pulse glow); muted blue-grays
-  `#99A6C4` / `#8A97B5` for the app-notification text (contrast-checked ≈6.6:1
-  on canvas — reviewed and approved); `#4D5878` for the divider label.
+- Color roles: Lemon `#E9DA02` headline (soft pulse glow per beat); Lavender
+  `#C2BAF1` typing cursor (functional, not decorative — no glow/text-shadow
+  on quotes); Lavender-600 `#8373E3` attributions; muted blue-grays
+  `#99A6C4` / `#8A97B5` for notification text; `#67708B` column label;
+  footer `#8A97B5` (contrast raised from `#4D5878` — was hard to read).
 - No Persimmon anywhere (reads as error state on this canvas).
 
 ## Structure (top to bottom)
 
-1. **Eyebrow stamp:** `RESEARCH SYNTHESIS · 8 DISCOVERY INTERVIEWS · 7
-   PROTOTYPE TESTS` — both studies named because quotes come from both.
-2. **Notification slot** (fixed min-height): app notifications *ping in*
-   iOS-style (slide-down + slight overshoot, ~520ms) one per beat, muted
-   blue-gray styling. Their job is to read as cheerful, generic, and
-   irrelevant — the artifact recreates the experience of being told something
-   that doesn't feel relevant or deep enough.
-3. **Divider label:** `MEANWHILE, WHAT SHE WAS ASKING —` (keeps the two
-   tracks parallel; the pairs are thematic, not literal dialogue).
-4. **Typing area** (fixed min-height so nothing reflows): after each
-   notification lands, her real question types out beneath it, serif italic,
-   blinking Lavender cursor; participant attribution fades in after.
-5. **Standing thesis** (always visible, separated by a thin lavender rule):
-   `"It should know me."` in Lemon Bricolage 800, with sub-line
-   `P1 · new mom — one participant's words for what every participant was
-   asking.` The sub-line must stand alone without any surrounding context —
-   it names the thesis as the synthesis of the study. Each completed beat pulses the thesis glow once (~650ms) —
-   evidence visibly feeding the conclusion.
+1. **Headline (the thesis, the only expressive element):**
+   `"It should know me."` — Lemon, Bricolage 800, ~40px, top of the artifact.
+   Sub-line beneath (12.5px, `#8A97B5`): `One participant's words for what
+   every participant was asking.` (Stands alone; names the thesis as the
+   study's synthesis. Attribution P1 · new mom lives in the screen-reader
+   list and spec, keeping the visible sub-line clean.)
+2. **Two-column evidence area** beneath the headline:
+   - **Left column** (~280px), labeled `WHAT THE APP SAID` (10.5px
+     letterspaced, `#67708B`): compact notification cards *ping in*
+     iOS-style (slide-down + slight overshoot, ~520ms) one per beat, muted
+     blue-gray. Beat 4's card carries a small `WEEK 40` tag inside it — the
+     timestamp is the irony and stays.
+   - **Right column** (flexible): her real quote types out, Instrument Sans
+     italic 19px, blinking Lavender cursor; attribution fades in after. No
+     column label — the quotation marks and P-code attributions identify the
+     voice; the layout carries the relationship (no "MEANWHILE" divider).
+   - Both columns have fixed min-heights so nothing reflows.
+3. **Footer** (single quiet row, `#8A97B5`, thin lavender rule above):
+   left, the rigor stamp `RESEARCH SYNTHESIS · 8 DISCOVERY INTERVIEWS · 7
+   PROTOTYPE TESTS`; right, the disclosure `App notifications are
+   representative copy, reconstructed from participants' descriptions. All
+   quotes are verbatim.` Rigor is evidence, not the message — it lives at
+   the bottom.
 
-Any still frame contains the complete argument: irrelevant notification → real
-question → thesis. The animation rewards attention but is never required.
+Each completed beat pulses the headline glow once (~650ms) — evidence
+visibly feeding the conclusion. Any still frame contains the complete
+argument: thesis → app-said → she-asked. The animation rewards attention but
+is never required.
 
 ## Content — call-and-response beats
 
@@ -137,9 +148,9 @@ research roster.
 - A small unobtrusive pause/play control (bottom corner) satisfies WCAG 2.2.2
   for auto-updating content.
 - `prefers-reduced-motion`: no typing, no pulse, no cycling, no notification
-  animation — a static frame showing beat 1 fully rendered (banana
-  notification, donuts question with attribution) and the thesis. This static
-  frame is also the design's five-second skim state.
+  animation — a static frame: headline, then beat 1 fully rendered in both
+  columns (banana notification, donuts quote with attribution), footer. This
+  static frame is also the design's five-second skim state.
 
 ## Accessibility
 
@@ -151,9 +162,10 @@ research roster.
 
 ## Responsive
 
-- Max-width 720px, centered. Below ~480px: typed quote 22px → 18px, thesis
-  34px → 26px, padding reduced; min-heights adjusted per breakpoint so the
-  iframe height stays stable (no per-character height chatter).
+- Max-width 760px, centered. Below ~560px the two columns stack
+  (notification above quote — call before response), headline 40px → 28px,
+  typed quote 19px → 17px, padding reduced; min-heights adjusted per
+  breakpoint so the iframe height stays stable (no per-character chatter).
 - Height reported to parent on load and resize only — content height is
   constant by design.
 
