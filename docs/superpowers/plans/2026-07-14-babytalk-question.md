@@ -87,10 +87,13 @@ Run: `node build-babytalk-fonts.mjs`
 Expected: `Wrote babytalk-fonts.css (…KB)` (roughly 80–200 KB).
 
 Run: `grep -c "@font-face" babytalk-fonts.css`
-Expected: `5`
+Expected: `3`–`5` depending on how Google buckets files (3 when Instrument Sans normal 400/500/600 share one variable file: Bricolage + Instrument-normal-range + Instrument-italic).
 
 Run: `grep -o "font-family:'[^']*'" babytalk-fonts.css | sort | uniq -c`
-Expected: `1 font-family:'Bricolage Grotesque'` and `4 font-family:'Instrument Sans'`.
+Expected: `1 font-family:'Bricolage Grotesque'`, remainder `font-family:'Instrument Sans'`.
+
+Verify no duplicate payloads and correct weight coverage:
+`node -e "const c=require('fs').readFileSync('babytalk-fonts.css','utf8');const b=[...c.matchAll(/base64,([^)]+)\)/g)].map(m=>m[1]);if(new Set(b).size!==b.length)throw new Error('duplicate font payloads');if(!/font-weight:400 600|font-weight:400;[\s\S]*font-weight:500/.test(c))throw new Error('missing weight coverage');console.log('payloads unique, weights covered')"`
 
 - [ ] **Step 3: Commit**
 
