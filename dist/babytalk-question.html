@@ -13,7 +13,7 @@
   :root {
     --canvas: #02103A; --ink: #F8F7FD; --lemon: #E9DA02; --cursor: #C2BAF1;
     --attr: #8373E3; --note-text: #99A6C4; --note-meta: #8A97B5;
-    --label: #67708B; --foot: #8A97B5;
+    --label: #8A97B5; --foot: #8A97B5;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: var(--canvas); }
@@ -320,7 +320,7 @@
   if (typeof IntersectionObserver === 'function') {
     new IntersectionObserver(function (entries) {
       ioReported = true;
-      visible = entries[0].isIntersecting;
+      visible = entries[entries.length - 1].isIntersecting;
     }, { threshold: 0.3 }).observe(document.querySelector('.artifact'));
     setTimeout(function () { if (!ioReported) visible = true; }, 1000);
   } else {
