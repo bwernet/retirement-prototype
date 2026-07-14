@@ -43,7 +43,7 @@ surrounding case-study page.
 - Color roles: Lemon `#E9DA02` headline (soft pulse glow per beat); Lavender
   `#C2BAF1` typing cursor (functional, not decorative — no glow/text-shadow
   on quotes); Lavender-600 `#8373E3` attributions; muted blue-grays
-  `#99A6C4` / `#8A97B5` for notification text; `#67708B` column label;
+  `#99A6C4` / `#8A97B5` for notification text; `#8A97B5` column label;
   footer `#8A97B5` (contrast raised from `#4D5878` — was hard to read).
 - No Persimmon anywhere (reads as error state on this canvas).
 
@@ -124,9 +124,9 @@ Beat evidence notes (what anchors each reconstruction):
   `HER PREGNANCY APP` only.
 - The week-35 dates quote was cut (weakest of the pool); it remains available
   to the case-study prose.
-- **Artifact footnote (permanent, 10px, `#4D5878`):** "App notifications are
-  representative copy, reconstructed from participants' descriptions of their
-  apps. All typed quotes are verbatim."
+- **Artifact footnote (permanent, footer row, `#8A97B5`):** "App notifications
+  are representative copy, reconstructed from participants' descriptions. All
+  quotes are verbatim."
 
 Honest-reporting constraints:
 
