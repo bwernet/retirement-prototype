@@ -152,7 +152,12 @@ research roster.
   fades in and the headline pulses; hold ~3.4s (final beat ~4.2s); quote and
   notification fade out (320-380ms); next beat. Full cycle ≈ 25s.
 - Starts only when scrolled into view (IntersectionObserver), cycles
-  indefinitely while visible, pauses when offscreen.
+  indefinitely while visible, pauses when offscreen. Long holds are sliced so
+  pausing (button or offscreen) takes effect within ~150ms during holds.
+  Robustness fallback: if the observer's first callback hasn't arrived ~1s
+  after load (quirky embed contexts), assume visible until it does — the
+  artifact must never sit permanently frozen. Heights re-measure once fonts
+  finish loading (document.fonts.ready) so fallback-font metrics can't stick.
 - A small unobtrusive pause/play control (bottom corner) satisfies WCAG 2.2.2
   for auto-updating content.
 - `prefers-reduced-motion`: no pulse, no cycling, no notification/crossfade
