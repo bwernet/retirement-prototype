@@ -38,7 +38,7 @@ assert.equal(/Georgia|Times|serif(?!-)/i.test(html.replace(/sans-serif/g, '')), 
 // retirement score visualizer. Every heading must set 500 explicitly
 // (browser default for h1-h3 is 700).
 assert.ok(html.includes("'DM Sans'"), 'DM Sans family');
-assert.equal(/font-weight:\s*[6-9]00/.test(html), false, 'no weights above 500');
+assert.equal(/font-weight:\s*([6-9]\d\d|bold\b)/.test(html), false, 'no weights above 500');
 assert.equal(/<(b|strong)[\s>]/i.test(html), false, 'no b/strong elements');
 // Browser default for h1-h3 is 700 — each heading selector must pin 500.
 assert.ok(/\.opening\s*{[^}]*font-weight:\s*500/.test(html), 'h1 (.opening) pinned to 500');

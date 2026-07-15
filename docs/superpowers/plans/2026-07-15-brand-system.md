@@ -868,7 +868,7 @@ Run this check (the artifact's own accessibility is the argument):
 ```bash
 node -e "
 const { contrast } = await import('./brand-model.js');
-const checks = [['#161D24','#FFFFFF','ink on white'],['#6E6E7D','#FFFFFF','muted on white'],['#1C5C98','#FFFFFF','accent on white'],['#161D24','#FDEBC7','flag text on announcement bg'],['#6E6E7D','#F2F2F7','muted on panel'],['#FFFFFF','#1E8404','score chip text']];
+const checks = [['#161D24','#FFFFFF','ink on white'],['#6E6E7D','#FFFFFF','muted on white'],['#1C5C98','#FFFFFF','accent on white'],['#161D24','#FDEBC7','flag text on announcement bg'],['#161D24','#F2F2F7','ink on panel (.ratio pill)'],['#FFFFFF','#1E8404','score chip text']];
 for (const [f,b,label] of checks) { const r = contrast(f,b); console.log(label, r.toFixed(2), r>=4.5?'AA':'FAIL'); if (r<4.5) process.exit(1); }
 " --input-type=module
 ```

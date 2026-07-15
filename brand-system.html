@@ -8,7 +8,7 @@
 <style>
   :root {
     --ink: #161D24; --muted: #6E6E7D; --border: #E2E2E5; --canvas: #FFFFFF;
-    --panel: #F2F2F7; --accent: #1C5C98;
+    --panel: #F2F2F7; /* panel bg: ink text only — gray2 on panel is 4.49:1, below AA */ --accent: #1C5C98;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -161,6 +161,7 @@
         <div class="role" data-role="background">
           <div class="role-head"><span class="role-name">brand/background</span><span class="role-src">← primary</span></div>
           <div class="role-out">
+            <span class="raw-pair"><span class="swatch raw"></span><span class="arrow">→</span></span>
             <span class="swatch out" style="background:#1E3A5F"></span>
             <span class="ratio">11.5:1 AA</span>
             <span class="badge">adjusted</span>
@@ -178,6 +179,7 @@
         <div class="role" data-role="cta">
           <div class="role-head"><span class="role-name">brand/CTA</span><span class="role-src">← secondary</span></div>
           <div class="role-out">
+            <span class="raw-pair"><span class="swatch raw"></span><span class="arrow">→</span></span>
             <span class="swatch out" style="background:#1FA98C"></span>
             <span class="ratio">5.8:1 AA</span>
             <span class="badge">adjusted</span>
@@ -258,7 +260,7 @@ function render(name, primary, secondary, wordmark) {
 
 let switchGen = 0;
 function switchTo(fn) {
-  if (reduced.matches) return fn();
+  if (reduced.matches) { switchGen++; return fn(); }
   const gen = ++switchGen;
   document.body.classList.add('fading');
   setTimeout(() => { if (gen !== switchGen) return; fn(); document.body.classList.remove('fading'); }, 230);
