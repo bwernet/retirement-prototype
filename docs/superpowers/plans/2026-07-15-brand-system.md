@@ -398,6 +398,17 @@ assert.equal(/color:\s*#9D9DA8|color:\s*#E2E2E5/i.test(html), false, 'gray3/gray
 assert.equal(/\p{Extended_Pictographic}/u.test(html), false, 'no emoji');
 assert.equal(/Georgia|Times|serif(?!-)/i.test(html.replace(/sans-serif/g, '')), false, 'no serif');
 
+// DM Sans only, Medium (500) is the boldest weight — same rule as the
+// retirement score visualizer. Every heading must set 500 explicitly
+// (browser default for h1-h3 is 700).
+assert.ok(html.includes("'DM Sans'"), 'DM Sans family');
+assert.equal(/font-weight:\s*[679]00/.test(html), false, 'no weights above 500');
+assert.equal(/<(b|strong)[\s>]/i.test(html), false, 'no b/strong elements');
+// Browser default for h1-h3 is 700 — each heading selector must pin 500.
+assert.ok(/\.opening\s*{[^}]*font-weight:\s*500/.test(html), 'h1 (.opening) pinned to 500');
+assert.ok(/\.band h2\s*{[^}]*font-weight:\s*500/.test(html), 'band h2 pinned to 500');
+assert.ok(/\.card h3\s*{[^}]*font-weight:\s*500/.test(html), 'card h3 pinned to 500');
+
 // Structure + behavior hooks.
 for (const hook of ['id="presets"', 'id="customColor"', 'id="stage"', 'id="phone"', 'id="roles"', 'id="live"', 'aria-live="polite"', 'data-role="background"', 'data-role="headline"', 'data-role="cta"']) {
   assert.ok(html.includes(hook), `missing hook ${hook}`);
