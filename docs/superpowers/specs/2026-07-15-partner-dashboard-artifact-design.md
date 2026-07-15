@@ -59,17 +59,25 @@ actions, not metrics. The hero card carries the affordance to expand.
 
 **Beat 2 — Why (the heart of the artifact).** The hero expands into a
 left-to-right provenance chain — the member-action → CU-benefit connection
-made visible:
+made visible.
+
+**Hard constraint (as shipped, confirmed): the platform could only report
+member activity on the platform** — behavioral events and member-entered
+inputs. No external banking data, no visibility into where deposits land.
+Every link in every chain must be a platform event or a member-entered value.
+The dashboard's craft was framing those signals in the CU's business terms
+without claiming sight it didn't have.
 
 > **What members did** (in the Silvur experience): ran the Social Security
-> calculator; set an election age; indicated benefits are (or will be)
-> deposited at another institution →
-> **What that means** (aggregated signal): 1,651 Harborlight members collecting
-> or about to collect Social Security, with recurring federal deposits landing
-> elsewhere →
-> **Why Harborlight cares** (business meaning): ~$23M/yr in annual deposits at
-> stake — retention risk if the primary-banking relationship sits elsewhere →
-> **What to do**: a direct-deposit switch campaign to exactly these members.
+> calculator; set or passed their election age; entered their benefit income
+> in their retirement score →
+> **What that means** (aggregated signal): 1,651 Harborlight members are
+> collecting — or about to start collecting — Social Security, ~$23M/yr in
+> recurring benefit income identified →
+> **Why Harborlight cares** (business meaning): recurring federal deposits
+> anchor a primary-banking relationship, and Harborlight can't see where
+> they land — which is exactly why these members are worth a campaign →
+> **What to do**: a direct-deposit campaign to exactly these members.
 
 All figures synthetic. Aggregate counts only — no fake individual member rows,
 ever (privacy optics matter even in fiction). The provenance panel exists
@@ -90,8 +98,9 @@ evidence, off by default):
 
 1. Segments are framed as needs + recommended actions, not metrics — designed
    for marketers, not analysts.
-2. Provenance is one click away, never buried — the insight must earn trust
-   before it asks for action.
+2. Provenance is one click away, never buried — and every signal is member
+   activity on the platform. The insight earns trust by showing its
+   reasoning and never claiming data it can't see.
 3. The workflow ends in the partner's existing tools — platform scope was a
    design decision, not a limitation.
 
@@ -108,16 +117,15 @@ evidence, off by default):
 - All counts, dollar figures, and member behaviors are synthetic. Footnote:
   "Credit union, members, and figures are fictional; segment logic is
   representative of the shipped product."
-- The segment mechanics table below must be verified against how the real
-  product actually derived segments before build — if a chain link (e.g.,
-  "deposited at another institution") wasn't knowable in the real system, the
-  chain must change. **[VERIFY WITH BETH]**
+- Segment mechanics (verified 2026-07-15): platform-activity signals only —
+  behavioral events and member-entered inputs. External banking data was NOT
+  knowable and must never appear in a chain.
 
-| Segment | Member behaviors feeding it (to verify) | CU benefit |
+| Segment | Platform signals feeding it | CU benefit |
 |---|---|---|
-| Direct Deposit: Social Security | SS calculator use, election age set, benefit-deposit destination | Deposit retention / direct-deposit switch |
-| Top Wealth Management Leads | Retirement horizon 0–3 yrs (score inputs), investable assets threshold | Wealth-management pipeline |
-| High Yield Savings Leads | Cash balances earning little interest (net-worth accounts) | Deposit growth into HYS/certificates |
+| Direct Deposit: Social Security | SS calculator use; election age set/passed; member-entered benefit income | Direct-deposit capture campaign |
+| Top Wealth Management Leads | Retirement horizon 0–3 yrs (score inputs); member-entered investable assets ≥ threshold | Wealth-management pipeline |
+| High Yield Savings Leads | Member-entered cash/savings balances in net-worth accounts | Deposit growth into HYS/certificates |
 
 - No NCUA / Equal Housing marks (fictional artifact must not carry regulator
   insignia).
