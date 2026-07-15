@@ -10,10 +10,12 @@ It must communicate, to a hiring manager in ~90 seconds, one argument:
 **The entire intake from a new credit union partner was a logo and two brand
 colors — and that was the achievement.** Spinning up a safe, usable, accessible
 member experience from two hex codes only works because the design system was
-architected so that *any* brand color lands without breaking contrast,
-hierarchy, or trust. The design work is everything that had to be true for
-minimal input to be enough: which visual roles may take brand color, which
-never do, and how hostile colors get adapted rather than obeyed.
+architected around a deliberate constraint: the two brand colors get exactly
+three jobs — background, headline, primary CTA — and every other surface is
+reduced to a neutral system engineered to work beside any brand. The design
+work is the seam: which few roles brand color may take, guardrails for when a
+color can't safely do its job, and a neutral system strong enough to carry
+the rest.
 
 The artifact demonstrates interaction design craft and systems thinking. It
 carries no business metrics — those live in the case study prose.
@@ -45,24 +47,26 @@ reconstruction of the shipped product (disclosed in footnote). The phone is
 NOT a tappable app — no interior interactions.
 
 **3. Derivation panel (right).** Eyebrow: "What the system did with it." Two
-stacked sections:
+stacked sections mirroring how the shipped system actually worked — the two
+brand colors were given exactly three jobs, and everything else went neutral:
 
-- **Derived tokens** — the pipeline from `brand/primary` to the roles the
-  system computed, each with a live-computed WCAG contrast ratio:
-  - `text on light` — primary darkened stepwise until ≥ 4.5:1 on white; shows
-    an "adjusted" badge with before → after swatches and ratios when the raw
-    color fails.
-  - `on-brand text` — white or ink, chosen by higher contrast against the
-    brand fill; if neither reaches 4.5:1, the fill itself is adjusted for
-    button/interactive use.
-  - `tint background` — primary mixed toward white (~90%), verified for ink
-    text legibility.
-  - `focus ring` — checked at ≥ 3:1 non-text contrast against adjacent
-    surfaces.
-- **Platform-owned, never re-branded** — a short fixed list: the score
+- **The three brand roles**, each with a live-computed WCAG contrast ratio:
+  - `brand/background` — the hero/header band. The system picks on-background
+    text (white or ink) by contrast against the brand fill.
+  - `brand/headline` — headline color on white; darkened stepwise until
+    ≥ 4.5:1 when the raw color fails (the Sunwise yellow case), shown with an
+    "adjusted" badge and before → after swatches and ratios.
+  - `brand/CTA` — primary button fill with on-CTA text chosen by contrast;
+    when neither white nor ink can reach 4.5:1 on the brand fill, the CTA
+    falls back to a neutral fill so the action never sacrifices legibility.
+    **[VERIFY WITH BETH]** whether the real rule was adjust-the-color or
+    fall-back-to-neutral (the ICCU instance's neutral dark CTAs suggest the
+    latter); the artifact must show the rule that actually shipped.
+- **Reduced to neutral — works with every brand** — the rest of the UI as a
+  fixed list: body text, cards, borders, icons, secondary buttons, the score
   gradient (semantic, member-facing trust), success/warning/error states,
-  typography, spacing, iconography. This is the seam: brand-owned vs
-  platform-owned.
+  typography, spacing. This is the seam: three brand-owned roles vs a
+  neutral, platform-owned system.
 
 All ratios are computed at runtime with real WCAG relative-luminance math —
 numbers are measured, not claimed. The artifact self-verifies its own
@@ -75,7 +79,7 @@ Chosen to span difficulty, so the derivation visibly earns its keep:
 | Credit union (fictional) | Colors sent | Why it's in the set |
 |---|---|---|
 | Harborlight Credit Union | navy `#1E3A5F` + teal `#1FA98C` | Well-behaved: most tokens pass raw. Establishes the baseline. |
-| Sunwise Credit Union | yellow `#FFC93C` + warm gray `#6E6A5E` | Hostile: yellow fails text contrast on white (~1.6:1). The system darkens it for text, keeps raw yellow for large fills with dark on-color text. This is the money moment. |
+| Sunwise Credit Union | yellow `#FFC93C` + warm gray `#6E6A5E` | Hostile: yellow fails headline contrast on white (~1.6:1). The system darkens it for headlines, keeps raw yellow where it can work (background band with ink text), and exercises the CTA guardrail. This is the money moment. |
 | Ember Valley Credit Union | burgundy `#6B1F2F` + dusty rose `#C98A8A` | Dark brand: exercises tints and white on-color text; proves the system isn't tuned to light brands. |
 
 Names must be collision-checked against real credit unions before publishing;
@@ -85,12 +89,13 @@ Wordmarks are simple text/SVG lockups (no fabricated logo art).
 ## Custom color
 
 One native color input, restyled: "Try any color." Selecting it switches the
-wordmark to a neutral "Anytown Credit Union" and derives the full token set
-from the single chosen primary (accent auto-derived — rotate hue / adjust
-lightness; exact recipe an implementation detail, but deterministic). This is
-the evidence interaction for arbitrary input: whatever the visitor picks, the
-member phone stays legible and the panel shows what was adjusted and why. No
-second color input, no logo upload.
+wordmark to a neutral "Anytown Credit Union" and fills the three brand roles
+from the single chosen primary (the secondary auto-derived — deterministic
+lightness/hue shift; exact recipe an implementation detail). This is the
+evidence interaction for arbitrary input: whatever the visitor picks, the
+member phone stays legible and the panel shows which roles took the color
+raw, which were adjusted, and which fell back — and why. No second color
+input, no logo upload.
 
 ## Motion
 
@@ -103,9 +108,9 @@ together, then stillness. Fixed heights everywhere; nothing reflows.
 
 - Opening line (top): "The entire intake from a new credit union partner: a
   logo and two brand colors."
-- Closing caption (bottom, small italic): "Everything else — hierarchy,
-  accessibility, trust — the system had to guarantee, no matter what colors
-  arrived."
+- Closing caption (bottom, small italic): "Two colors, three jobs —
+  background, headline, CTA. Everything else was reduced to a neutral system
+  that had to work beside any brand that arrived."
 - Footnote: "Credit unions shown are fictional; member data is synthetic; app
   copy is a representative reconstruction of the shipped product."
 
@@ -114,8 +119,8 @@ together, then stillness. Fixed heights everywhere; nothing reflows.
 Non-negotiable: an artifact arguing "the system guarantees contrast" cannot
 ship a contrast failure. All artifact chrome ≥ AA. Preset cards and the color
 input keyboard-operable (tab order, Enter/Space, visible focus). Brand switch
-announced via `aria-live=polite` ("Now showing Sunwise Credit Union; 2 tokens
-adjusted for contrast"). Derivation ratios rendered as text, not color-only.
+announced via `aria-live=polite` ("Now showing Sunwise Credit Union; headline
+color adjusted for contrast"). Derivation ratios rendered as text, not color-only.
 
 ## Responsive
 
