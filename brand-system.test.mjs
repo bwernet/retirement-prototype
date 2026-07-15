@@ -50,4 +50,10 @@ for (const hook of ['id="presets"', 'id="customColor"', 'id="stage"', 'id="phone
   assert.ok(html.includes(hook), `missing hook ${hook}`);
 }
 assert.ok(html.includes('<link rel="stylesheet" href="fonts.css">'), 'font link (build replaces this exact tag)');
+
+// Script invariants (Task 4+).
+assert.ok(html.includes("import { PRESETS, NEUTRALS, deriveRoles, deriveSecondary } from './brand-model.js';"), 'model import line (build replaces this exact string)');
+assert.ok(html.includes('brand-system:height'), 'height postMessage type');
+assert.ok(html.includes('prefers-reduced-motion'), 'reduced-motion gate in script');
+assert.ok(html.includes('Anytown Credit Union'), 'custom-mode wordmark');
 console.log('brand-system content-integrity: all checks passed');

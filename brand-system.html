@@ -212,6 +212,79 @@
 <p class="closing">Two colors, three jobs — background, headline, CTA. Everything else was reduced to a neutral system that had to work beside any brand that arrived.</p>
 <p class="footnote">Credit unions shown are fictional; member data is synthetic; app copy is a representative reconstruction of the shipped product.</p>
 <p id="live" class="sr-only" aria-live="polite"></p>
-<script type="module" src="brand-app-placeholder"></script>
+<script type="module">
+import { PRESETS, NEUTRALS, deriveRoles, deriveSecondary } from './brand-model.js';
+
+const $ = s => document.querySelector(s);
+const phone = $('#phone'), rolesPanel = $('#rolesPanel'), live = $('#live'), stageWrap = $('#stage');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+let animToken = 0;
+
+const fmt = r => `${(Math.round(r * 10) / 10).toFixed(1)}:1 AA`;
+
+function paintRole(el, { out, raw, ratio, adjusted, steps }) {
+  const token = ++animToken;
+  el.classList.toggle('adjusted', adjusted);
+  const outSw = el.querySelector('.swatch.out');
+  const rawSw = el.querySelector('.swatch.raw');
+  if (rawSw) rawSw.style.background = raw;
+  el.querySelector('.ratio').textContent = fmt(ratio);
+  if (adjusted && steps && steps.length && !reduced.matches) {
+    // Story-serving motion: perform the guardrail — step darker until it passes.
+    const frames = steps.filter((_, i) => i % Math.ceil(steps.length / 6) === 0).concat(out);
+    outSw.style.background = raw;
+    frames.forEach((c, i) => setTimeout(() => { if (animToken === token) outSw.style.background = c; }, 120 * (i + 1)));
+  } else {
+    outSw.style.background = out;
+  }
+}
+
+function render(name, primary, secondary, wordmark) {
+  const r = deriveRoles(primary, secondary);
+  phone.style.setProperty('--bg', r.background.fill);
+  phone.style.setProperty('--on-bg', r.background.onColor);
+  phone.style.setProperty('--headline', r.headline.color);
+  phone.style.setProperty('--cta', r.cta.fill);
+  phone.style.setProperty('--on-cta', r.cta.onColor);
+  $('#phoneWordmark').textContent = wordmark;
+  paintRole($('[data-role="background"]'), { out: r.background.fill, raw: r.background.raw, ratio: r.background.ratio, adjusted: r.background.adjusted });
+  paintRole($('[data-role="headline"]'), { out: r.headline.color, raw: r.headline.raw, ratio: r.headline.ratio, adjusted: r.headline.adjusted, steps: r.headline.steps });
+  paintRole($('[data-role="cta"]'), { out: r.cta.fill, raw: r.cta.raw, ratio: r.cta.ratio, adjusted: r.cta.adjusted });
+  rolesPanel.classList.toggle('flagged', r.flagged.length > 0);
+  live.textContent = r.flagged.length
+    ? `Now showing ${name}. ${r.flagged.join(' and ')} adjusted for contrast and flagged for partner review.`
+    : `Now showing ${name}. All brand roles pass contrast as sent.`;
+  postHeight();
+}
+
+function switchTo(fn) {
+  if (reduced.matches) return fn();
+  document.body.classList.add('fading');
+  setTimeout(() => { fn(); document.body.classList.remove('fading'); }, 230);
+}
+
+for (const btn of document.querySelectorAll('.preset')) {
+  btn.addEventListener('click', () => {
+    for (const b of document.querySelectorAll('.preset')) b.setAttribute('aria-pressed', String(b === btn));
+    const p = PRESETS.find(p => p.id === btn.dataset.id);
+    switchTo(() => render(p.name, p.primary, p.secondary, p.name));
+  });
+}
+
+$('#customColor').addEventListener('change', e => {
+  for (const b of document.querySelectorAll('.preset')) b.setAttribute('aria-pressed', 'false');
+  const primary = e.target.value.toUpperCase();
+  switchTo(() => render('Anytown Credit Union', primary, deriveSecondary(primary), 'Anytown Credit Union'));
+});
+
+function postHeight() {
+  window.parent.postMessage({ type: 'brand-system:height', height: document.documentElement.scrollHeight }, '*');
+}
+postHeight(); // synchronous first post — rAF is throttled in offscreen iframes
+addEventListener('resize', () => requestAnimationFrame(postHeight));
+
+// Re-render Harborlight from the model so static markup can never drift from the math.
+render(PRESETS[0].name, PRESETS[0].primary, PRESETS[0].secondary, PRESETS[0].name);
+</script>
 </body>
 </html>
