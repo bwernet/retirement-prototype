@@ -132,10 +132,14 @@ evidence, off by default):
 
 ## Motion
 
-Beat transitions follow the established rules: each beat's content arrives as
-one synchronized movement, then stillness. Fixed stage height, no reflow.
-`prefers-reduced-motion`: instant swaps. No count-up numbers, no ambient
-animation.
+Default is subtle, restrained, realistic. Beat transitions follow the
+established rules: each beat's content arrives as one synchronized movement,
+then stillness. Fixed stage height, no reflow. `prefers-reduced-motion`:
+instant swaps. No count-up numbers, no ambient animation.
+
+Story-serving exception (permitted where motion IS the argument): the Beat 2
+provenance chain may draw left-to-right once — member action tracing through
+to CU benefit — since that connection is the artifact's whole argument.
 
 ## Accessibility
 

@@ -120,10 +120,15 @@ adjustment) — and why. No second color input, no logo upload.
 
 ## Motion
 
-Per established artifact motion rules: preset switch triggers ONE synchronized
-crossfade (~450ms) across phone and derivation panel — everything arrives
-together, then stillness. Fixed heights everywhere; nothing reflows.
-`prefers-reduced-motion`: instant swap. No ambient or looping animation.
+Default is subtle, restrained, realistic. Preset switch triggers ONE
+synchronized crossfade (~450ms) across phone and derivation panel —
+everything arrives together, then stillness. Fixed heights everywhere;
+nothing reflows. `prefers-reduced-motion`: instant swap. No ambient or
+looping animation.
+
+Story-serving exception (permitted where motion IS the argument): on an
+adjusted role, the swatch may visibly step darker until its ratio passes —
+the guardrail performed, once per switch, never looping.
 
 ## Framing copy (inside the artifact)
 
