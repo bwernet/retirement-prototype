@@ -117,8 +117,8 @@
 <div class="layout">
   <div class="rail" id="presets" role="group" aria-label="What a new partner sent us">
     <p class="eyebrow">What a new partner sent us</p>
-    <button class="preset" data-id="harborlight" aria-pressed="true">
-      <span class="cu">Harborlight Credit Union</span>
+    <button class="preset" data-id="lanternbay" aria-pressed="true">
+      <span class="cu">Lanternbay Credit Union</span>
       <span class="chips"><i class="chip" style="background:#1E3A5F"></i><i class="chip" style="background:#1FA98C"></i><code>#1E3A5F · #1FA98C</code></span>
     </button>
     <button class="preset" data-id="sunwise" aria-pressed="false">
@@ -138,7 +138,7 @@
   <div id="stage">
     <div id="phone" style="--bg:#1E3A5F; --on-bg:#FFFFFF; --headline:#1E3A5F; --cta:#1FA98C; --on-cta:#161D24">
       <div class="band">
-        <p class="wordmark" id="phoneWordmark">Harborlight Credit Union</p>
+        <p class="wordmark" id="phoneWordmark">Lanternbay Credit Union</p>
         <div class="scorerow"><span>Retirement Score</span><span class="scorechip">82y 5m</span></div>
         <h2>Top priority for you:</h2>
         <div class="card">
@@ -288,7 +288,7 @@ const SCORE = {
 };
 
 const PRESETS = [
-  { id: 'harborlight', name: 'Harborlight Credit Union', primary: '#1E3A5F', secondary: '#1FA98C' },
+  { id: 'lanternbay', name: 'Lanternbay Credit Union', primary: '#1E3A5F', secondary: '#1FA98C' },
   { id: 'sunwise', name: 'Sunwise Credit Union', primary: '#FFC93C', secondary: '#6E6A5E' },
   { id: 'embervalley', name: 'Ember Valley Credit Union', primary: '#6B1F2F', secondary: '#C98A8A' },
 ];
@@ -418,7 +418,7 @@ function postHeight() {
 postHeight(); // synchronous first post — rAF is throttled in offscreen iframes
 addEventListener('resize', () => requestAnimationFrame(postHeight));
 
-// Re-render Harborlight from the model so static markup can never drift from the math.
+// Re-render Lanternbay from the model so static markup can never drift from the math.
 render(PRESETS[0].name, PRESETS[0].primary, PRESETS[0].secondary, PRESETS[0].name);
 </script>
 </body>

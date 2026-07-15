@@ -13,7 +13,7 @@ assert.ok(html.includes('Credit unions shown are fictional; member data is synth
 assert.ok(html.includes('Flagged for partner review — relationship manager notified'), 'flag chip copy');
 
 // Fictional CUs present; forbidden marks absent.
-for (const name of ['Harborlight Credit Union', 'Sunwise Credit Union', 'Ember Valley Credit Union']) {
+for (const name of ['Lanternbay Credit Union', 'Sunwise Credit Union', 'Ember Valley Credit Union']) {
   assert.ok(html.includes(name), `missing ${name}`);
 }
 assert.equal(/NCUA|Equal Housing|\bFederal\b/i.test(html), false, 'no regulator marks / no Federal');

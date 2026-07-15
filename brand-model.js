@@ -71,7 +71,7 @@ export const SCORE = {
 };
 
 export const PRESETS = [
-  { id: 'harborlight', name: 'Harborlight Credit Union', primary: '#1E3A5F', secondary: '#1FA98C' },
+  { id: 'lanternbay', name: 'Lanternbay Credit Union', primary: '#1E3A5F', secondary: '#1FA98C' },
   { id: 'sunwise', name: 'Sunwise Credit Union', primary: '#FFC93C', secondary: '#6E6A5E' },
   { id: 'embervalley', name: 'Ember Valley Credit Union', primary: '#6B1F2F', secondary: '#C98A8A' },
 ];

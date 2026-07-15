@@ -4,7 +4,7 @@
 
 **Goal:** Build `brand-system.html` — a self-contained interactive artifact showing that a credit union's entire brand intake (a logo + two colors) was enough to spin up a safe, accessible member experience, because the design system gave those colors exactly three jobs and reduced everything else to neutrals.
 
-**Architecture:** Testable derivation logic lives in `brand-model.js` (pure functions, unit-tested with `node:test`, same pattern as `model.js`). The artifact page `brand-system.html` holds markup + CSS + an inline module script that imports the model; `build.mjs` inlines fonts and the model into `dist/brand-system.html`. Static-first: the markup renders a complete Harborlight view with no JS; the script layers on preset switching, the custom color input, motion, and iframe height reporting.
+**Architecture:** Testable derivation logic lives in `brand-model.js` (pure functions, unit-tested with `node:test`, same pattern as `model.js`). The artifact page `brand-system.html` holds markup + CSS + an inline module script that imports the model; `build.mjs` inlines fonts and the model into `dist/brand-system.html`. Static-first: the markup renders a complete Lanternbay view with no JS; the script layers on preset switching, the custom color input, motion, and iframe height reporting.
 
 **Tech Stack:** Vanilla HTML/CSS/JS, Node ≥18, no dependencies, no package.json. Existing `fonts.css` (DM Sans 400/500, base64) is reused.
 
@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- **Fictional credit unions only:** Harborlight Credit Union, Sunwise Credit Union, Ember Valley Credit Union, and (custom mode) Anytown Credit Union. No real CU names, no "Federal" in names, no NCUA/Equal-Housing marks, no fictional personal names anywhere including commits.
+- **Fictional credit unions only:** Lanternbay Credit Union, Sunwise Credit Union, Ember Valley Credit Union, and (custom mode) Anytown Credit Union. No real CU names, no "Federal" in names, no NCUA/Equal-Housing marks, no fictional personal names anywhere including commits.
 - **Exact framing copy** (tests assert these strings verbatim):
   - Opening: `The entire intake from a new credit union partner: a logo and two brand colors.`
   - Closing: `Two colors, three jobs — background, headline, CTA. Everything else was reduced to a neutral system that had to work beside any brand that arrived.`
@@ -30,7 +30,7 @@
 
 - `brand-model.js` — pure logic: hex/HSL conversions, WCAG luminance + contrast, `darkenUntil`, `onColorFor`, `deriveRoles`, `deriveSecondary`, `PRESETS`, `NEUTRALS`, `SCORE`.
 - `brand-model.test.mjs` — `node:test` unit tests (run `node --test brand-model.test.mjs`).
-- `brand-system.html` — the artifact: inline `<style>`, static Harborlight markup, inline `<script type="module">` importing `./brand-model.js`.
+- `brand-system.html` — the artifact: inline `<style>`, static Lanternbay markup, inline `<script type="module">` importing `./brand-model.js`.
 - `brand-system.test.mjs` — content-integrity checks, plain `node brand-system.test.mjs`.
 - `build.mjs` — modified: appends an inline step producing `dist/brand-system.html` (fonts + model inlined).
 
@@ -70,7 +70,7 @@ test('WCAG anchors', () => {
 test('known ratios from the spec palette', () => {
   const near = (a, b, tol = 0.05) => assert.ok(Math.abs(a - b) < tol, `${a} !~ ${b}`);
   near(contrast('#FFC93C', '#FFFFFF'), 1.54);  // Sunwise yellow fails on white
-  near(contrast('#1E3A5F', '#FFFFFF'), 11.50); // Harborlight navy passes big
+  near(contrast('#1E3A5F', '#FFFFFF'), 11.50); // Lanternbay navy passes big
   near(contrast('#6E6E7D', '#FFFFFF'), 5.01);  // gray2 is text-safe
   near(contrast('#9D9DA8', '#FFFFFF'), 2.68);  // gray3 is NOT text-safe
 });
@@ -180,7 +180,7 @@ git commit -m "feat: brand-model color math — WCAG luminance/contrast, HSL dar
 - Produces (Task 3–5 rely on these exact names/shapes):
   - `NEUTRALS = { gray1:'#161D24', gray2:'#6E6E7D', gray3:'#9D9DA8', gray4:'#E2E2E5', gray5:'#F2F2F7', white:'#FFFFFF', errorText:'#E15255', errorBg:'#F8D5D5', announcementBg:'#FDEBC7', accentBlue:'#1C5C98' }`
   - `SCORE = { gradient: ['#F69835','#F4C355','#529D40'], statuses: ['#1E8404','#7EB52C','#FFBA2C','#FF8201'] }`
-  - `PRESETS` — array of `{ id, name, primary, secondary }` for harborlight/sunwise/embervalley.
+  - `PRESETS` — array of `{ id, name, primary, secondary }` for lanternbay/sunwise/embervalley.
   - `onColorFor(fill) -> { color, ratio }` — white or gray1, whichever contrasts more.
   - `darkenUntil(hex, against, target=4.5) -> { color, adjusted, steps }` — steps is the array of intermediate hexes (for the step-down motion).
   - `deriveRoles(primary, secondary) -> { background: {fill, raw, adjusted, onColor, ratio}, headline: {color, raw, adjusted, ratio, rawRatio, steps}, cta: {fill, raw, adjusted, onColor, ratio}, flagged: string[] }`
@@ -209,8 +209,8 @@ test('onColorFor picks the higher-contrast text color', () => {
   assert.equal(onColorFor('#FFC93C').color, NEUTRALS.gray1);
 });
 
-test('Harborlight: every role passes raw, nothing flagged', () => {
-  const p = PRESETS.find(p => p.id === 'harborlight');
+test('Lanternbay: every role passes raw, nothing flagged', () => {
+  const p = PRESETS.find(p => p.id === 'lanternbay');
   const r = deriveRoles(p.primary, p.secondary);
   assert.deepEqual(r.flagged, []);
   assert.equal(r.headline.adjusted, false);
@@ -279,7 +279,7 @@ export const SCORE = {
 };
 
 export const PRESETS = [
-  { id: 'harborlight', name: 'Harborlight Credit Union', primary: '#1E3A5F', secondary: '#1FA98C' },
+  { id: 'lanternbay', name: 'Lanternbay Credit Union', primary: '#1E3A5F', secondary: '#1FA98C' },
   { id: 'sunwise', name: 'Sunwise Credit Union', primary: '#FFC93C', secondary: '#6E6A5E' },
   { id: 'embervalley', name: 'Ember Valley Credit Union', primary: '#6B1F2F', secondary: '#C98A8A' },
 ];
@@ -358,7 +358,7 @@ git commit -m "feat: brand role derivation — three roles, darken-until-passes 
 
 **Interfaces:**
 - Consumes: `fonts.css` via `<link rel="stylesheet" href="fonts.css">` (this exact tag; build replaces it).
-- Produces: complete static page rendering Harborlight with element ids the script (Task 4) binds to: `#presets` (contains three `button.preset`), `#customColor` (input), `#stage`, `#phone`, `#roles` (three `.role` rows with `data-role="background|headline|cta"`), `#neutrals`, `#live` (aria-live). CSS custom properties on `#stage`: `--bg`, `--on-bg`, `--headline`, `--cta`, `--on-cta`.
+- Produces: complete static page rendering Lanternbay with element ids the script (Task 4) binds to: `#presets` (contains three `button.preset`), `#customColor` (input), `#stage`, `#phone`, `#roles` (three `.role` rows with `data-role="background|headline|cta"`), `#neutrals`, `#live` (aria-live). CSS custom properties on `#stage`: `--bg`, `--on-bg`, `--headline`, `--cta`, `--on-cta`.
 
 - [ ] **Step 1: Write the failing content-integrity test**
 
@@ -380,7 +380,7 @@ assert.ok(html.includes('Credit unions shown are fictional; member data is synth
 assert.ok(html.includes('Flagged for partner review — relationship manager notified'), 'flag chip copy');
 
 // Fictional CUs present; forbidden marks absent.
-for (const name of ['Harborlight Credit Union', 'Sunwise Credit Union', 'Ember Valley Credit Union']) {
+for (const name of ['Lanternbay Credit Union', 'Sunwise Credit Union', 'Ember Valley Credit Union']) {
   assert.ok(html.includes(name), `missing ${name}`);
 }
 assert.equal(/NCUA|Equal Housing|Federal Credit Union/i.test(html), false, 'no regulator marks / no Federal');
@@ -424,7 +424,7 @@ Expected: FAIL — `ENOENT ... brand-system.html`.
 
 - [ ] **Step 3: Build the static page**
 
-Create `brand-system.html`. Static defaults are Harborlight's derived values (from Task 2 math: band `#1E3A5F`/white text, headline `#1E3A5F` 11.5:1, CTA `#1FA98C`/ink text 5.8:1). Complete file:
+Create `brand-system.html`. Static defaults are Lanternbay's derived values (from Task 2 math: band `#1E3A5F`/white text, headline `#1E3A5F` 11.5:1, CTA `#1FA98C`/ink text 5.8:1). Complete file:
 
 ```html
 <!DOCTYPE html>
@@ -543,8 +543,8 @@ Create `brand-system.html`. Static defaults are Harborlight's derived values (fr
 <div class="layout">
   <div class="rail" id="presets" role="group" aria-label="What a new partner sent us">
     <p class="eyebrow">What a new partner sent us</p>
-    <button class="preset" data-id="harborlight" aria-pressed="true">
-      <span class="cu">Harborlight Credit Union</span>
+    <button class="preset" data-id="lanternbay" aria-pressed="true">
+      <span class="cu">Lanternbay Credit Union</span>
       <span class="chips"><i class="chip" style="background:#1E3A5F"></i><i class="chip" style="background:#1FA98C"></i><code>#1E3A5F · #1FA98C</code></span>
     </button>
     <button class="preset" data-id="sunwise" aria-pressed="false">
@@ -564,7 +564,7 @@ Create `brand-system.html`. Static defaults are Harborlight's derived values (fr
   <div id="stage">
     <div id="phone" style="--bg:#1E3A5F; --on-bg:#FFFFFF; --headline:#1E3A5F; --cta:#1FA98C; --on-cta:#161D24">
       <div class="band">
-        <p class="wordmark" id="phoneWordmark">Harborlight Credit Union</p>
+        <p class="wordmark" id="phoneWordmark">Lanternbay Credit Union</p>
         <div class="scorerow"><span>Retirement Score</span><span class="scorechip">82y 5m</span></div>
         <h2>Top priority for you:</h2>
         <div class="card">
@@ -655,13 +655,13 @@ Expected: PASS — `brand-system content-integrity: all checks passed`.
 - [ ] **Step 5: Visual sanity check**
 
 Run: `node serve.mjs` (or the `prototype` launch config) and open `http://localhost:8000/brand-system.html`.
-Expected: three-column layout, Harborlight phone with navy band + teal CTA, three role rows, neutral strip. No JS behavior yet.
+Expected: three-column layout, Lanternbay phone with navy band + teal CTA, three role rows, neutral strip. No JS behavior yet.
 
 - [ ] **Step 6: Commit**
 
 ```bash
 git add brand-system.html brand-system.test.mjs
-git commit -m "feat: brand-system static artifact — Harborlight default, three roles, neutral system"
+git commit -m "feat: brand-system static artifact — Lanternbay default, three roles, neutral system"
 ```
 
 ---
@@ -767,7 +767,7 @@ function postHeight() {
 postHeight(); // synchronous first post — rAF is throttled in offscreen iframes
 addEventListener('resize', () => requestAnimationFrame(postHeight));
 
-// Re-render Harborlight from the model so static markup can never drift from the math.
+// Re-render Lanternbay from the model so static markup can never drift from the math.
 render(PRESETS[0].name, PRESETS[0].primary, PRESETS[0].secondary, PRESETS[0].name);
 </script>
 ```
@@ -783,7 +783,7 @@ Expected: PASS.
 
 Serve and open `http://localhost:8000/brand-system.html`. Verify, in order:
 1. Click **Sunwise**: phone band turns raw yellow with ink text; headline swatch visibly steps darker then settles; `adjusted` badge + raw→out pair appear on the headline row; the flag chip appears; card title on the phone is the darkened olive tone, NOT raw yellow.
-2. Click **Harborlight**: badge and flag disappear (space reserved — panel height must not change; if it jumps, fix with the `visibility` rules from Task 3).
+2. Click **Lanternbay**: badge and flag disappear (space reserved — panel height must not change; if it jumps, fix with the `visibility` rules from Task 3).
 3. Click **Ember Valley**: dark burgundy band, white band text, rose CTA with ink text.
 4. Pick a near-white custom color (e.g. `#F5F5F5`): headline steps down dramatically, flag fires, wordmark reads "Anytown Credit Union".
 5. Keyboard: Tab reaches all three presets and the color input; Enter activates; focus ring visible.
@@ -833,7 +833,7 @@ Open `dist/brand-system.html` directly via `file://` (no server): fonts render, 
 
 - [ ] **Step 3: Name collision check**
 
-Web-search each of: `"Harborlight Credit Union"`, `"Sunwise Credit Union"`, `"Ember Valley Credit Union"` (also check NCUA's find-a-credit-union tool, mapping.ncua.gov). If any name matches or is confusably close to a real credit union, choose a replacement (clearly fictional, no "Federal"), update `PRESETS` in `brand-model.js`, the three preset buttons + wordmark default in `brand-system.html`, both test files, and the spec's preset table. Record the check result (searched names + date + outcome) in the commit message.
+Web-search each of: `"Lanternbay Credit Union"`, `"Sunwise Credit Union"`, `"Ember Valley Credit Union"` (also check NCUA's find-a-credit-union tool, mapping.ncua.gov). If any name matches or is confusably close to a real credit union, choose a replacement (clearly fictional, no "Federal"), update `PRESETS` in `brand-model.js`, the three preset buttons + wordmark default in `brand-system.html`, both test files, and the spec's preset table. Record the check result (searched names + date + outcome) in the commit message.
 
 - [ ] **Step 4: Run all tests**
 

@@ -99,7 +99,7 @@ matching the real intake:
 
 | Credit union (fictional) | Colors sent | Why it's in the set |
 |---|---|---|
-| Harborlight Credit Union | primary navy `#1E3A5F` + secondary teal `#1FA98C` | Well-behaved: every role passes raw. Structurally echoes the Retire Strong reference instance (dark primary band, vivid CTA). Establishes the baseline. |
+| Lanternbay Credit Union | primary navy `#1E3A5F` + secondary teal `#1FA98C` | Well-behaved: every role passes raw. Structurally echoes the Retire Strong reference instance (dark primary band, vivid CTA). Establishes the baseline. |
 | Sunwise Credit Union | primary yellow `#FFC93C` + secondary warm gray `#6E6A5E` | Hostile primary: yellow fails headline contrast on white (~1.6:1) → darkened for headlines, kept raw on the background band with ink text, and the partner-review flag fires. Gray CTA mirrors the real neutral-secondary case (a partner's deliberate choice). This is the money moment. |
 | Ember Valley Credit Union | primary burgundy `#6B1F2F` + secondary dusty rose `#C98A8A` | Dark primary (white on-band text); light-mid secondary exercises the on-CTA text choice (ink, not white). Proves the system isn't tuned to light brands. |
 

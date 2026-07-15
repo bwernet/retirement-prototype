@@ -18,7 +18,7 @@ test('WCAG anchors', () => {
 test('known ratios from the spec palette', () => {
   const near = (a, b, tol = 0.05) => assert.ok(Math.abs(a - b) < tol, `${a} !~ ${b}`);
   near(contrast('#FFC93C', '#FFFFFF'), 1.54);  // Sunwise yellow fails on white
-  near(contrast('#1E3A5F', '#FFFFFF'), 11.50); // Harborlight navy passes big
+  near(contrast('#1E3A5F', '#FFFFFF'), 11.50); // Lanternbay navy passes big
   near(contrast('#6E6E7D', '#FFFFFF'), 5.01);  // gray2 is text-safe
   near(contrast('#9D9DA8', '#FFFFFF'), 2.68);  // gray3 is NOT text-safe
 });
@@ -47,8 +47,8 @@ test('onColorFor picks the higher-contrast text color', () => {
   assert.equal(onColorFor('#FFC93C').color, NEUTRALS.gray1);
 });
 
-test('Harborlight: every role passes raw, nothing flagged', () => {
-  const p = PRESETS.find(p => p.id === 'harborlight');
+test('Lanternbay: every role passes raw, nothing flagged', () => {
+  const p = PRESETS.find(p => p.id === 'lanternbay');
   const r = deriveRoles(p.primary, p.secondary);
   assert.deepEqual(r.flagged, []);
   assert.equal(r.headline.adjusted, false);
