@@ -59,12 +59,19 @@ brand colors were given exactly three jobs, and everything else went neutral:
     case), shown with an "adjusted" badge and before → after swatches and
     ratios.
   - `brand/CTA` ← **secondary** (documented in the shipped system as "main
-    button color") — button fill with on-CTA text chosen by contrast; when
-    neither white nor ink can reach 4.5:1 on the fill, the color is adjusted
-    so the action never sacrifices legibility. **[VERIFY WITH BETH]** the
-    shipped failure rule: adjust the color, or fall back to a neutral fill?
-    (ICCU's dark-gray CTAs could be either a fallback — or simply ICCU's own
-    secondary color.) The artifact must show the rule that actually shipped.
+    button color") — button fill with on-CTA text chosen by contrast; if the
+    fill can't carry legible text, the same adjustment rule applies.
+
+**The failure rule (as shipped, confirmed):** when a partner color fails its
+role's contrast requirement, the system darkens it stepwise until it passes —
+and raises a flag to Silvur's internal relationship manager, who reviews the
+adjustment with the credit union client. The partner is never silently
+overridden. The artifact renders this as part of the derivation panel: on an
+adjusted role, alongside the before → after swatches, a small flag chip —
+"Flagged for partner review — relationship manager notified" — with a
+one-line note that this routed a human conversation, not just a color change.
+(ICCU's gray CTAs were simply their preferred secondary, not a fallback; a
+neutral secondary is a valid partner choice, represented by Sunwise.)
 - **Reduced to neutral — works with every brand** — the rest of the UI, shown
   with the real shipped palette (faithful reconstruction, not invention):
   grays `#161D24` `#6E6E7D` `#9D9DA8` `#E2E2E5` `#F2F2F7` + white for text,
@@ -93,7 +100,7 @@ matching the real intake:
 | Credit union (fictional) | Colors sent | Why it's in the set |
 |---|---|---|
 | Harborlight Credit Union | primary navy `#1E3A5F` + secondary teal `#1FA98C` | Well-behaved: every role passes raw. Structurally echoes the Retire Strong reference instance (dark primary band, vivid CTA). Establishes the baseline. |
-| Sunwise Credit Union | primary yellow `#FFC93C` + secondary warm gray `#6E6A5E` | Hostile primary: yellow fails headline contrast on white (~1.6:1) → darkened for headlines, kept raw on the background band with ink text. Gray CTA mirrors the ICCU-style neutral-secondary case. This is the money moment. |
+| Sunwise Credit Union | primary yellow `#FFC93C` + secondary warm gray `#6E6A5E` | Hostile primary: yellow fails headline contrast on white (~1.6:1) → darkened for headlines, kept raw on the background band with ink text, and the partner-review flag fires. Gray CTA mirrors the real neutral-secondary case (a partner's deliberate choice). This is the money moment. |
 | Ember Valley Credit Union | primary burgundy `#6B1F2F` + secondary dusty rose `#C98A8A` | Dark primary (white on-band text); light-mid secondary exercises the on-CTA text choice (ink, not white). Proves the system isn't tuned to light brands. |
 
 Names must be collision-checked against real credit unions before publishing;
@@ -108,8 +115,8 @@ from the single chosen primary (the secondary auto-derived — deterministic
 lightness/hue shift; exact recipe an implementation detail). This is the
 evidence interaction for arbitrary input: whatever the visitor picks, the
 member phone stays legible and the panel shows which roles took the color
-raw, which were adjusted, and which fell back — and why. No second color
-input, no logo upload.
+raw and which were adjusted (with the partner-review flag firing on any
+adjustment) — and why. No second color input, no logo upload.
 
 ## Motion
 
