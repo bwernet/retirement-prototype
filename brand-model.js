@@ -57,3 +57,72 @@ export function darken(hex, dl) {
   const [h, s, l] = rgbToHsl(hexToRgb(hex));
   return rgbToHex(hslToRgb([h, s, Math.max(0, l - dl)]));
 }
+
+export const NEUTRALS = {
+  gray1: '#161D24', gray2: '#6E6E7D', gray3: '#9D9DA8', gray4: '#E2E2E5', gray5: '#F2F2F7',
+  white: '#FFFFFF',
+  errorText: '#E15255', errorBg: '#F8D5D5',
+  announcementBg: '#FDEBC7', accentBlue: '#1C5C98',
+};
+
+export const SCORE = {
+  gradient: ['#F69835', '#F4C355', '#529D40'],
+  statuses: ['#1E8404', '#7EB52C', '#FFBA2C', '#FF8201'],
+};
+
+export const PRESETS = [
+  { id: 'harborlight', name: 'Harborlight Credit Union', primary: '#1E3A5F', secondary: '#1FA98C' },
+  { id: 'sunwise', name: 'Sunwise Credit Union', primary: '#FFC93C', secondary: '#6E6A5E' },
+  { id: 'embervalley', name: 'Ember Valley Credit Union', primary: '#6B1F2F', secondary: '#C98A8A' },
+];
+
+export function onColorFor(fill) {
+  const w = contrast(fill, NEUTRALS.white);
+  const k = contrast(fill, NEUTRALS.gray1);
+  return w >= k ? { color: NEUTRALS.white, ratio: w } : { color: NEUTRALS.gray1, ratio: k };
+}
+
+export function darkenUntil(hex, against, target = 4.5) {
+  let color = hex;
+  const steps = [];
+  while (contrast(color, against) < target) {
+    const next = darken(color, 0.02);
+    if (next === color) break; // black floor
+    color = next;
+    steps.push(color);
+  }
+  return { color, adjusted: color !== hex, steps };
+}
+
+// The shipped rule: a fill keeps the partner's raw color and the TEXT adapts;
+// only when no text color can pass does the fill itself darken (then flag).
+function fillRole(rawFill) {
+  let fill = rawFill, adjusted = false;
+  let on = onColorFor(fill);
+  if (on.ratio < 4.5) {
+    fill = darkenUntil(fill, NEUTRALS.white, 4.5).color;
+    adjusted = true;
+    on = { color: NEUTRALS.white, ratio: contrast(fill, NEUTRALS.white) };
+  }
+  return { fill, raw: rawFill, adjusted, onColor: on.color, ratio: on.ratio };
+}
+
+export function deriveRoles(primary, secondary) {
+  const background = fillRole(primary);
+  const h = darkenUntil(primary, NEUTRALS.white, 4.5);
+  const headline = {
+    color: h.color, raw: primary, adjusted: h.adjusted, steps: h.steps,
+    ratio: contrast(h.color, NEUTRALS.white), rawRatio: contrast(primary, NEUTRALS.white),
+  };
+  const cta = fillRole(secondary);
+  const flagged = [];
+  if (background.adjusted) flagged.push('background');
+  if (headline.adjusted) flagged.push('headline');
+  if (cta.adjusted) flagged.push('CTA');
+  return { background, headline, cta, flagged };
+}
+
+export function deriveSecondary(primary) {
+  const [h, s] = rgbToHsl(hexToRgb(primary));
+  return rgbToHex(hslToRgb([(h + 0.42) % 1, Math.max(0.35, Math.min(0.75, s)), 0.32]));
+}

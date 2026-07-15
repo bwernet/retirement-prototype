@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { hexToRgb, rgbToHex, relativeLuminance, contrast, rgbToHsl, hslToRgb, darken } from './brand-model.js';
+import { hexToRgb, rgbToHex, relativeLuminance, contrast, rgbToHsl, hslToRgb, darken, NEUTRALS, SCORE, PRESETS, onColorFor, darkenUntil, deriveRoles, deriveSecondary } from './brand-model.js';
 
 test('hex round-trips', () => {
   assert.deepEqual(hexToRgb('#1E3A5F'), [30, 58, 95]);
@@ -29,4 +29,66 @@ test('hsl round-trips and darken lowers lightness', () => {
   const darker = darken('#FFC93C', 0.1);
   assert.ok(relativeLuminance(darker) < relativeLuminance('#FFC93C'));
   assert.equal(darken('#000000', 0.1), '#000000', 'floor at black');
+});
+
+test('darkenUntil: hostile yellow darkens to pass, with visible steps', () => {
+  const fix = darkenUntil('#FFC93C', '#FFFFFF', 4.5);
+  assert.equal(fix.adjusted, true);
+  assert.ok(contrast(fix.color, '#FFFFFF') >= 4.5);
+  assert.ok(fix.steps.length > 3, 'multiple visible steps for the motion');
+  const ok = darkenUntil('#1E3A5F', '#FFFFFF', 4.5);
+  assert.equal(ok.adjusted, false);
+  assert.equal(ok.color, '#1E3A5F');
+  assert.equal(ok.steps.length, 0);
+});
+
+test('onColorFor picks the higher-contrast text color', () => {
+  assert.equal(onColorFor('#1E3A5F').color, NEUTRALS.white);
+  assert.equal(onColorFor('#FFC93C').color, NEUTRALS.gray1);
+});
+
+test('Harborlight: every role passes raw, nothing flagged', () => {
+  const p = PRESETS.find(p => p.id === 'harborlight');
+  const r = deriveRoles(p.primary, p.secondary);
+  assert.deepEqual(r.flagged, []);
+  assert.equal(r.headline.adjusted, false);
+  assert.equal(r.background.onColor, NEUTRALS.white);
+  assert.equal(r.cta.onColor, NEUTRALS.gray1, 'teal CTA takes ink text');
+  assert.ok(r.cta.ratio >= 4.5);
+});
+
+test('Sunwise: headline adjusted + flagged; band keeps raw yellow with ink text; gray CTA passes', () => {
+  const p = PRESETS.find(p => p.id === 'sunwise');
+  const r = deriveRoles(p.primary, p.secondary);
+  assert.deepEqual(r.flagged, ['headline']);
+  assert.equal(r.headline.adjusted, true);
+  assert.ok(r.headline.rawRatio < 4.5 && r.headline.ratio >= 4.5);
+  assert.equal(r.background.fill, '#FFC93C', 'band keeps the raw brand color');
+  assert.equal(r.background.onColor, NEUTRALS.gray1);
+  assert.equal(r.cta.adjusted, false);
+  assert.equal(r.cta.onColor, NEUTRALS.white);
+});
+
+test('Ember Valley: dark band takes white text, rose CTA takes ink text, nothing flagged', () => {
+  const p = PRESETS.find(p => p.id === 'embervalley');
+  const r = deriveRoles(p.primary, p.secondary);
+  assert.deepEqual(r.flagged, []);
+  assert.equal(r.background.onColor, NEUTRALS.white);
+  assert.equal(r.cta.onColor, NEUTRALS.gray1);
+});
+
+test('every role always ends >= 4.5:1, for arbitrary hostile input', () => {
+  for (const hex of ['#F2F2F7', '#FFFF00', '#00FF00', '#888888', '#FFFFFF']) {
+    const r = deriveRoles(hex, hex);
+    assert.ok(r.headline.ratio >= 4.5, `headline ${hex}`);
+    assert.ok(r.background.ratio >= 4.5, `background ${hex}`);
+    assert.ok(r.cta.ratio >= 4.5, `cta ${hex}`);
+  }
+});
+
+test('deriveSecondary is deterministic and CTA-usable', () => {
+  const a = deriveSecondary('#1E3A5F');
+  assert.equal(a, deriveSecondary('#1E3A5F'));
+  const r = deriveRoles('#1E3A5F', a);
+  assert.ok(r.cta.ratio >= 4.5);
 });
