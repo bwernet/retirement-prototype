@@ -216,7 +216,7 @@
 import { PRESETS, NEUTRALS, deriveRoles, deriveSecondary } from './brand-model.js';
 
 const $ = s => document.querySelector(s);
-const phone = $('#phone'), rolesPanel = $('#rolesPanel'), live = $('#live'), stageWrap = $('#stage');
+const phone = $('#phone'), rolesPanel = $('#rolesPanel'), live = $('#live');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
 const fmt = r => `${(Math.round(r * 10) / 10).toFixed(1)}:1 AA`;
@@ -256,10 +256,12 @@ function render(name, primary, secondary, wordmark) {
   postHeight();
 }
 
+let switchGen = 0;
 function switchTo(fn) {
   if (reduced.matches) return fn();
+  const gen = ++switchGen;
   document.body.classList.add('fading');
-  setTimeout(() => { fn(); document.body.classList.remove('fading'); }, 230);
+  setTimeout(() => { if (gen !== switchGen) return; fn(); document.body.classList.remove('fading'); }, 230);
 }
 
 for (const btn of document.querySelectorAll('.preset')) {
