@@ -7,114 +7,159 @@
 <link rel="stylesheet" href="fonts.css">
 <style>
   :root {
-    --ink: #161D24; --muted: #6E6E7D; --border: #E2E2E5; --canvas: #FFFFFF;
+    --ink: #161D24; --muted: #6E6E7D; --border: #E2E2E5; --canvas: #FBFAF7;
     --panel: #F2F2F7; /* panel bg: ink text only — gray2 on panel is 4.49:1, below AA */ --accent: #1C5C98;
+    --hairline: rgba(22,29,36,.09);
+    --shadow-card: 0 1px 2px rgba(22,29,36,.04);
+    --shadow-lift: 0 1px 2px rgba(22,29,36,.05), 0 8px 20px rgba(22,29,36,.07);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: var(--canvas); }
   body {
     font-family: 'DM Sans', -apple-system, sans-serif; background: var(--canvas);
-    color: var(--ink); font-size: 15px; line-height: 1.45; padding: 28px 24px 20px;
+    color: var(--ink); font-size: 15px; line-height: 1.5;
+    padding: 44px clamp(20px, 4vw, 56px) 30px;
   }
-  .eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
-  .opening { font-size: 19px; font-weight: 500; margin: 6px 0 24px; max-width: 560px; }
-  .layout { display: grid; grid-template-columns: 220px minmax(300px, 360px) 1fr; gap: 28px; align-items: start; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  /* ---- header plate ---- */
+  .eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); }
+  .opening { font-size: clamp(21px, 2.6vw, 28px); font-weight: 500; letter-spacing: -0.012em; line-height: 1.28; margin: 10px 0 0; max-width: 640px; }
+  .rule { border: none; border-top: 1px solid var(--border); margin: 26px 0 30px; }
+
+  .layout { display: grid; grid-template-columns: 252px minmax(320px, 400px) minmax(360px, 1fr); gap: clamp(28px, 4vw, 56px); align-items: start; }
+  .colhead { font-size: 11px; font-weight: 500; letter-spacing: .15em; text-transform: uppercase; color: var(--muted);
+    display: flex; align-items: baseline; gap: 10px; min-height: 16px; margin-bottom: 16px; }
+  .colhead .num { color: var(--accent); letter-spacing: .08em; }
+
+  /* synchronized arrival — everything rises together, once */
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .rail, #phone, #rolesPanel { animation: rise 560ms cubic-bezier(.22,.61,.36,1) both; }
 
   /* ---- intake rail ---- */
-  .rail .eyebrow { color: var(--muted); }
   .preset {
     display: block; width: 100%; text-align: left; background: #fff; border: 1px solid var(--border);
-    border-radius: 14px; padding: 14px; margin-top: 10px; cursor: pointer; font: inherit; color: inherit;
+    border-radius: 16px; padding: 15px 16px 14px; margin-top: 12px; cursor: pointer; font: inherit; color: inherit;
+    box-shadow: var(--shadow-card); transition: border-color 160ms ease, box-shadow 160ms ease;
   }
-  .preset[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+  .preset:hover { border-color: #C9CBD1; box-shadow: var(--shadow-lift); }
+  .preset[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink), var(--shadow-lift); }
   .preset:focus-visible, #customColor:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .preset .cu { font-weight: 500; font-size: 14px; }
-  .chips { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
-  .chip { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--border); }
-  .chips code { font-size: 11px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
-  .custom { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
-  .custom label { font-size: 13px; color: var(--muted); }
-  #customColor { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; padding: 2px; background: #fff; cursor: pointer; }
+  .preset .cu { display: block; font-weight: 500; font-size: 14.5px; letter-spacing: -0.005em; }
+  .chips { display: flex; gap: 7px; margin-top: 11px; align-items: center; }
+  .chip { width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--hairline); flex: none; }
+  .chips code { font-size: 11px; letter-spacing: .02em; color: var(--muted); font-family: 'DM Sans', sans-serif; margin-left: 3px; }
+  .custom {
+    margin-top: 12px; display: flex; align-items: center; gap: 12px;
+    border: 1px dashed #C9CBD1; border-radius: 16px; padding: 13px 16px; background: transparent;
+  }
+  .custom label { font-size: 13.5px; font-weight: 500; color: var(--muted); cursor: pointer; }
+  #customColor { width: 32px; height: 32px; border: 1px solid var(--hairline); border-radius: 9px; padding: 2px; background: #fff; cursor: pointer; flex: none; }
+  .rail-note { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 14px; max-width: 220px; }
 
   /* ---- stage (phone + roles crossfade together) ---- */
   #stage { display: contents; }
   #phone, #rolesPanel { transition: opacity 220ms ease; }
   .fading #phone, .fading #rolesPanel { opacity: 0; }
   @media (prefers-reduced-motion: reduce) {
-    #phone, #rolesPanel, .swatch { transition: none !important; }
+    #phone, #rolesPanel, .swatch, .preset { transition: none !important; }
+    .rail, #phone, #rolesPanel { animation: none !important; }
   }
 
-  /* ---- member phone ---- */
+  /* ---- member phone (device frame) ---- */
   #phone {
-    width: 320px; border-radius: 36px; border: 1px solid var(--border);
-    box-shadow: 0 18px 40px rgba(22,29,36,.14); overflow: hidden; background: #fff; margin: 0 auto;
+    width: 330px; margin: 0 auto; background: #14171B; border-radius: 48px; padding: 9px;
+    box-shadow: 0 1px 2px rgba(22,29,36,.12), 0 14px 28px rgba(22,29,36,.12), 0 34px 68px rgba(22,29,36,.16);
   }
-  .band { background: var(--bg, #1E3A5F); color: var(--on-bg, #FFFFFF); padding: 18px 18px 22px; }
-  .wordmark { font-size: 13px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
-  .scorerow { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 13px; }
+  .screen { border-radius: 40px; overflow: hidden; background: #fff; position: relative; }
+  .band { background: var(--bg, #1E3A5F); color: var(--on-bg, #FFFFFF); padding: 12px 18px 22px; }
+  .statusbar { display: flex; justify-content: space-between; align-items: center; height: 30px; position: relative; }
+  .statusbar .time { font-size: 13px; font-weight: 500; letter-spacing: .02em; width: 54px; }
+  .island { position: absolute; left: 50%; top: 4px; transform: translateX(-50%); width: 84px; height: 22px; border-radius: 999px; background: #0B0D10; }
+  .statusglyphs { display: flex; align-items: center; gap: 5px; }
+  .statusglyphs svg { display: block; }
+  .wordmark { font-size: 13px; font-weight: 500; letter-spacing: .11em; text-transform: uppercase; margin-top: 12px; }
+  .scorerow { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; font-size: 13.5px; }
   /* status green #1E8404 (shipped statuses palette), not gradient-end #529D40:
      white text needs 4.5:1 and only the darker status green passes (4.8 vs 3.4) */
-  .scorechip { background: #1E8404; color: #fff; font-weight: 500; border-radius: 999px; padding: 3px 12px; }
-  .band h2 { font-size: 17px; font-weight: 500; margin-top: 14px; }
-  .card { background: #fff; border-radius: 16px; padding: 16px; margin: 14px 14px 0; border: 1px solid var(--border); }
-  .band .card { margin: 12px 0 0; border: none; }
-  .card .eyebrow { color: var(--accent); }
-  .card h3 { color: var(--headline, #1E3A5F); font-size: 17px; font-weight: 500; margin: 4px 0 6px; }
-  .card p { color: var(--muted); font-size: 13px; }
+  .scorechip { background: #1E8404; color: #fff; font-weight: 500; font-size: 13px; border-radius: 999px; padding: 4px 13px; }
+  .band h2 { font-size: 17px; font-weight: 500; letter-spacing: -0.005em; margin-top: 16px; }
+  .card { background: #fff; border-radius: 18px; padding: 17px 16px 16px; margin: 14px 14px 0; border: 1px solid var(--border); box-shadow: var(--shadow-card); }
+  .band .card { margin: 12px 0 0; border: 1px solid rgba(22,29,36,.08); box-shadow: 0 6px 18px rgba(11,13,16,.10); }
+  .card .eyebrow { color: var(--accent); font-size: 10.5px; line-height: 1.5; }
+  .card h3 { color: var(--headline, #1E3A5F); font-size: 17.5px; font-weight: 500; letter-spacing: -0.008em; line-height: 1.28; margin: 6px 0 6px; }
+  .card p { color: var(--muted); font-size: 13px; line-height: 1.5; }
   .cta {
-    display: block; width: 100%; margin-top: 12px; padding: 11px; border: none; border-radius: 999px;
+    display: block; width: 100%; margin-top: 14px; padding: 12px; border: none; border-radius: 999px;
     background: var(--cta, #1FA98C); color: var(--on-cta, #161D24); font: inherit; font-weight: 500; font-size: 14px;
   }
-  .progress { height: 8px; border-radius: 999px; background: var(--border); margin-top: 10px; overflow: hidden; }
+  .progress { height: 8px; border-radius: 999px; background: var(--panel); margin-top: 12px; overflow: hidden; }
   .progress i { display: block; height: 100%; width: 32%; border-radius: 999px;
     background: linear-gradient(90deg, #F69835, #F4C355, #529D40); }
-  .plabel { font-size: 12px; color: var(--muted); margin-top: 6px; }
-  .powered { text-align: center; font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
-    color: var(--muted); padding: 14px 0 16px; }
+  .plabel { font-size: 12px; color: var(--muted); margin-top: 7px; }
+  .powered { text-align: center; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--muted); padding: 16px 0 18px; }
 
-  /* ---- derivation panel ---- */
-  #rolesPanel .eyebrow { color: var(--muted); }
-  .role { border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 10px; min-height: 96px; }
-  .role-head { display: flex; justify-content: space-between; font-size: 13px; }
-  .role-name { font-weight: 500; }
-  .role-src { color: var(--muted); }
-  .role-out { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-  .swatch { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--border); transition: background-color 90ms linear; }
-  .arrow { color: var(--muted); }
-  .ratio { font-size: 12px; font-weight: 500; background: var(--panel); border-radius: 999px; padding: 3px 10px; }
-  .badge { font-size: 11px; font-weight: 500; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 8px; visibility: hidden; }
+  /* ---- derivation panel (spec sheet) ---- */
+  .role { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 15px 16px; margin-top: 12px; min-height: 102px; box-shadow: var(--shadow-card); }
+  .role:first-child { margin-top: 0; }
+  .role-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 13.5px; }
+  .role-name { font-weight: 500; letter-spacing: .01em; }
+  .role-src { color: var(--muted); font-size: 10.5px; font-weight: 500; letter-spacing: .13em; text-transform: uppercase; }
+  .role-out { display: flex; align-items: center; gap: 9px; margin-top: 13px; }
+  .swatch { width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--hairline); transition: background-color 90ms linear; flex: none; }
+  .arrow { color: var(--muted); font-size: 13px; }
+  .ratio { font-size: 12px; font-weight: 500; letter-spacing: .02em; background: var(--panel); border-radius: 999px; padding: 4px 11px; }
+  .badge { font-size: 9.5px; font-weight: 500; letter-spacing: .13em; text-transform: uppercase; color: var(--accent);
+    border: 1px solid rgba(28,92,152,.45); border-radius: 999px; padding: 3px 9px; visibility: hidden; }
   .role.adjusted .badge { visibility: visible; }
   /* space reserved even when hidden — layout must never reflow on toggle */
-  .role .raw-pair { display: flex; visibility: hidden; align-items: center; gap: 8px; }
+  .role .raw-pair { display: flex; visibility: hidden; align-items: center; gap: 9px; }
   .role.adjusted .raw-pair { visibility: visible; }
-  .flag { display: flex; align-items: center; gap: 7px; margin-top: 20px; font-size: 13px; color: var(--ink);
-    background: #FDEBC7; border-radius: 10px; padding: 10px 12px; visibility: hidden; }
+  .flag { display: flex; align-items: center; gap: 9px; margin-top: 14px; font-size: 13px; line-height: 1.45; color: var(--ink);
+    background: #FDEBC7; border: 1px solid rgba(22,29,36,.07); border-radius: 12px; padding: 11px 14px; visibility: hidden; }
+  .flag svg { flex: none; }
   .flagged .flag { visibility: visible; }
-  .neutrals { border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 14px; }
-  .nswatches { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-  .nswatches .chip { width: 26px; height: 26px; }
-  .gradbar { height: 10px; border-radius: 999px; margin-top: 10px;
-    background: linear-gradient(90deg, #F69835, #F4C355, #529D40); }
-  .ncaption { font-size: 12px; color: var(--muted); margin-top: 10px; }
 
-  .closing { text-align: center; font-style: italic; color: var(--muted); font-size: 13px; margin-top: 30px; }
-  .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 8px; }
+  .neutrals { border-top: 1px solid var(--border); margin-top: 22px; padding-top: 18px; }
+  .neutrals .colhead { margin-bottom: 14px; }
+  .ngroup { display: flex; align-items: center; gap: 7px; margin-top: 9px; }
+  .ngroup .nlabel { font-size: 11px; font-weight: 500; letter-spacing: .06em; color: var(--muted); width: 76px; flex: none; }
+  .nswatches { display: flex; gap: 7px; flex-wrap: wrap; }
+  .nswatches .chip { width: 24px; height: 24px; border-radius: 7px; }
+  .gradbar { height: 12px; border-radius: 999px; flex: 1; max-width: 172px;
+    background: linear-gradient(90deg, #F69835, #F4C355, #529D40); border: 1px solid var(--hairline); }
+  .ncaption { font-size: 12px; color: var(--muted); line-height: 1.55; margin-top: 14px; max-width: 420px; }
+
+  /* ---- footer plate ---- */
+  .footer { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px; }
+  .closing { text-align: center; font-style: italic; color: var(--muted); font-size: 13.5px; line-height: 1.55; max-width: 560px; margin: 0 auto; }
+  .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 10px; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-  @media (max-width: 760px) {
-    .layout { grid-template-columns: 1fr; }
-    .rail { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
-    .rail > .eyebrow { flex-basis: 100%; }
-    .preset { min-width: 190px; }
+  @media (max-width: 980px) {
+    body { padding-top: 32px; }
+    .layout { grid-template-columns: 1fr; gap: 30px; }
+    .rail { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; flex-wrap: nowrap; }
+    .rail .colhead { flex-basis: 100%; margin-bottom: 4px; }
+    .preset { min-width: 212px; margin-top: 0; flex: none; }
+    .custom { margin-top: 0; flex: none; align-self: stretch; }
+    .rail-note { display: none; }
+    .ncaption { max-width: none; }
   }
 </style>
 </head>
 <body>
-<p class="eyebrow">Silvur — white-label platform · design system</p>
-<h1 class="opening">The entire intake from a new credit union partner: a logo and two brand colors.</h1>
+<div class="wrap">
+<header>
+  <p class="eyebrow">Silvur — white-label platform · design system</p>
+  <h1 class="opening">The entire intake from a new credit union partner: a logo and two brand colors.</h1>
+</header>
+<hr class="rule">
 
 <div class="layout">
   <div class="rail" id="presets" role="group" aria-label="What a new partner sent us">
-    <p class="eyebrow">What a new partner sent us</p>
+    <p class="colhead"><span class="num">01</span> What a new partner sent us</p>
     <button class="preset" data-id="lanternbay" aria-pressed="true">
       <span class="cu">Lanternbay Credit Union</span>
       <span class="chips"><i class="chip" style="background:#1E3A5F"></i><i class="chip" style="background:#1FA98C"></i><code>#1E3A5F · #1FA98C</code></span>
@@ -131,11 +176,22 @@
       <input type="color" id="customColor" value="#1C5C98" aria-label="Try any color as a brand primary">
       <label for="customColor">Try any color</label>
     </div>
+    <p class="rail-note">That was the whole onboarding form. The system handled the rest.</p>
   </div>
 
   <div id="stage">
     <div id="phone" style="--bg:#1E3A5F; --on-bg:#FFFFFF; --headline:#1E3A5F; --cta:#1FA98C; --on-cta:#161D24">
+      <div class="screen">
       <div class="band">
+        <div class="statusbar">
+          <span class="time">9:41</span>
+          <span class="island" aria-hidden="true"></span>
+          <span class="statusglyphs" aria-hidden="true">
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+            <svg width="15" height="11" viewBox="0 0 15 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1.5 3.8a9.2 9.2 0 0 1 12 0"/><path d="M3.8 6.3a5.9 5.9 0 0 1 7.4 0"/><path d="M6.1 8.7a2.7 2.7 0 0 1 2.8 0"/></svg>
+            <svg width="23" height="11" viewBox="0 0 23 11" fill="none"><rect x="0.5" y="0.5" width="19" height="10" rx="3" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="7" rx="1.6" fill="currentColor"/><path d="M21.5 3.5v4a2.2 2.2 0 0 0 0-4z" fill="currentColor" opacity=".5"/></svg>
+          </span>
+        </div>
         <p class="wordmark" id="phoneWordmark">Lanternbay Credit Union</p>
         <div class="scorerow"><span>Retirement Score</span><span class="scorechip">82y 5m</span></div>
         <h2>Top priority for you:</h2>
@@ -153,10 +209,11 @@
         <p class="plabel">32% complete</p>
       </div>
       <p class="powered">Powered by Silvur</p>
+      </div>
     </div>
 
     <div id="rolesPanel">
-      <p class="eyebrow">What the system did with it</p>
+      <p class="colhead"><span class="num">02</span> What the system did with it</p>
       <div id="roles">
         <div class="role" data-role="background">
           <div class="role-head"><span class="role-name">brand/background</span><span class="role-src">← primary</span></div>
@@ -191,28 +248,39 @@
         <span>Flagged for partner review — relationship manager notified</span>
       </p>
       <div class="neutrals" id="neutrals">
-        <p class="eyebrow" style="color:#6E6E7D">Reduced to neutral — works with every brand</p>
-        <div class="nswatches">
-          <i class="chip" style="background:#161D24" title="#161D24"></i>
-          <i class="chip" style="background:#6E6E7D" title="#6E6E7D"></i>
-          <i class="chip" style="background:#9D9DA8" title="#9D9DA8"></i>
-          <i class="chip" style="background:#E2E2E5" title="#E2E2E5"></i>
-          <i class="chip" style="background:#F2F2F7" title="#F2F2F7"></i>
-          <i class="chip" style="background:#FFFFFF" title="#FFFFFF"></i>
-          <i class="chip" style="background:#F8D5D5" title="#F8D5D5"></i>
-          <i class="chip" style="background:#E15255" title="#E15255"></i>
-          <i class="chip" style="background:#FDEBC7" title="#FDEBC7"></i>
-          <i class="chip" style="background:#1C5C98" title="#1C5C98"></i>
+        <p class="colhead"><span class="num">03</span> Reduced to neutral — works with every brand</p>
+        <div class="ngroup"><span class="nlabel">Grays</span>
+          <span class="nswatches">
+            <i class="chip" style="background:#161D24" title="#161D24"></i>
+            <i class="chip" style="background:#6E6E7D" title="#6E6E7D"></i>
+            <i class="chip" style="background:#9D9DA8" title="#9D9DA8"></i>
+            <i class="chip" style="background:#E2E2E5" title="#E2E2E5"></i>
+            <i class="chip" style="background:#F2F2F7" title="#F2F2F7"></i>
+            <i class="chip" style="background:#FFFFFF" title="#FFFFFF"></i>
+          </span>
         </div>
-        <div class="gradbar" title="#F69835 #F4C355 #529D40"></div>
+        <div class="ngroup"><span class="nlabel">Semantic</span>
+          <span class="nswatches">
+            <i class="chip" style="background:#F8D5D5" title="#F8D5D5"></i>
+            <i class="chip" style="background:#E15255" title="#E15255"></i>
+            <i class="chip" style="background:#FDEBC7" title="#FDEBC7"></i>
+            <i class="chip" style="background:#1C5C98" title="#1C5C98"></i>
+          </span>
+        </div>
+        <div class="ngroup"><span class="nlabel">Score</span>
+          <span class="gradbar" title="#F69835 #F4C355 #529D40"></span>
+        </div>
         <p class="ncaption">Text, cards, borders, icons, errors, announcements — and the Retirement Score gradient, a semantic trust color that never takes brand.</p>
       </div>
     </div>
   </div>
 </div>
 
-<p class="closing">Two colors, three jobs — background, headline, CTA. Everything else was reduced to a neutral system that had to work beside any brand that arrived.</p>
-<p class="footnote">Credit unions shown are fictional; member data is synthetic; app copy is a representative reconstruction of the shipped product.</p>
+<div class="footer">
+  <p class="closing">Two colors, three jobs — background, headline, CTA. Everything else was reduced to a neutral system that had to work beside any brand that arrived.</p>
+  <p class="footnote">Credit unions shown are fictional; member data is synthetic; app copy is a representative reconstruction of the shipped product.</p>
+</div>
+</div>
 <p id="live" class="sr-only" aria-live="polite"></p>
 <script type="module">
 import { PRESETS, NEUTRALS, deriveRoles, deriveSecondary } from './brand-model.js';
