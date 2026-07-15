@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>White-label brand system — a logo and two colors in</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+  :root {
+    --ink: #161D24; --muted: #6E6E7D; --border: #E2E2E5; --canvas: #FFFFFF;
+    --panel: #F2F2F7; --accent: #1C5C98;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif; background: var(--canvas);
+    color: var(--ink); font-size: 15px; line-height: 1.45; padding: 28px 24px 20px;
+  }
+  .eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  .opening { font-size: 19px; font-weight: 500; margin: 6px 0 24px; max-width: 560px; }
+  .layout { display: grid; grid-template-columns: 220px minmax(300px, 360px) 1fr; gap: 28px; align-items: start; }
+
+  /* ---- intake rail ---- */
+  .rail .eyebrow { color: var(--muted); }
+  .preset {
+    display: block; width: 100%; text-align: left; background: #fff; border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px; margin-top: 10px; cursor: pointer; font: inherit; color: inherit;
+  }
+  .preset[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+  .preset:focus-visible, #customColor:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .preset .cu { font-weight: 500; font-size: 14px; }
+  .chips { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+  .chip { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--border); }
+  .chips code { font-size: 11px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+  .custom { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
+  .custom label { font-size: 13px; color: var(--muted); }
+  #customColor { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; padding: 2px; background: #fff; cursor: pointer; }
+
+  /* ---- stage (phone + roles crossfade together) ---- */
+  #stage { display: contents; }
+  #phone, #rolesPanel { transition: opacity 220ms ease; }
+  .fading #phone, .fading #rolesPanel { opacity: 0; }
+  @media (prefers-reduced-motion: reduce) {
+    #phone, #rolesPanel, .swatch { transition: none !important; }
+  }
+
+  /* ---- member phone ---- */
+  #phone {
+    width: 320px; border-radius: 36px; border: 1px solid var(--border);
+    box-shadow: 0 18px 40px rgba(22,29,36,.14); overflow: hidden; background: #fff; margin: 0 auto;
+  }
+  .band { background: var(--bg, #1E3A5F); color: var(--on-bg, #FFFFFF); padding: 18px 18px 22px; }
+  .wordmark { font-size: 13px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
+  .scorerow { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 13px; }
+  /* status green #1E8404 (shipped statuses palette), not gradient-end #529D40:
+     white text needs 4.5:1 and only the darker status green passes (4.8 vs 3.4) */
+  .scorechip { background: #1E8404; color: #fff; font-weight: 500; border-radius: 999px; padding: 3px 12px; }
+  .band h2 { font-size: 17px; font-weight: 500; margin-top: 14px; }
+  .card { background: #fff; border-radius: 16px; padding: 16px; margin: 14px 14px 0; border: 1px solid var(--border); }
+  .band .card { margin: 12px 0 0; border: none; }
+  .card .eyebrow { color: var(--accent); }
+  .card h3 { color: var(--headline, #1E3A5F); font-size: 17px; font-weight: 500; margin: 4px 0 6px; }
+  .card p { color: var(--muted); font-size: 13px; }
+  .cta {
+    display: block; width: 100%; margin-top: 12px; padding: 11px; border: none; border-radius: 999px;
+    background: var(--cta, #1FA98C); color: var(--on-cta, #161D24); font: inherit; font-weight: 500; font-size: 14px;
+  }
+  .progress { height: 8px; border-radius: 999px; background: var(--border); margin-top: 10px; overflow: hidden; }
+  .progress i { display: block; height: 100%; width: 32%; border-radius: 999px;
+    background: linear-gradient(90deg, #F69835, #F4C355, #529D40); }
+  .plabel { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .powered { text-align: center; font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); padding: 14px 0 16px; }
+
+  /* ---- derivation panel ---- */
+  #rolesPanel .eyebrow { color: var(--muted); }
+  .role { border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 10px; min-height: 96px; }
+  .role-head { display: flex; justify-content: space-between; font-size: 13px; }
+  .role-name { font-weight: 500; }
+  .role-src { color: var(--muted); }
+  .role-out { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .swatch { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--border); transition: background-color 90ms linear; }
+  .arrow { color: var(--muted); }
+  .ratio { font-size: 12px; font-weight: 500; background: var(--panel); border-radius: 999px; padding: 3px 10px; }
+  .badge { font-size: 11px; font-weight: 500; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 8px; visibility: hidden; }
+  .role.adjusted .badge { visibility: visible; }
+  .role .raw-pair { display: none; align-items: center; gap: 8px; }
+  .role.adjusted .raw-pair { display: flex; }
+  .flag { display: flex; align-items: center; gap: 7px; margin-top: 20px; font-size: 13px; color: var(--ink);
+    background: #FDEBC7; border-radius: 10px; padding: 10px 12px; visibility: hidden; }
+  .flagged .flag { visibility: visible; }
+  .neutrals { border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 14px; }
+  .nswatches { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .nswatches .chip { width: 26px; height: 26px; }
+  .gradbar { height: 10px; border-radius: 999px; margin-top: 10px;
+    background: linear-gradient(90deg, #F69835, #F4C355, #529D40); }
+  .ncaption { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+  .closing { text-align: center; font-style: italic; color: var(--muted); font-size: 13px; margin-top: 30px; }
+  .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  @media (max-width: 760px) {
+    .layout { grid-template-columns: 1fr; }
+    .rail { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+    .rail > .eyebrow { flex-basis: 100%; }
+    .preset { min-width: 190px; }
+  }
+</style>
+</head>
+<body>
+<p class="eyebrow">Silvur — white-label platform · design system</p>
+<h1 class="opening">The entire intake from a new credit union partner: a logo and two brand colors.</h1>
+
+<div class="layout">
+  <div class="rail" id="presets" role="group" aria-label="What a new partner sent us">
+    <p class="eyebrow">What a new partner sent us</p>
+    <button class="preset" data-id="harborlight" aria-pressed="true">
+      <span class="cu">Harborlight Credit Union</span>
+      <span class="chips"><i class="chip" style="background:#1E3A5F"></i><i class="chip" style="background:#1FA98C"></i><code>#1E3A5F · #1FA98C</code></span>
+    </button>
+    <button class="preset" data-id="sunwise" aria-pressed="false">
+      <span class="cu">Sunwise Credit Union</span>
+      <span class="chips"><i class="chip" style="background:#FFC93C"></i><i class="chip" style="background:#6E6A5E"></i><code>#FFC93C · #6E6A5E</code></span>
+    </button>
+    <button class="preset" data-id="embervalley" aria-pressed="false">
+      <span class="cu">Ember Valley Credit Union</span>
+      <span class="chips"><i class="chip" style="background:#6B1F2F"></i><i class="chip" style="background:#C98A8A"></i><code>#6B1F2F · #C98A8A</code></span>
+    </button>
+    <div class="custom">
+      <input type="color" id="customColor" value="#1C5C98" aria-label="Try any color as a brand primary">
+      <label for="customColor">Try any color</label>
+    </div>
+  </div>
+
+  <div id="stage">
+    <div id="phone" style="--bg:#1E3A5F; --on-bg:#FFFFFF; --headline:#1E3A5F; --cta:#1FA98C; --on-cta:#161D24">
+      <div class="band">
+        <p class="wordmark" id="phoneWordmark">Harborlight Credit Union</p>
+        <div class="scorerow"><span>Retirement Score</span><span class="scorechip">82y 5m</span></div>
+        <h2>Top priority for you:</h2>
+        <div class="card">
+          <p class="eyebrow">Because you're near your election age</p>
+          <h3>Plan your Social Security election</h3>
+          <p>Electing at the right age can add years of income to your retirement.</p>
+          <button class="cta" tabindex="-1">Learn More</button>
+        </div>
+      </div>
+      <div class="card">
+        <p class="eyebrow" style="color:#6E6E7D">In progress</p>
+        <h3 style="color:#161D24">Maximize your Retirement Savings</h3>
+        <div class="progress"><i></i></div>
+        <p class="plabel">32% complete</p>
+      </div>
+      <p class="powered">Powered by Silvur</p>
+    </div>
+
+    <div id="rolesPanel">
+      <p class="eyebrow">What the system did with it</p>
+      <div id="roles">
+        <div class="role" data-role="background">
+          <div class="role-head"><span class="role-name">brand/background</span><span class="role-src">← primary</span></div>
+          <div class="role-out">
+            <span class="swatch out" style="background:#1E3A5F"></span>
+            <span class="ratio">11.5:1 AA</span>
+            <span class="badge">adjusted</span>
+          </div>
+        </div>
+        <div class="role" data-role="headline">
+          <div class="role-head"><span class="role-name">brand/headline</span><span class="role-src">← primary</span></div>
+          <div class="role-out">
+            <span class="raw-pair"><span class="swatch raw"></span><span class="arrow">→</span></span>
+            <span class="swatch out" style="background:#1E3A5F"></span>
+            <span class="ratio">11.5:1 AA</span>
+            <span class="badge">adjusted</span>
+          </div>
+        </div>
+        <div class="role" data-role="cta">
+          <div class="role-head"><span class="role-name">brand/CTA</span><span class="role-src">← secondary</span></div>
+          <div class="role-out">
+            <span class="swatch out" style="background:#1FA98C"></span>
+            <span class="ratio">5.8:1 AA</span>
+            <span class="badge">adjusted</span>
+          </div>
+        </div>
+      </div>
+      <p class="flag" id="flag">
+        <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M1 1v12M1 1h9l-2 3 2 3H1" fill="none" stroke="#161D24" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span>Flagged for partner review — relationship manager notified</span>
+      </p>
+      <div class="neutrals" id="neutrals">
+        <p class="eyebrow" style="color:#6E6E7D">Reduced to neutral — works with every brand</p>
+        <div class="nswatches">
+          <i class="chip" style="background:#161D24" title="#161D24"></i>
+          <i class="chip" style="background:#6E6E7D" title="#6E6E7D"></i>
+          <i class="chip" style="background:#9D9DA8" title="#9D9DA8"></i>
+          <i class="chip" style="background:#E2E2E5" title="#E2E2E5"></i>
+          <i class="chip" style="background:#F2F2F7" title="#F2F2F7"></i>
+          <i class="chip" style="background:#FFFFFF" title="#FFFFFF"></i>
+          <i class="chip" style="background:#F8D5D5" title="#F8D5D5"></i>
+          <i class="chip" style="background:#E15255" title="#E15255"></i>
+          <i class="chip" style="background:#FDEBC7" title="#FDEBC7"></i>
+          <i class="chip" style="background:#1C5C98" title="#1C5C98"></i>
+        </div>
+        <div class="gradbar" title="#F69835 #F4C355 #529D40"></div>
+        <p class="ncaption">Text, cards, borders, icons, errors, announcements — and the Retirement Score gradient, a semantic trust color that never takes brand.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="closing">Two colors, three jobs — background, headline, CTA. Everything else was reduced to a neutral system that had to work beside any brand that arrived.</p>
+<p class="footnote">Credit unions shown are fictional; member data is synthetic; app copy is a representative reconstruction of the shipped product.</p>
+<p id="live" class="sr-only" aria-live="polite"></p>
+<script type="module" src="brand-app-placeholder"></script>
+</body>
+</html>
