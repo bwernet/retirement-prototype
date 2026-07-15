@@ -218,12 +218,11 @@ import { PRESETS, NEUTRALS, deriveRoles, deriveSecondary } from './brand-model.j
 const $ = s => document.querySelector(s);
 const phone = $('#phone'), rolesPanel = $('#rolesPanel'), live = $('#live'), stageWrap = $('#stage');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-let animToken = 0;
 
 const fmt = r => `${(Math.round(r * 10) / 10).toFixed(1)}:1 AA`;
 
 function paintRole(el, { out, raw, ratio, adjusted, steps }) {
-  const token = ++animToken;
+  const token = (el._anim = (el._anim || 0) + 1);
   el.classList.toggle('adjusted', adjusted);
   const outSw = el.querySelector('.swatch.out');
   const rawSw = el.querySelector('.swatch.raw');
@@ -233,7 +232,7 @@ function paintRole(el, { out, raw, ratio, adjusted, steps }) {
     // Story-serving motion: perform the guardrail — step darker until it passes.
     const frames = steps.filter((_, i) => i % Math.ceil(steps.length / 6) === 0).concat(out);
     outSw.style.background = raw;
-    frames.forEach((c, i) => setTimeout(() => { if (animToken === token) outSw.style.background = c; }, 120 * (i + 1)));
+    frames.forEach((c, i) => setTimeout(() => { if (el._anim === token) outSw.style.background = c; }, 120 * (i + 1)));
   } else {
     outSw.style.background = out;
   }
