@@ -4,8 +4,11 @@
     {
       "name": "prototype",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["serve.mjs"],
-      "port": 8000
+      "runtimeArgs": [
+        "serve.mjs"
+      ],
+      "port": 8000,
+      "autoPort": true
     }
   ]
 }
