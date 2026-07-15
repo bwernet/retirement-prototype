@@ -82,6 +82,8 @@ export function onColorFor(fill) {
   return w >= k ? { color: NEUTRALS.white, ratio: w } : { color: NEUTRALS.gray1, ratio: k };
 }
 
+// Guaranteed to terminate (lightness floor at black), and guaranteed to REACH
+// `target` only when `against` is light (all shipped uses pass white).
 export function darkenUntil(hex, against, target = 4.5) {
   let color = hex;
   const steps = [];
@@ -115,6 +117,8 @@ export function deriveRoles(primary, secondary) {
     ratio: contrast(h.color, NEUTRALS.white), rawRatio: contrast(primary, NEUTRALS.white),
   };
   const cta = fillRole(secondary);
+  // flagged holds human-readable role labels for prose/announcements
+  // ('CTA' is an acronym, always uppercase) — NOT the object keys above.
   const flagged = [];
   if (background.adjusted) flagged.push('background');
   if (headline.adjusted) flagged.push('headline');

@@ -92,3 +92,14 @@ test('deriveSecondary is deterministic and CTA-usable', () => {
   const r = deriveRoles('#1E3A5F', a);
   assert.ok(r.cta.ratio >= 4.5);
 });
+
+test('fill roles darken as a last resort when no text color passes, and flag with display labels', () => {
+  // #338899 sits in the dead zone: neither white nor ink reaches 4.5:1 on it.
+  const r = deriveRoles('#338899', '#338899');
+  assert.equal(r.background.adjusted, true);
+  assert.equal(r.cta.adjusted, true);
+  assert.equal(r.background.onColor, NEUTRALS.white, 'darkened fill takes white text');
+  assert.ok(r.background.ratio >= 4.5);
+  assert.ok(r.cta.ratio >= 4.5);
+  assert.deepEqual(r.flagged, ['background', 'headline', 'CTA'], 'display labels, CTA uppercase');
+});
