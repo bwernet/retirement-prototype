@@ -34,3 +34,15 @@ const bt = fs.readFileSync('babytalk-question.html', 'utf8')
 if (bt.includes('href="babytalk-fonts.css"')) throw new Error('babytalk-question inline failed');
 fs.writeFileSync('dist/babytalk-question.html', bt);
 console.log(`Wrote dist/babytalk-question.html (${(bt.length / 1024).toFixed(0)} KB)`);
+
+// brand-system imports brand-model.js — inline both fonts and model.
+const brandModel = fs.readFileSync('brand-model.js', 'utf8').replace(/^export /gm, '');
+const BRAND_IMPORT = `import { PRESETS, NEUTRALS, deriveRoles, deriveSecondary } from './brand-model.js';`;
+const brandSrc = fs.readFileSync('brand-system.html', 'utf8');
+if (!brandSrc.includes(BRAND_IMPORT)) throw new Error('brand-system import line drifted — update build.mjs');
+const brand = brandSrc
+  .replace('<link rel="stylesheet" href="fonts.css">', () => `<style>\n${fonts}</style>`)
+  .replace(BRAND_IMPORT, () => brandModel);
+if (brand.includes('href="fonts.css"') || brand.includes("from './brand-model.js'")) throw new Error('brand-system inline failed');
+fs.writeFileSync('dist/brand-system.html', brand);
+console.log(`Wrote dist/brand-system.html (${(brand.length / 1024).toFixed(0)} KB)`);

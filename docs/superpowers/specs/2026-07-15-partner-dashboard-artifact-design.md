@@ -30,15 +30,15 @@ DM Sans 400/500 via `fonts.css`.
 
 ## Connective tissue with artifact 1
 
-The dashboard is Harborlight Credit Union's instance — the same fictional CU
-the visitor configured in the brand-system artifact. Harborlight's wordmark
+The dashboard is Lanternbay Credit Union's instance — the same fictional CU
+the visitor configured in the brand-system artifact. Lanternbay's wordmark
 sits in the sidebar under the silvur PARTNERS chrome. A hiring manager who saw
-Harborlight born from a logo and two colors now sees its marketing team acting
+Lanternbay born from a logo and two colors now sees its marketing team acting
 on member signals. Neither artifact argues the platform loop; seeing the same
 CU in both carries it. The case-study prose stitches them explicitly.
 
 No fictional personal names anywhere (consistent with anonymization rules):
-the sidebar account area reads "Marketing · Harborlight CU", not a fake person.
+the sidebar account area reads "Marketing · Lanternbay CU", not a fake person.
 
 ## Structure — one segment, end to end
 
@@ -71,11 +71,11 @@ without claiming sight it didn't have.
 > **What members did** (in the Silvur experience): ran the Social Security
 > calculator; set or passed their election age; entered their benefit income
 > in their retirement score →
-> **What that means** (aggregated signal): 1,651 Harborlight members are
+> **What that means** (aggregated signal): 1,651 Lanternbay members are
 > collecting — or about to start collecting — Social Security, ~$23M/yr in
 > recurring benefit income identified →
-> **Why Harborlight cares** (business meaning): recurring federal deposits
-> anchor a primary-banking relationship, and Harborlight can't see where
+> **Why Lanternbay cares** (business meaning): recurring federal deposits
+> anchor a primary-banking relationship, and Lanternbay can't see where
 > they land — which is exactly why these members are worth a campaign →
 > **What to do**: a direct-deposit campaign to exactly these members.
 
