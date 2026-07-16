@@ -55,12 +55,12 @@
   .account > svg { margin-left: auto; margin-right: 5px; color: var(--muted); flex: none; }
 
   /* ---- main ---- */
-  .main { padding: 18px 20px 18px; min-width: 0; }
+  .main { padding: 18px 20px 0; min-width: 0; } /* no bottom pad — the scroll region runs to the frame edge */
   /* shorter mock: the product surface scrolls internally; sidebar stays pinned full height */
-  #screens { position: relative; height: 616px; }
+  #screens { position: relative; height: 634px; }
   .screen { position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: translateY(4px);
     overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #C9CBD1 transparent;
-    padding-right: 4px;
+    padding-right: 4px; padding-bottom: 16px; /* inner pad scrolls with the content */
     transition: opacity 200ms ease, transform 200ms ease, visibility 0s 200ms; }
   .screen::-webkit-scrollbar { width: 8px; }
   .screen::-webkit-scrollbar-thumb { background: #C9CBD1; border-radius: 999px; }
