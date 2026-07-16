@@ -11,9 +11,6 @@ const html = fs.readFileSync('partner-dashboard.html', 'utf8');
 assert.ok(html.includes('Credit union, members, and figures are fictional; segment logic is representative of the shipped product.'), 'disclosure footnote');
 assert.ok(/can't see where those deposits land/.test(html), 'story rail keeps the platform-cannot-see honesty line');
 for (const b of ['1 · Signal', '2 · Why', '3 · Act']) assert.ok(html.includes(b), `story beat: ${b}`);
-assert.ok(html.includes('Segments are framed as needs and recommended actions, not metrics — designed for marketers, not analysts.'), 'design note 1');
-assert.ok(html.includes("Provenance is one click away, never buried — and every signal is member activity on the platform. The insight earns trust by showing its reasoning and never claiming data it can't see."), 'design note 2');
-assert.ok(html.includes("The workflow ends in the partner's existing tools — platform scope was a design decision, not a limitation."), 'design note 3');
 
 // Product-voice copy inside the frame (faithful to the shipped dashboard).
 for (const s of ['Campaign Segments', 'All Segments', 'Date Range', 'Filters', 'Export Data',
@@ -64,7 +61,7 @@ assert.equal(/\p{Extended_Pictographic}/u.test(html), false, 'no emoji');
 
 // Structure + a11y hooks (product/explanation separation depends on these).
 for (const hook of ['id="screens"', 'data-screen="home"', 'id="heroCard"', 'id="backBtn"', 'id="doneBtn"',
-  'id="scrim"', 'id="notesToggle"', 'id="notesPanel"', 'id="storyRail"', 'class="storybeat"', 'id="storyCaption"',
+  'id="scrim"', 'id="storyRail"', 'class="storybeat"', 'id="storyCaption"',
   'id="exportSeg"', 'id="exportLeads"', 'id="live"', 'aria-live="polite"', 'id="scaler"', 'id="frame"',
   'role="dialog"', 'aria-modal="true"']) {
   assert.ok(html.includes(hook), `missing hook ${hook}`);

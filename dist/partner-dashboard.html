@@ -21,17 +21,14 @@
   .wrap { max-width: 980px; margin: 0 auto; }
   .pagehead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
   .eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); }
-  #notesToggle { font: inherit; font-size: 12px; font-weight: 500; color: var(--accent); background: none;
-    border: 1px solid var(--accent); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
-  #notesToggle[aria-pressed="true"] { background: var(--accent); color: #fff; }
-  #notesToggle:focus-visible, .storybeat:focus-visible, #heroCard:focus-visible, #backBtn:focus-visible,
+  .storybeat:focus-visible, #heroCard:focus-visible, #backBtn:focus-visible,
   .exportbtn:focus-visible, #doneBtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* ================= product frame (product voice ONLY inside) ================= */
   #scaler { transform-origin: top left; width: 980px; }
   #frame { position: relative; width: 980px; background: #fff; border: 1px solid var(--border); border-radius: 16px;
     box-shadow: 0 1px 2px rgba(22,29,36,.05), 0 10px 30px rgba(22,29,36,.07);
-    display: grid; grid-template-columns: 224px 1fr; overflow: hidden; }
+    display: grid; grid-template-columns: 238px 1fr; overflow: hidden; }
 
   /* ---- sidebar ---- */
   .sidebar { border-right: 1px solid var(--border); padding: 18px 14px 14px; display: flex; flex-direction: column; }
@@ -39,7 +36,9 @@
   .logotype .silvur { font-weight: 500; }
   .logotype .partners { font-weight: 500; font-size: 12px; letter-spacing: .18em; color: var(--teal-text); margin-left: 6px; }
   .nav { margin-top: 22px; display: flex; flex-direction: column; gap: 2px; }
-  .nav > span { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px; font-size: 13.5px; color: var(--muted); }
+  /* every menu item fits on one line */
+  .nav > span { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px;
+    font-size: 13.5px; color: var(--muted); white-space: nowrap; }
   .nav .active { background: var(--pill); color: var(--ink); font-weight: 500; }
   .nav .active .chev { margin-left: auto; }
   .nav .sub { padding-left: 37px; font-size: 13px; }
@@ -179,15 +178,6 @@
     color: var(--muted); min-height: 42px; opacity: 1; transition: opacity 180ms ease; }
   @media (prefers-reduced-motion: reduce) { #storyCaption { transition: none !important; } }
 
-  #notesPanel { display: none; background: #fff; border: 1px solid var(--accent); border-radius: 14px;
-    padding: 14px 16px; margin-top: 12px; }
-  body.notes-on #notesPanel { display: block; }
-  #notesPanel ol { list-style: none; }
-  #notesPanel li { display: flex; gap: 9px; font-size: 12.5px; line-height: 1.5; margin-top: 8px; }
-  #notesPanel li:first-child { margin-top: 0; }
-  .notebadge { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff;
-    font-size: 11px; font-weight: 500; line-height: 18px; text-align: center; flex: none; }
-
   .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 14px; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
@@ -196,7 +186,6 @@
 <div class="wrap">
 <div class="pagehead">
   <p class="eyebrow">Silvur — white-label platform · partner dashboard</p>
-  <button id="notesToggle" aria-pressed="false">Design notes</button>
 </div>
 
 <div id="scaler">
@@ -372,14 +361,6 @@
 </div>
 <p id="storyCaption">The home screen leads with needs, not metrics — segments framed as campaigns worth running today.</p>
 
-<aside id="notesPanel" aria-label="Design notes">
-  <ol>
-    <li><span class="notebadge">1</span><span>Segments are framed as needs and recommended actions, not metrics — designed for marketers, not analysts.</span></li>
-    <li><span class="notebadge">2</span><span>Provenance is one click away, never buried — and every signal is member activity on the platform. The insight earns trust by showing its reasoning and never claiming data it can't see.</span></li>
-    <li><span class="notebadge">3</span><span>The workflow ends in the partner's existing tools — platform scope was a design decision, not a limitation.</span></li>
-  </ol>
-</aside>
-
 <p class="footnote">Credit union, members, and figures are fictional; segment logic is representative of the shipped product.</p>
 </div>
 <p id="live" class="sr-only" aria-live="polite"></p>
@@ -481,14 +462,6 @@
       if (n === 3) { if (screens.dataset.screen !== 'detail') setScreen('detail'); openExport(document.querySelector('.panel .exportbtn')); }
     });
   }
-
-  const notes = $('#notesToggle');
-  notes.addEventListener('click', () => {
-    const on = notes.getAttribute('aria-pressed') !== 'true';
-    notes.setAttribute('aria-pressed', String(on));
-    document.body.classList.toggle('notes-on', on);
-    postHeight();
-  });
 
   // Fixed 980px frame scales down to fit narrow viewports (no bespoke mobile layout).
   // The case-study embed may pass ?scale=0.8 (clamped 0.4–1) to shrink the whole

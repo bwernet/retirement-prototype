@@ -220,3 +220,7 @@ chrome.
 grow once on first entry to the detail screen (the data-native descendant of
 the chain draw — once per entry from the home screen, never looping);
 `prefers-reduced-motion`: instant.
+
+**Later 2026-07-16:** the Design-notes layer was removed entirely (author) —
+the cycling story captions carry all narration alone. Sidebar menu items must
+each fit on one line (238px sidebar, nowrap).
