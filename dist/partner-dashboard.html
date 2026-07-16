@@ -21,7 +21,7 @@
   .wrap { max-width: 980px; margin: 0 auto; }
   .pagehead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
   .eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); }
-  .storybeat:focus-visible, #heroCard:focus-visible, #backBtn:focus-visible,
+  .storybeat:focus-visible, .segcard[data-detail]:focus-visible, #backBtn:focus-visible,
   .exportbtn:focus-visible, #doneBtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* ================= product frame (product voice ONLY inside) ================= */
@@ -93,8 +93,8 @@
     font-size: 12.5px; font-weight: 500; letter-spacing: 0; text-transform: none; }
   .exportbtn { font: inherit; display: block; width: 108px; margin-top: 13px; padding: 9px 0; border: none;
     border-radius: 7px; background: var(--teal-text); color: #fff; font-weight: 500; font-size: 13px; cursor: pointer; }
-  #heroCard { cursor: pointer; transition: border-color 160ms ease, box-shadow 160ms ease; }
-  #heroCard:hover { border-color: #C9CBD1; box-shadow: 0 1px 2px rgba(22,29,36,.05), 0 8px 20px rgba(22,29,36,.08); }
+  .segcard[data-detail] { cursor: pointer; transition: border-color 160ms ease, box-shadow 160ms ease; }
+  .segcard[data-detail]:hover { border-color: #C9CBD1; box-shadow: 0 1px 2px rgba(22,29,36,.05), 0 8px 20px rgba(22,29,36,.08); }
 
   /* ---- home: All Segments table ---- */
   .tablecard { background: #fff; border: 1px solid var(--border); border-radius: 10px; margin-top: 16px;
@@ -237,7 +237,7 @@
       <!-- product screen: Campaign Segments home -->
       <section class="screen home" aria-label="Campaign Segments">
         <div class="cards">
-          <div class="segcard">
+          <div class="segcard" data-detail="wm" role="button" tabindex="0" aria-label="Top Wealth Management Leads — open segment">
             <span class="cardtop"><span class="chip opp">Top Opportunity</span></span>
             <h3>Top Wealth Management Leads</h3>
             <p>Customers 0–3 years away from retirement with over $1 million in investable assets</p>
@@ -245,7 +245,7 @@
             <span class="metric"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M4.5 1v12M7.5 3.2C6.8 2.5 5.8 2.1 4.5 2.1c-1.6 0-2.9.8-2.9 2.2 0 2.9 5.8 1.5 5.8 4.5 0 1.4-1.3 2.2-2.9 2.2-1.3 0-2.4-.4-3.1-1.2"/></svg>Total Assets<span class="pill">$752M</span></span>
             <button class="exportbtn" data-seg="Top Wealth Management Leads" data-leads="597">Export Data</button>
           </div>
-          <div class="segcard" id="heroCard" role="button" tabindex="0" aria-label="Direct Deposit: Social Security — open segment">
+          <div class="segcard" id="heroCard" data-detail="ss" role="button" tabindex="0" aria-label="Direct Deposit: Social Security — open segment">
             <span class="cardtop"><span class="chip risk"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>Top Risk</span></span>
             <h3>Direct Deposit: Social Security</h3>
             <p>Customers already collecting Social Security.</p>
@@ -253,7 +253,7 @@
             <span class="metric"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M4.5 1v12M7.5 3.2C6.8 2.5 5.8 2.1 4.5 2.1c-1.6 0-2.9.8-2.9 2.2 0 2.9 5.8 1.5 5.8 4.5 0 1.4-1.3 2.2-2.9 2.2-1.3 0-2.4-.4-3.1-1.2"/></svg>Annual Deposits<span class="pill">$23M</span></span>
             <button class="exportbtn" data-seg="Direct Deposit: Social Security" data-leads="1,651">Export Data</button>
           </div>
-          <div class="segcard">
+          <div class="segcard" data-detail="hys" role="button" tabindex="0" aria-label="High Yield Savings Leads — open segment">
             <span class="cardtop"><span class="chip opp">Top Opportunity</span></span>
             <h3>High Yield Savings Leads</h3>
             <p>Customers who have over $10k in cash earning little to no interest.</p>
@@ -313,12 +313,12 @@
       <section class="screen detail" aria-label="Social Security direct-deposit opportunity">
         <button id="backBtn"><svg width="6" height="10" viewBox="0 0 6 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 1 1 5l4 4"/></svg>Campaign Segments</button>
         <div class="detailhead">
-          <span class="chip risk"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>Top Risk</span>
-          <h2>Social Security direct-deposit opportunity</h2>
-          <p>1,651 members are already receiving Social Security income.</p>
+          <span class="chip risk" id="dChip"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>Top Risk</span>
+          <h2 id="dTitle">Social Security direct-deposit opportunity</h2>
+          <p id="dSub">1,651 members are already receiving Social Security income.</p>
           <p class="window">Activity window: Last 90 days</p>
         </div>
-        <p class="statline"><span class="num">1,651</span> eligible members<span class="sep">·</span><span class="num">87</span> added recently<span class="sep">·</span><span class="num">$23M</span> estimated annual volume</p>
+        <p class="statline" id="dStats"><span class="num">1,651</span> eligible members<span class="sep">·</span><span class="num">87</span> added recently<span class="sep">·</span><span class="num">$23M</span> estimated annual volume</p>
         <div class="detailcols">
           <div class="panel" id="signals">
             <h3>Signals behind this opportunity</h3>
@@ -340,10 +340,10 @@
           </div>
           <div class="panel action">
             <h3>Recommended next step</h3>
-            <p class="action-title">Launch direct-deposit outreach</p>
-            <p class="actionline"><span class="alabel">Audience:</span> 1,651 members</p>
+            <p class="action-title" id="dActionTitle">Launch direct-deposit outreach</p>
+            <p class="actionline"><span class="alabel">Audience:</span> <span id="dAudience">1,651 members</span></p>
             <p class="actionline"><span class="alabel">Destination:</span> Marketing tools</p>
-            <button class="exportbtn" data-seg="Social Security direct-deposit opportunity" data-leads="1,651">Export audience</button>
+            <button class="exportbtn" id="dExport" data-seg="Social Security direct-deposit opportunity" data-leads="1,651">Export audience</button>
           </div>
         </div>
       </section>
@@ -388,9 +388,34 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let lastFocus = null;
 
+  // Every segment's detail screen is the same product template, populated from
+  // platform-only signals (score inputs, entered accounts, tool + lesson activity).
+  const RISK_ICON = '<svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>';
+  const SEGMENTS = {
+    ss: { chip: 'risk', chipLabel: 'Top Risk', title: 'Social Security direct-deposit opportunity',
+      sub: '1,651 members are already receiving Social Security income.',
+      stats: [['1,651', 'eligible members'], ['87', 'added recently'], ['$23M', 'estimated annual volume']],
+      signals: [['Reached eligibility age', '1,651', 100], ['Entered benefit income', '1,455', 88], ['Used Social Security tool', '1,204', 73]],
+      criteria: 'Election age set or passed, Social Security benefit income entered, and activity within the last 90 days.',
+      action: 'Launch direct-deposit outreach', audience: '1,651 members', leads: '1,651' },
+    wm: { chip: 'opp', chipLabel: 'Top Opportunity', title: 'Wealth management opportunity',
+      sub: '597 members are approaching retirement with $1M+ in investable assets.',
+      stats: [['597', 'eligible members'], ['41', 'added recently'], ['$752M', 'investable assets']],
+      signals: [['Set a retirement date within 3 years', '597', 100], ['Updated net worth or accounts', '538', 90], ['Explored income-planning lessons', '412', 69]],
+      criteria: 'Retirement date within 3 years, investable assets of $1M or more entered, and activity within the last 90 days.',
+      action: 'Launch wealth management referrals', audience: '597 members', leads: '597' },
+    hys: { chip: 'opp', chipLabel: 'Top Opportunity', title: 'High-yield savings opportunity',
+      sub: '2,146 members hold cash savings earning little to no interest.',
+      stats: [['2,146', 'eligible members'], ['132', 'added recently'], ['$350M', 'in cash savings']],
+      signals: [['Entered $10k+ in cash savings', '2,146', 100], ['Started the Maximize Your Return on Cash path', '1,289', 60], ['Explored certificate lessons', '976', 45]],
+      criteria: 'Cash savings of $10k or more entered, earning little or no interest, and activity within the last 90 days.',
+      action: 'Launch high-yield savings outreach', audience: '2,146 members', leads: '2,146' },
+  };
+  let currentSeg = 'ss', lastCard = null;
+
   const MESSAGES = {
     1: 'Showing the Campaign Segments home screen.',
-    2: 'Showing the Social Security direct-deposit opportunity: 1,651 eligible members, 23 million dollars in estimated annual volume, with per-signal member activity counts.',
+    2: () => `Showing ${SEGMENTS[currentSeg].title}: ${SEGMENTS[currentSeg].audience} eligible, with per-signal member activity counts.`,
     3: 'Export dialog open.',
   };
   const CAPTIONS = {
@@ -409,7 +434,7 @@
   function sync() {
     const b = currentBeat();
     for (const s of document.querySelectorAll('.storybeat')) s.setAttribute('aria-pressed', String(Number(s.dataset.beat) === b));
-    live.textContent = MESSAGES[b];
+    live.textContent = typeof MESSAGES[b] === 'function' ? MESSAGES[b]() : MESSAGES[b];
     if (b !== shownBeat) {
       shownBeat = b;
       // swap text synchronously, then fade in from 0 — no timers (throttled offscreen)
@@ -446,14 +471,48 @@
     if (focusBack && lastFocus) lastFocus.focus();
   }
 
-  $('#heroCard').addEventListener('click', e => {
-    if (e.target.closest('.exportbtn')) return; // the card's Export button exports; the card itself navigates
-    setScreen('detail'); $('#backBtn').focus();
-  });
-  $('#heroCard').addEventListener('keydown', e => {
-    if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('.exportbtn')) { e.preventDefault(); setScreen('detail'); $('#backBtn').focus(); }
-  });
-  $('#backBtn').addEventListener('click', () => { setScreen('home'); $('#heroCard').focus(); });
+  function populateDetail(id) {
+    const s = SEGMENTS[id]; currentSeg = id;
+    const chip = $('#dChip');
+    chip.className = 'chip ' + s.chip;
+    chip.innerHTML = (s.chip === 'risk' ? RISK_ICON : '') + s.chipLabel;
+    $('#dTitle').textContent = s.title;
+    $('#dSub').textContent = s.sub;
+    $('#dStats').innerHTML = s.stats.map(([n, l], i) => `${i ? '<span class="sep">·</span>' : ''}<span class="num">${n}</span> ${l}`).join('');
+    document.querySelectorAll('#signals .sig').forEach((el, i) => {
+      const [label, count, w] = s.signals[i];
+      el.querySelector('.sigrow span').textContent = label;
+      el.querySelector('.count').textContent = count;
+      el.querySelector('.sigbar i').style.setProperty('--w', w + '%');
+    });
+    $('#criteriaText').textContent = s.criteria;
+    $('#criteriaText').classList.remove('open');
+    criteriaLink.setAttribute('aria-expanded', 'false');
+    $('#dActionTitle').textContent = s.action;
+    $('#dAudience').textContent = s.audience;
+    const btn = $('#dExport');
+    btn.dataset.seg = s.title; btn.dataset.leads = s.leads;
+    const screen = document.querySelector('.screen.detail');
+    screen.setAttribute('aria-label', s.title);
+    screen.scrollTop = 0;
+  }
+
+  function openDetail(id, card) {
+    lastCard = card || lastCard;
+    populateDetail(id);
+    setScreen('detail');
+  }
+
+  for (const card of document.querySelectorAll('.segcard[data-detail]')) {
+    card.addEventListener('click', e => {
+      if (e.target.closest('.exportbtn')) return; // the card's Export button exports; the card itself navigates
+      openDetail(card.dataset.detail, card); $('#backBtn').focus();
+    });
+    card.addEventListener('keydown', e => {
+      if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('.exportbtn')) { e.preventDefault(); openDetail(card.dataset.detail, card); $('#backBtn').focus(); }
+    });
+  }
+  $('#backBtn').addEventListener('click', () => { setScreen('home'); (lastCard || $('#heroCard')).focus(); });
   for (const btn of document.querySelectorAll('.exportbtn, .exportbtn-row')) {
     btn.addEventListener('click', () => openExport(btn));
   }
@@ -482,8 +541,8 @@
     beat.addEventListener('click', () => {
       const n = Number(beat.dataset.beat);
       if (n === 1) { closeExport(false); setScreen('home'); }
-      if (n === 2) { closeExport(false); setScreen('detail'); }
-      if (n === 3) { if (screens.dataset.screen !== 'detail') setScreen('detail'); openExport(document.querySelector('.panel .exportbtn')); }
+      if (n === 2) { closeExport(false); openDetail('ss'); }
+      if (n === 3) { if (screens.dataset.screen !== 'detail' || currentSeg !== 'ss') openDetail('ss'); openExport($('#dExport')); }
     });
   }
 

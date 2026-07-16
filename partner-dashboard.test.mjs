@@ -26,12 +26,16 @@ for (const s of ['Campaign Segments', 'All Segments', 'Date Range', 'Filters', '
   'Signals behind this opportunity', 'Reached eligibility age', 'Entered benefit income',
   'Used Social Security tool', 'View segment criteria', 'Based on activity in Silvur',
   'Recommended next step', 'Launch direct-deposit outreach', 'Export audience',
+  'Wealth management opportunity', 'Launch wealth management referrals',
+  'Set a retirement date within 3 years', 'Updated net worth or accounts', 'Explored income-planning lessons',
+  'High-yield savings opportunity', 'Launch high-yield savings outreach',
+  'Entered $10k+ in cash savings', 'Started the Maximize Your Return on Cash path', 'Explored certificate lessons',
   'Questions about this export? Contact your Silvur relationship manager.']) {
   assert.ok(html.includes(s), `product copy: ${s}`);
 }
 
 // Synthetic figures (fixed).
-for (const n of ['597', '$752M', '1,651', '$23M', '2,146', '$350M', '590', '146', '$110M', '114', '$43M', '$363M', '1,455', '1,204', '87']) {
+for (const n of ['597', '$752M', '1,651', '$23M', '2,146', '$350M', '590', '146', '$110M', '114', '$43M', '$363M', '1,455', '1,204', '87', '538', '412', '1,289', '976', '41', '132']) {
   assert.ok(html.includes(n), `figure: ${n}`);
 }
 
