@@ -21,8 +21,8 @@ assert.ok(html.includes('Members received holistic retirement guidance through a
 assert.ok(html.includes('On-platform activity revealed topics and decisions traditional credit-union systems could not see.'), 'insight point');
 assert.ok(html.includes('Teams could turn those signals into campaign audiences and relevant outreach.'), 'action point');
 
-// Caption — exact.
-assert.ok(html.includes('The platform created a feedback loop between trusted guidance and timely member support.'), 'caption');
+// No caption inside the artifact (author 2026-07-16 — the case-study prose carries it).
+assert.equal(html.includes('The platform created a feedback loop'), false, 'caption lives in the case study, not the artifact');
 
 // Fictional-only; forbidden marks absent.
 assert.equal(/NCUA|Equal Housing|Retire Strong|ICCU|MSUFCU|Idaho Central|Olivia/i.test(html), false, 'no regulator marks / real brands / personal names');

@@ -33,16 +33,16 @@
     text-transform: uppercase; color: var(--teal-text); }
   .stage .phrase { display: block; font-size: 14.5px; font-weight: 500; letter-spacing: -0.005em; margin-top: 2px; }
   .down { display: flex; justify-content: center; padding: 4px 0; color: #9D9DA8; }
-  /* return curve: stage 4 loops back up to stage 1 */
-  #returnArrow { position: absolute; top: 0; right: 0; height: 100%; width: 40px; color: #9D9DA8; }
+  /* return bracket: stage 4 loops back up to stage 1 — CSS borders keep the corners circular */
+  #returnArrow { position: absolute; right: 8px; top: 29px; bottom: 29px; width: 30px;
+    border: 1.5px solid #9D9DA8; border-left: none; border-radius: 0 12px 12px 0; pointer-events: none; }
+  #returnArrow .tip { position: absolute; left: -3px; top: -8px; color: #9D9DA8; }
 
   /* ---- reveal (fixed height — nothing reflows on hover) ---- */
   #reveal { min-height: 66px; margin-top: 16px; text-align: center; font-size: 14.5px; line-height: 1.6;
     color: var(--muted); opacity: 1; transition: opacity 160ms ease; }
   @media (prefers-reduced-motion: reduce) { #reveal, .stage { transition: none !important; } }
 
-  .caption { border-top: 1px solid var(--border); margin-top: 14px; padding-top: 14px; text-align: center;
-    font-size: 13.5px; line-height: 1.6; color: var(--muted); }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
 </head>
@@ -70,15 +70,10 @@
       <span class="tag">Action</span>
       <span class="phrase">Credit union sees needs and responds</span>
     </button>
-    <svg id="returnArrow" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M4 88 H22 Q34 88 34 76 V24 Q34 12 22 12 H8" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
-      <path d="M13 7.5 L8 12 L13 16.5" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
+    <span id="returnArrow" aria-hidden="true"><svg class="tip" width="9" height="15" viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1 1.5 7.5 8 14"/></svg></span>
   </div>
 
   <p id="reveal" class="serifvoice" aria-live="polite">“This is an incredible value to get through my credit union.”</p>
-
-  <p class="caption serifvoice">The platform created a feedback loop between trusted guidance and timely member support.</p>
 </div>
 <script>
 (() => {
