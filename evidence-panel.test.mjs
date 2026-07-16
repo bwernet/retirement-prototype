@@ -19,6 +19,12 @@ assert.ok(html.includes('Top requested guidance'), 'chart label');
 for (const c of ['Tax planning', 'Healthcare', 'Estate planning', 'Social Security']) {
   assert.ok(html.includes(c), `category: ${c}`);
 }
+// Real survey counts (author-supplied 2026-07-16): top four "could use more help with"
+// responses; widths are proportional to these (166 = 100%).
+for (const [n, w] of [['166', '100%'], ['124', '75%'], ['119', '72%'], ['111', '67%']]) {
+  assert.ok(html.includes(`>${n}<`), `count ${n}`);
+  assert.ok(html.includes(`--w:${w}`), `width ${w} proportional to ${n}`);
+}
 assert.ok(html.includes('Methodology: survey of 330 members across 7 partner credit unions, sent shortly after members created their Silvur accounts.'), 'methodology note verbatim (author-supplied 2026-07-16)');
 
 // Fictional-only; forbidden marks absent.
@@ -44,4 +50,3 @@ assert.equal(/<canvas|tooltip|legend/i.test(html), false, 'no chart machinery â€
 assert.ok(html.includes('<link rel="stylesheet" href="fonts.css">'), 'font link (build replaces this exact tag)');
 assert.ok(html.includes('evidence-panel:height'), 'height postMessage type');
 console.log('evidence-panel content-integrity: all checks passed');
-console.log('PUBLISH GATE: bar widths are placeholders until the author supplies real proportions (or confirms ordinal-only).');

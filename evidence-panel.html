@@ -30,7 +30,9 @@
     color: var(--muted); margin-bottom: 11px; }
   .bar { margin-top: 9px; }
   .bar:first-of-type { margin-top: 0; }
+  .bar .brow { display: flex; justify-content: space-between; align-items: baseline; }
   .bar .blabel { display: block; font-size: 13px; }
+  .bar .bcount { font-size: 12.5px; font-weight: 500; }
   .bar .btrack { display: block; height: 6px; border-radius: 999px; background: var(--track); margin-top: 5px; overflow: hidden; }
   .bar .btrack i { display: block; height: 100%; border-radius: 999px; background: var(--bar); width: var(--w, 0%); }
   .method { font-size: 11.5px; line-height: 1.5; color: var(--muted); margin-top: 16px; }
@@ -52,10 +54,10 @@
     <hr class="rule">
 
     <p class="chartlabel">Top requested guidance</p>
-    <div class="bar"><span class="blabel">Tax planning</span><span class="btrack"><i style="--w:100%"></i></span></div>
-    <div class="bar"><span class="blabel">Healthcare</span><span class="btrack"><i style="--w:82%"></i></span></div>
-    <div class="bar"><span class="blabel">Estate planning</span><span class="btrack"><i style="--w:64%"></i></span></div>
-    <div class="bar"><span class="blabel">Social Security</span><span class="btrack"><i style="--w:55%"></i></span></div>
+    <div class="bar"><span class="brow"><span class="blabel">Tax planning</span><span class="bcount">166</span></span><span class="btrack"><i style="--w:100%"></i></span></div>
+    <div class="bar"><span class="brow"><span class="blabel">Healthcare</span><span class="bcount">124</span></span><span class="btrack"><i style="--w:75%"></i></span></div>
+    <div class="bar"><span class="brow"><span class="blabel">Estate planning</span><span class="bcount">119</span></span><span class="btrack"><i style="--w:72%"></i></span></div>
+    <div class="bar"><span class="brow"><span class="blabel">Social Security</span><span class="bcount">111</span></span><span class="btrack"><i style="--w:67%"></i></span></div>
 
     <p class="method">Methodology: survey of 330 members across 7 partner credit unions, sent shortly after members created their Silvur accounts.</p>
   </div>
