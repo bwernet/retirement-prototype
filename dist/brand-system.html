@@ -20,9 +20,13 @@
   .eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
   .opening { font-size: 19px; font-weight: 500; margin: 4px 0 14px; max-width: 560px; }
   .layout { display: grid; grid-template-columns: 220px minmax(320px, 380px) 1fr; gap: 28px; align-items: start; }
+  /* #stage is display:contents, so the real grid items are .rail, #phone, #rolesPanel —
+     min-width:0 keeps their scroll rows from blowing the grid column out past the viewport */
+  .rail, #phone, #rolesPanel { min-width: 0; }
 
   /* ---- intake rail ---- */
   .rail .eyebrow { color: var(--muted); }
+  .railrow { display: contents; } /* invisible on desktop; becomes the scroll row on mobile */
   .preset {
     display: block; width: 100%; text-align: left; background: #fff; border: 1px solid var(--border);
     border-radius: 14px; padding: 14px; margin-top: 10px; cursor: pointer; font: inherit; color: inherit;
@@ -145,12 +149,17 @@
   @media (max-width: 760px) {
     body { padding-left: 16px; padding-right: 16px; }
     .layout { grid-template-columns: 1fr; }
-    .rail { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
-    .rail > .eyebrow { flex-basis: 100%; }
-    .preset { min-width: 190px; }
-    /* role cards sideways-scroll like the credit union colors */
-    #roles { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+    .opening { max-width: none; }
+    /* section titles sit above their rows, full width */
+    .rail > .eyebrow { display: block; margin-bottom: 10px; }
+    .railrow { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+    .preset { width: 212px; min-width: 212px; flex: none; margin-top: 0; }
+    .custom { flex: none; margin-top: 0; align-self: stretch; }
+    /* the whole "what the system did" set — roles AND neutrals — sideways-scrolls
+       like the credit union colors; nothing wider than the viewframe */
+    #roles { display: flex; align-items: flex-start; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
     #roles .role { width: 272px; min-width: 272px; flex: none; margin-top: 6px; }
+    #roles .neutrals { width: 300px; min-width: 300px; flex: none; margin-top: 6px; }
   }
 </style>
 </head>
@@ -161,6 +170,7 @@
 <div class="layout">
   <div class="rail" id="presets" role="group" aria-label="What a new partner sent us">
     <p class="eyebrow">What a new partner sent us</p>
+    <div class="railrow">
     <button class="preset" data-id="lanternbay" aria-pressed="true">
       <span class="cu">Lanternbay Credit Union</span>
       <span class="chips"><i class="chip" style="background:#1E3A5F"></i><i class="chip" style="background:#15806B"></i><code>#1E3A5F · #15806B</code></span>
@@ -176,6 +186,7 @@
     <div class="custom">
       <input type="color" id="customColor" value="#1C5C98" aria-label="Try any color as a brand primary">
       <label for="customColor">Try any color</label>
+    </div>
     </div>
   </div>
 
@@ -286,8 +297,7 @@
             <span>Flagged for partner review — relationship manager notified</span>
           </p>
         </div>
-      </div>
-      <div class="neutrals" id="neutrals">
+        <div class="neutrals" id="neutrals">
         <p class="eyebrow" style="color:#6E6E7D">Reduced to neutral — works with every brand</p>
         <div class="nswatches">
           <i class="chip" style="background:#161D24" title="#161D24"></i>
@@ -303,6 +313,7 @@
         </div>
         <div class="gradbar" title="#F69835 #F4C355 #529D40"></div>
         <p class="ncaption">Text, cards, borders, icons, errors, announcements — and the Retirement Score gradient, a semantic trust color that never takes brand.</p>
+        </div>
       </div>
     </div>
   </div>
