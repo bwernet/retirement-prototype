@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Partner dashboard — member actions to campaign</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+  :root {
+    --ink: #161D24; --muted: #6E6E7D; --border: #E2E2E5; --canvas: #F7F8FA;
+    --teal: #0ABFAB; --teal-text: #078375; --accent: #1C5C98;
+    --opp-bg: #E6F8F1; --opp-text: #0B7D57; --risk-bg: #FDEBC7; --risk-text: #A65500;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: var(--canvas); }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; background: var(--canvas); color: var(--ink);
+    font-size: 14px; line-height: 1.45; padding: 20px 16px 14px; }
+  h1 { font-size: 18px; font-weight: 500; letter-spacing: -0.008em; }
+
+  /* fixed-width frame, scaled to fit narrow viewports by the script */
+  #scaler { transform-origin: top left; margin: 0 auto; width: 980px; max-width: none; }
+  #frame { width: 980px; background: #fff; border: 1px solid var(--border); border-radius: 18px;
+    box-shadow: 0 1px 2px rgba(22,29,36,.05), 0 10px 30px rgba(22,29,36,.07);
+    display: grid; grid-template-columns: 212px 1fr; overflow: hidden; }
+
+  /* ---- sidebar (white — muted text fails AA on gray5) ---- */
+  .sidebar { border-right: 1px solid var(--border); padding: 20px 16px 16px; display: flex; flex-direction: column; min-height: 620px; }
+  .logotype { font-size: 16px; letter-spacing: -0.01em; }
+  .logotype .silvur { font-weight: 500; }
+  .logotype .partners { font-weight: 500; font-size: 11px; letter-spacing: .16em; color: var(--teal-text); margin-left: 5px; }
+  .nav { margin-top: 26px; display: flex; flex-direction: column; gap: 2px; }
+  .nav span { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 9px; font-size: 13.5px; color: var(--muted); }
+  .nav .active { background: #F2F2F7; color: var(--ink); font-weight: 500; }
+  .nav .sub { padding-left: 34px; font-size: 13px; }
+  .nav svg { flex: none; }
+  .sidebar .spacer { flex: 1; }
+  .account { border-top: 1px solid var(--border); padding-top: 12px; display: flex; align-items: center; gap: 9px; }
+  .account svg { flex: none; color: #1E3A5F; }
+  .account span { font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+
+  /* ---- main ---- */
+  .main { padding: 20px 22px 18px; }
+  .mainhead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  #notesToggle { font: inherit; font-size: 12.5px; font-weight: 500; color: var(--accent); background: none;
+    border: 1px solid var(--accent); border-radius: 999px; padding: 6px 13px; cursor: pointer; }
+  #notesToggle[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  #notesToggle:focus-visible, #heroCard:focus-visible, #backBtn:focus-visible, #exportBtn:focus-visible, #doneBtn:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- fixed-height stage; beats swap inside, page height never changes ---- */
+  #stage { position: relative; height: 470px; }
+  .beat { position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: translateY(4px);
+    transition: opacity 200ms ease, transform 200ms ease, visibility 0s 200ms; }
+  #stage[data-beat="1"] .beat1, #stage[data-beat="2"] .beat2 { opacity: 1; visibility: visible; transform: none; transition: opacity 200ms ease, transform 200ms ease, visibility 0s; }
+  #stage[data-beat="3"] .beat2 { opacity: 1; visibility: visible; transform: none; transition: opacity 200ms ease, transform 200ms ease, visibility 0s; }
+  @media (prefers-reduced-motion: reduce) {
+    .beat, .chain li, .chain li::after, .beat3, #scrim { transition: none !important; }
+  }
+
+  /* ---- beat 1: segment cards ---- */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .segcard { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 16px;
+    box-shadow: 0 1px 2px rgba(22,29,36,.04); text-align: left; }
+  .segcard h3 { font-size: 16px; font-weight: 500; letter-spacing: -0.008em; line-height: 1.25; margin: 10px 0 6px; }
+  .segcard p { color: var(--muted); font-size: 13px; line-height: 1.45; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500;
+    letter-spacing: .04em; border-radius: 999px; padding: 4px 10px; }
+  .chip.opp { background: var(--opp-bg); color: var(--opp-text); }
+  .chip.risk { background: var(--risk-bg); color: var(--risk-text); }
+  .stats { margin-top: 12px; font-size: 13px; color: var(--ink); }
+  .stats .num { font-weight: 500; }
+  #heroCard { font: inherit; color: inherit; cursor: pointer; border: 1px solid var(--border);
+    transition: border-color 160ms ease, box-shadow 160ms ease; }
+  #heroCard:hover { border-color: #C9CBD1; box-shadow: 0 1px 2px rgba(22,29,36,.05), 0 8px 20px rgba(22,29,36,.07); }
+  .seewhy { display: flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 13px; font-weight: 500; color: var(--teal-text); }
+
+  /* ---- beat 2: provenance chain ---- */
+  .recap { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  #backBtn { font: inherit; font-size: 13px; font-weight: 500; color: var(--muted); background: none; border: none;
+    cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 6px 8px; border-radius: 8px; }
+  #backBtn:hover { background: #F2F2F7; color: var(--ink); }
+  .recap h2 { font-size: 16px; font-weight: 500; }
+  .chain { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; margin-top: 8px; }
+  .chain li { position: relative; background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+  .chain h3 { font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--teal-text); margin-bottom: 8px; }
+  .chain p { font-size: 13px; line-height: 1.5; color: var(--ink); }
+  .chain .big { font-size: 20px; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .chain li::after { content: ''; position: absolute; top: 50%; right: -17px; width: 12px; height: 2px;
+    background: #9D9DA8; }
+  .chain li:last-child::after { display: none; }
+  /* draw-in: nodes reveal left-to-right once per entry (added by script) */
+  .chain.veiled li { opacity: 0; transform: translateX(-6px); }
+  .chain.drawn li { opacity: 1; transform: none; transition: opacity 260ms ease, transform 260ms ease; }
+  .chain.drawn li:nth-child(2) { transition-delay: 140ms; }
+  .chain.drawn li:nth-child(3) { transition-delay: 280ms; }
+  .chain.drawn li:nth-child(4) { transition-delay: 420ms; }
+  .honesty { margin-top: 14px; font-size: 12px; color: var(--muted); }
+  #exportBtn { font: inherit; display: flex; justify-content: center; align-items: center; gap: 7px; width: 100%;
+    margin-top: 12px; padding: 10px; border: none; border-radius: 999px; background: var(--teal); color: var(--ink);
+    font-weight: 500; font-size: 13.5px; cursor: pointer; }
+
+  /* ---- beat 3: export slide-over ---- */
+  #scrim { position: absolute; inset: 0; background: rgba(22,29,36,.28); opacity: 0; visibility: hidden;
+    transition: opacity 200ms ease, visibility 0s 200ms; border-radius: 0 0 16px 0; }
+  #stage[data-beat="3"] #scrim { opacity: 1; visibility: visible; transition: opacity 200ms ease, visibility 0s; }
+  .beat3 { position: absolute; top: 0; right: 0; bottom: 0; width: 372px; background: #fff;
+    border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: -12px 0 34px rgba(22,29,36,.12);
+    opacity: 0; visibility: hidden; transform: translateX(14px);
+    transition: opacity 200ms ease, transform 200ms ease, visibility 0s 200ms; }
+  #stage[data-beat="3"] .beat3 { opacity: 1; visibility: visible; transform: none;
+    transition: opacity 200ms ease, transform 200ms ease, visibility 0s; }
+  .beat3 h2 { font-size: 17px; font-weight: 500; }
+  .beat3 dl { margin-top: 14px; }
+  .beat3 dt { font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 12px; }
+  .beat3 dd { font-size: 13.5px; line-height: 1.5; margin-top: 3px; }
+  .beat3 .scopenote { margin-top: 16px; font-size: 12px; line-height: 1.5; color: var(--muted);
+    border-top: 1px solid var(--border); padding-top: 12px; }
+  #doneBtn { font: inherit; display: block; width: 100%; margin-top: 16px; padding: 10px; border: none;
+    border-radius: 999px; background: var(--teal); color: var(--ink); font-weight: 500; font-size: 13.5px; cursor: pointer; }
+
+  /* ---- step indicator ---- */
+  #steps { position: absolute; left: 0; bottom: 0; display: flex; gap: 14px; font-size: 11.5px;
+    font-weight: 500; letter-spacing: .06em; color: var(--muted); }
+  #steps .step { display: flex; align-items: center; gap: 6px; }
+  #steps .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
+  #steps .step.on { color: var(--ink); }
+  #steps .step.on .dot { background: var(--teal-text); }
+
+  /* ---- design notes ---- */
+  .notebadge { display: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff;
+    font-size: 11px; font-weight: 500; line-height: 18px; text-align: center; flex: none; }
+  body.notes-on .notebadge { display: inline-block; }
+  #notesPanel { display: none; position: absolute; right: 0; bottom: -6px; width: 340px; background: #fff; border: 1px solid var(--accent);
+    border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(22,29,36,.14); }
+  body.notes-on #notesPanel { display: block; }
+  #notesPanel ol { list-style: none; }
+  #notesPanel li { display: flex; gap: 9px; font-size: 12.5px; line-height: 1.5; margin-top: 8px; }
+  #notesPanel li:first-child { margin-top: 0; }
+
+  .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 14px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="scaler">
+<div id="frame">
+  <aside class="sidebar">
+    <p class="logotype"><span class="silvur">silvur</span><span class="partners">PARTNERS</span></p>
+    <nav class="nav" aria-label="Dashboard sections">
+      <span><svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 7.5 2 13 6.5V13H2z"/></svg>Home</span>
+      <span class="active"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2.5 12.5v-4M7.5 12.5v-7M12.5 12.5v-10"/></svg>Campaign Segments<span class="notebadge" aria-hidden="true">1</span></span>
+      <span class="sub">All Segments</span>
+    </nav>
+    <span class="spacer"></span>
+    <nav class="nav" aria-label="Account">
+      <span><svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5.5"/><path d="M7.5 5v3l2 1.5" stroke-linecap="round"/></svg>Support</span>
+      <span><svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="7.5" cy="7.5" r="2.2"/><path d="M7.5 1.5v2M7.5 11.5v2M1.5 7.5h2M11.5 7.5h2M3.3 3.3l1.4 1.4M10.3 10.3l1.4 1.4M11.7 3.3l-1.4 1.4M4.7 10.3l-1.4 1.4" stroke-linecap="round"/></svg>Settings</span>
+    </nav>
+    <p class="account">
+      <svg width="26" height="26" viewBox="0 0 30 30" fill="none" aria-hidden="true"><circle cx="15" cy="15" r="13.5" stroke="currentColor" stroke-width="2"/><rect x="9" y="15" width="3" height="7" rx="1" fill="currentColor"/><rect x="13.5" y="11" width="3" height="11" rx="1" fill="currentColor"/><rect x="18" y="8" width="3" height="14" rx="1" fill="currentColor"/></svg>
+      <span>Marketing · Lanternbay CU</span>
+    </p>
+  </aside>
+
+  <main class="main">
+    <div class="mainhead">
+      <h1>Campaign Segments</h1>
+      <button id="notesToggle" aria-pressed="false">Design notes</button>
+    </div>
+
+    <div id="stage" data-beat="1">
+      <!-- Beat 1 · Signal -->
+      <section class="beat beat1" aria-label="Segments">
+        <div class="cards">
+          <button class="segcard" id="heroCard">
+            <span class="chip risk"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>Top Risk<span class="notebadge" aria-hidden="true">1</span></span>
+            <h3>Direct Deposit: Social Security</h3>
+            <p>Members already collecting Social Security.</p>
+            <p class="stats"><span class="num">1,651</span> members · <span class="num">~$23M/yr</span> benefit income identified</p>
+            <span class="seewhy">See why<svg width="6" height="10" viewBox="0 0 6 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1l4 4-4 4"/></svg></span>
+          </button>
+          <div class="segcard">
+            <span class="chip opp">Top Opportunity</span>
+            <h3>Top Wealth Management Leads</h3>
+            <p>Members 0–3 years from retirement with $1M+ in investable assets.</p>
+            <p class="stats"><span class="num">597</span> members · <span class="num">$752M</span> investable assets</p>
+          </div>
+          <div class="segcard">
+            <span class="chip opp">Top Opportunity</span>
+            <h3>High Yield Savings Leads</h3>
+            <p>Members holding cash savings earning little to no interest.</p>
+            <p class="stats"><span class="num">2,146</span> members · <span class="num">$350M</span> in cash savings</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Beat 2 · Why -->
+      <section class="beat beat2" aria-label="Why this segment matters">
+        <div class="recap">
+          <button id="backBtn"><svg width="6" height="10" viewBox="0 0 6 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 1 1 5l4 4"/></svg>All segments</button>
+          <span class="chip risk"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>Top Risk</span>
+          <h2>Direct Deposit: Social Security</h2>
+        </div>
+        <ol class="chain veiled">
+          <li>
+            <h3>What members did<span class="notebadge" aria-hidden="true">2</span></h3>
+            <p>Ran the Social Security calculator, set or passed an election age, and entered benefit income in their Retirement Score.</p>
+          </li>
+          <li>
+            <h3>What that means</h3>
+            <p class="big">1,651 members</p>
+            <p>are collecting — or about to start collecting — Social Security. ~$23M/yr in recurring benefit income identified.</p>
+          </li>
+          <li>
+            <h3>Why Lanternbay cares</h3>
+            <p>Recurring federal deposits anchor a primary-banking relationship — and Lanternbay can't see where those deposits land today. That's exactly why these members are worth a campaign.</p>
+          </li>
+          <li>
+            <h3>What to do</h3>
+            <p>A direct-deposit campaign to exactly these members.</p>
+            <button id="exportBtn">Export for campaign<svg width="6" height="10" viewBox="0 0 6 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1l4 4-4 4"/></svg></button>
+          </li>
+        </ol>
+        <p class="honesty">Every signal is member activity on the platform.</p>
+      </section>
+
+      <!-- Beat 3 · Act -->
+      <div id="scrim"></div>
+      <section class="beat3" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+        <h2 id="exportTitle">Export ready</h2>
+        <dl>
+          <dt>Audience</dt>
+          <dd>1,651 members</dd>
+          <dt>Fields<span class="notebadge" aria-hidden="true">3</span></dt>
+          <dd>Member contact via your system of record, plus the segment reason: collecting Social Security, recurring benefit income identified.</dd>
+          <dt>Destination</dt>
+          <dd>Your existing email and direct-mail tools.</dd>
+        </dl>
+        <p class="scopenote">The platform's job ends at the audience — partners already have campaign tools. Scope was a design decision, not a limitation.</p>
+        <button id="doneBtn">Done</button>
+      </section>
+
+      <div id="steps" aria-hidden="true">
+        <span class="step on" data-step="1"><span class="dot"></span>Signal</span>
+        <span class="step" data-step="2"><span class="dot"></span>Why</span>
+        <span class="step" data-step="3"><span class="dot"></span>Act</span>
+      </div>
+
+      <aside id="notesPanel" aria-label="Design notes">
+        <ol>
+          <li><span class="notebadge" style="display:inline-block">1</span><span>Segments are framed as needs and recommended actions, not metrics — designed for marketers, not analysts.</span></li>
+          <li><span class="notebadge" style="display:inline-block">2</span><span>Provenance is one click away, never buried — and every signal is member activity on the platform. The insight earns trust by showing its reasoning and never claiming data it can't see.</span></li>
+          <li><span class="notebadge" style="display:inline-block">3</span><span>The workflow ends in the partner's existing tools — platform scope was a design decision, not a limitation.</span></li>
+        </ol>
+      </aside>
+    </div>
+  </main>
+</div>
+</div>
+
+<p class="footnote">Credit union, members, and figures are fictional; segment logic is representative of the shipped product.</p>
+<p id="live" class="sr-only" aria-live="polite"></p>
+<script src="partner-dashboard-app-placeholder"></script>
+</body>
+</html>
