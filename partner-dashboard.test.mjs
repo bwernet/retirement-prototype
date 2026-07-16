@@ -9,7 +9,7 @@ const html = fs.readFileSync('partner-dashboard.html', 'utf8');
 
 // Exact copy — outside-the-frame narration (story rail + notes + footnote).
 assert.ok(html.includes('Credit union, members, and figures are fictional; segment logic is representative of the shipped product.'), 'disclosure footnote');
-assert.ok(/can't see where those deposits land/.test(html), 'story rail keeps the platform-cannot-see honesty line');
+assert.ok(/never claims data it can't see/.test(html) && /where those deposits land/.test(html), 'caption keeps the platform-cannot-see honesty line');
 for (const b of ['1 · Signal', '2 · Why', '3 · Act']) assert.ok(html.includes(b), `story beat: ${b}`);
 
 // Product-voice copy inside the frame (faithful to the shipped dashboard).
@@ -49,7 +49,10 @@ assert.equal(/color:\s*#9D9DA8|color:\s*#E2E2E5/i.test(html), false, 'gray3/gray
 assert.ok(html.includes("'DM Sans'"), 'DM Sans family');
 assert.equal(/font-weight:\s*([6-9]\d\d|bold\b)/.test(html), false, 'no weights above 500');
 assert.equal(/<(b|strong)[\s>]/i.test(html), false, 'no b/strong');
-assert.equal(/Georgia|Times|serif(?!-)/i.test(html.replace(/sans-serif/g, '')), false, 'no serif');
+// Serif is allowed in exactly one place: the story captions (author-directed —
+// the case-study's quote voice); the product frame itself stays sans.
+assert.ok(/#storyCaption\s*{[^}]*Georgia/.test(html), 'captions use the serif voice');
+assert.equal((html.match(/Georgia/g) || []).length, 1, 'serif appears only in the caption rule');
 assert.ok(/\.tablehead h2\s*{[^}]*font-weight:\s*500/.test(html), 'table h2 pinned to 500');
 assert.ok(/\.detailhead h2\s*{[^}]*font-weight:\s*500/.test(html), 'detail h2 pinned to 500');
 assert.ok(/\.exportPanel h2\s*{[^}]*font-weight:\s*500/.test(html), 'dialog h2 pinned to 500');

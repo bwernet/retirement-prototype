@@ -179,8 +179,10 @@
   .storybeat .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); }
   .storybeat[aria-pressed="true"] { color: var(--ink); }
   .storybeat[aria-pressed="true"] .dot { background: var(--teal-text); }
-  #storyCaption { max-width: 660px; margin: 10px auto 0; text-align: center; font-size: 13px; line-height: 1.55;
-    color: var(--muted); min-height: 42px; opacity: 1; transition: opacity 180ms ease; }
+  /* captions speak in the case-study's serif voice — the one non-product element */
+  #storyCaption { max-width: 660px; margin: 10px auto 0; text-align: center;
+    font-family: Georgia, 'Times New Roman', serif; font-size: 14.5px; line-height: 1.6;
+    color: var(--muted); min-height: 48px; opacity: 1; transition: opacity 180ms ease; }
   @media (prefers-reduced-motion: reduce) { #storyCaption { transition: none !important; } }
 
   .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 14px; }
@@ -364,7 +366,7 @@
   <button class="storybeat" data-beat="2" aria-pressed="false"><span class="dot"></span>2 · Why</button>
   <button class="storybeat" data-beat="3" aria-pressed="false"><span class="dot"></span>3 · Act</button>
 </div>
-<p id="storyCaption">The home screen leads with needs, not metrics — segments framed as campaigns worth running today.</p>
+<p id="storyCaption">Designed to lead with needs, not metrics — each segment is a campaign a marketing team could run today.</p>
 
 <p class="footnote">Credit union, members, and figures are fictional; segment logic is representative of the shipped product.</p>
 </div>
@@ -382,9 +384,9 @@
     3: 'Export dialog open.',
   };
   const CAPTIONS = {
-    1: 'The home screen leads with needs, not metrics — segments framed as campaigns worth running today.',
-    2: "Every number traces to member activity on the platform. Lanternbay can't see where those deposits land — exactly why this segment is worth a retention campaign.",
-    3: "Export hands the audience to the tools the team already uses. The platform's job ends at the audience — a scope decision, not a limitation.",
+    1: 'Designed to lead with needs, not metrics — each segment is a campaign a marketing team could run today.',
+    2: "Provenance is a product decision: every number traces to member activity on the platform, and the tool never claims data it can't see — like where those deposits land.",
+    3: 'Export hands the audience to the tools the team already uses.',
   };
   const caption = $('#storyCaption');
   let shownBeat = 1;
