@@ -206,6 +206,14 @@
 
   .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 14px; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* capture mode (?shot=1): transparent canvas, product frame only, full content —
+     for exporting clean case-study PNGs via headless Chrome */
+  html.shot, body.shot { background: transparent; }
+  body.shot { padding: 24px; }
+  body.shot .pagehead, body.shot #storyRail, body.shot #storyCaption, body.shot .footnote, body.shot .beacon { display: none; }
+  body.shot #screens { height: auto; }
+  body.shot .screen.home { position: static; opacity: 1; visibility: visible; transform: none; overflow: visible; padding-bottom: 18px; }
 </style>
 </head>
 <body>
@@ -558,7 +566,9 @@
   // The case-study embed may pass ?scale=0.8 (clamped 0.4–1) to shrink the whole
   // product proportionally — type included — below its real-product size.
   const scaler = $('#scaler');
-  const maxScale = Math.min(1, Math.max(0.4, parseFloat(new URLSearchParams(location.search).get('scale')) || 1));
+  const params = new URLSearchParams(location.search);
+  if (params.get('shot')) { document.documentElement.classList.add('shot'); document.body.classList.add('shot'); }
+  const maxScale = Math.min(1, Math.max(0.4, parseFloat(params.get('scale')) || 1));
   function fit() {
     const bs = getComputedStyle(document.body);
     const avail = document.body.clientWidth - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight);
