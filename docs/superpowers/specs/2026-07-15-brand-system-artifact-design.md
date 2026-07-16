@@ -126,9 +126,12 @@ adjustment) — and why. No second color input, no logo upload.
 
 Default is subtle, restrained, realistic. Preset switch triggers ONE
 synchronized crossfade (~450ms) across phone and derivation panel —
-everything arrives together, then stillness. Fixed heights everywhere;
-nothing reflows. `prefers-reduced-motion`: instant swap. No ambient or
-looping animation.
+everything arrives together, then stillness. Role rows stay compact and only
+grow when flagged (author-directed 2026-07-15: no empty space waiting for
+error messages); the height change lands behind the crossfade, never in
+front of the viewer. `prefers-reduced-motion`: instant swap. No ambient or
+looping animation. The whole artifact fits a 850px-tall iframe in every
+state.
 
 Story-serving exception (permitted where motion IS the argument): on an
 adjusted role, the swatch may visibly step darker until its ratio passes —

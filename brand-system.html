@@ -13,10 +13,10 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'DM Sans', -apple-system, sans-serif; background: var(--canvas);
-    color: var(--ink); font-size: 15px; line-height: 1.45; padding: 28px 24px 20px;
+    color: var(--ink); font-size: 15px; line-height: 1.45; padding: 18px 24px 14px;
   }
   .eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
-  .opening { font-size: 19px; font-weight: 500; margin: 6px 0 24px; max-width: 560px; }
+  .opening { font-size: 19px; font-weight: 500; margin: 4px 0 14px; max-width: 560px; }
   .layout { display: grid; grid-template-columns: 220px minmax(320px, 380px) 1fr; gap: 28px; align-items: start; }
 
   /* ---- intake rail ---- */
@@ -49,14 +49,14 @@
     box-shadow: 0 1px 2px rgba(22,29,36,.12), 0 14px 28px rgba(22,29,36,.12), 0 34px 68px rgba(22,29,36,.16);
   }
   .screen { border-radius: 40px; overflow: hidden; background: #fff; }
-  .band { background: var(--bg, #1E3A5F); color: var(--on-bg, #FFFFFF); padding: 12px 16px 14px; }
-  .band.band2 { padding: 16px 0 14px 16px; }
-  .statusbar { display: flex; justify-content: space-between; align-items: center; height: 28px; position: relative; }
+  .band { background: var(--bg, #1E3A5F); color: var(--on-bg, #FFFFFF); padding: 10px 16px 12px; }
+  .band.band2 { padding: 13px 0 11px 16px; }
+  .statusbar { display: flex; justify-content: space-between; align-items: center; height: 26px; position: relative; }
   .statusbar .time { font-size: 13px; font-weight: 500; letter-spacing: .02em; width: 54px; }
   .island { position: absolute; left: 50%; top: 3px; transform: translateX(-50%); width: 84px; height: 22px; border-radius: 999px; background: #0B0D10; }
   .statusglyphs { display: flex; align-items: center; gap: 5px; }
   .statusglyphs svg { display: block; }
-  .logorow { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  .logorow { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
   .lockup { display: flex; align-items: center; gap: 8px; }
   .lockup .glyph { flex: none; }
   .lockup-text { display: flex; flex-direction: column; }
@@ -65,32 +65,32 @@
   .menupill { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500;
     border: 1.5px solid currentColor; border-radius: 999px; padding: 6px 14px; }
   .scorestrip { display: flex; justify-content: space-between; align-items: center; background: #fff; color: var(--ink);
-    padding: 12px 16px; font-size: 16px; font-weight: 500; letter-spacing: -0.005em; }
+    padding: 9px 16px; font-size: 16px; font-weight: 500; letter-spacing: -0.005em; }
   .scoreright { display: flex; align-items: center; gap: 8px; }
   /* status green #1E8404 (shipped statuses palette), not gradient-end #529D40:
      white text needs 4.5:1 and only the darker status green passes (4.8 vs 3.4) */
   .scorechip { background: #1E8404; color: #fff; font-weight: 500; font-size: 15px; border-radius: 999px; padding: 4px 14px; }
   .scoreright svg { color: var(--muted); }
   .band h2 { font-size: 20px; font-weight: 500; letter-spacing: -0.01em; }
-  .cardrow { display: flex; gap: 10px; margin-top: 14px; overflow: hidden; }
-  .card { background: #fff; border-radius: 16px; padding: 18px 16px 16px; flex: none; width: calc(100% - 40px); }
+  .cardrow { display: flex; gap: 10px; margin-top: 11px; overflow: hidden; }
+  .card { background: #fff; border-radius: 16px; padding: 15px 16px 14px; flex: none; width: calc(100% - 40px); }
   .card .eyebrow { color: var(--headline, #1E3A5F); font-size: 10.5px; letter-spacing: .11em; line-height: 1.35; }
   .card h3 { color: var(--headline, #1E3A5F); font-size: 19px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.18; margin: 6px 0 8px; }
   .card p { color: var(--ink); font-size: 13.5px; line-height: 1.5; }
   .card.peek { width: 200px; }
   .cta {
-    display: flex; justify-content: center; align-items: center; gap: 7px; width: 100%; margin-top: 16px; padding: 12px; border: none; border-radius: 999px;
+    display: flex; justify-content: center; align-items: center; gap: 7px; width: 100%; margin-top: 12px; padding: 11px; border: none; border-radius: 999px;
     background: var(--cta, #1FA98C); color: var(--on-cta, #161D24); font: inherit; font-weight: 500; font-size: 14.5px;
   }
-  .completed { display: flex; align-items: center; gap: 9px; margin-top: 14px; font-size: 13.5px; color: var(--ink); }
+  .completed { display: flex; align-items: center; gap: 9px; margin-top: 11px; font-size: 13.5px; color: var(--ink); }
   .completed .radio { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #9D9DA8; flex: none; }
-  .dots { display: flex; gap: 5px; justify-content: center; margin-top: 14px; padding-right: 16px; }
+  .dots { display: flex; gap: 5px; justify-content: center; margin-top: 10px; padding-right: 16px; }
   .dots i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .4; }
   .dots i.on { opacity: 1; }
-  .phonebody { padding: 14px 16px 0; }
+  .phonebody { padding: 12px 16px 0; }
   .inprogress { font-size: 13px; font-weight: 500; color: var(--headline, #1E3A5F); }
   .plans-title { font-size: 17px; font-weight: 500; letter-spacing: -0.005em; margin-top: 3px; }
-  .plancard { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px 16px; margin-top: 12px;
+  .plancard { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 12px 16px 13px; margin-top: 10px;
     box-shadow: 0 1px 2px rgba(22,29,36,.05); }
   .progressrow { display: flex; align-items: center; gap: 10px; }
   /* solid fill — the score gradient belongs to the Retirement Score only, never generic progress */
@@ -98,11 +98,11 @@
   .progress i { display: block; height: 100%; width: 32%; border-radius: 999px; background: var(--cta, #1FA98C); }
   .progressrow svg { color: var(--muted); flex: none; }
   .plabel { font-size: 12.5px; color: var(--muted); margin-top: 7px; }
-  .plantitle { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .plantitle { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
   .plantitle svg { flex: none; color: var(--headline, #1E3A5F); }
   .plantitle span { font-size: 16.5px; font-weight: 500; color: var(--headline, #1E3A5F); letter-spacing: -0.005em; line-height: 1.3; }
   .powered { text-align: center; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase;
-    color: var(--muted); padding: 16px 0 14px; }
+    color: var(--muted); padding: 9px 0 10px; }
 
   /* ---- derivation panel ---- */
   #rolesPanel .eyebrow { color: var(--muted); }
@@ -116,14 +116,14 @@
   .ratio { font-size: 12px; font-weight: 500; background: var(--panel); border-radius: 999px; padding: 3px 10px; }
   .badge { font-size: 11px; font-weight: 500; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 8px; visibility: hidden; }
   .role.adjusted .badge { visibility: visible; }
-  /* space reserved even when hidden — layout must never reflow on toggle */
-  .role .raw-pair { display: flex; visibility: hidden; align-items: center; gap: 8px; }
-  .role.adjusted .raw-pair { visibility: visible; }
-  /* per-role flag: shown beside the adjusted role; space reserved so nothing reflows */
-  .flag { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; line-height: 1.4; color: var(--ink);
-    background: #FDEBC7; border-radius: 9px; padding: 8px 11px; visibility: hidden; }
+  .role .raw-pair { display: none; align-items: center; gap: 8px; }
+  .role.adjusted .raw-pair { display: flex; }
+  /* per-role flag: appears inside the adjusted role's row; rows stay compact
+     otherwise (height change lands behind the crossfade) */
+  .flag { display: none; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; line-height: 1.4; color: var(--ink);
+    background: #FDEBC7; border-radius: 9px; padding: 8px 11px; }
   .flag svg { flex: none; }
-  .role.adjusted .flag { visibility: visible; }
+  .role.adjusted .flag { display: flex; }
   .neutrals { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 14px; }
   .nswatches { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
   .nswatches .chip { width: 26px; height: 26px; }
@@ -131,7 +131,7 @@
     background: linear-gradient(90deg, #F69835, #F4C355, #529D40); }
   .ncaption { font-size: 12px; color: var(--muted); margin-top: 10px; }
 
-  .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 30px; }
+  .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 12px; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
   @media (max-width: 760px) {
