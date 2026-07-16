@@ -275,10 +275,11 @@
   };
 
   function setBeat(n) {
+    const prev = Number(stage.dataset.beat);
     stage.dataset.beat = String(n);
     for (const s of document.querySelectorAll('#steps .step')) s.classList.toggle('on', Number(s.dataset.step) <= n);
     live.textContent = MESSAGES[n];
-    if (n === 2) drawChain();
+    if (n === 2 && prev === 1) drawChain();
     postHeight();
   }
 

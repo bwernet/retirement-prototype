@@ -14,7 +14,7 @@ for (const h of ['What members did', 'What that means', 'Why Lanternbay cares', 
 assert.ok(html.includes('Every signal is member activity on the platform.'), 'honesty line');
 assert.ok(html.includes('Segments are framed as needs and recommended actions, not metrics — designed for marketers, not analysts.'), 'design note 1');
 assert.ok(html.includes("Provenance is one click away, never buried — and every signal is member activity on the platform. The insight earns trust by showing its reasoning and never claiming data it can't see."), 'design note 2');
-assert.ok(html.includes("The workflow ends in the partner's existing tools — platform scope was a design decision, not a limitation.") || html.includes("The workflow ends in the partner's existing tools — platform scope was a design decision, not a limitation."), 'design note 3');
+assert.ok(html.includes("The workflow ends in the partner's existing tools — platform scope was a design decision, not a limitation."), 'design note 3');
 
 // Segments + synthetic figures.
 for (const s of ['Direct Deposit: Social Security', 'Top Wealth Management Leads', 'High Yield Savings Leads', '1,651', '$23M', '597', '$752M', '2,146', '$350M', 'Top Risk', 'Top Opportunity']) {
@@ -29,7 +29,7 @@ assert.equal(/NCUA|Equal Housing|Retire Strong|ICCU|MSUFCU|Idaho Central|Olivia/
 assert.equal(/\bFederal\b/.test(html), false, 'no capital-F Federal (names/marks)');
 
 // Platform-only provenance: the chain must not claim external banking sight.
-assert.ok(/can't see where|can't see where/.test(html), 'chain states the platform cannot see deposit destinations');
+assert.ok(/can't see where/.test(html), 'chain states the platform cannot see deposit destinations');
 
 // Anti-generic dashboard rules.
 assert.equal(/Date Range|Filters|Search…|<input[^>]+type="search"/i.test(html), false, 'no date pickers/filters/search');

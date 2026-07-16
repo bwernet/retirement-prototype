@@ -28,7 +28,7 @@
 - Fonts: DM Sans 400/500 via `<link rel="stylesheet" href="fonts.css">`; **500 is the boldest weight anywhere** (every h1/h2/h3 pinned to 500 — browser default is 700); no `<b>`/`<strong>`, no serif, no emoji (inline SVG icons only).
 - Motion (author's established taste): restrained; beats morph in place (~200ms, no fade-to-blank flash); the Beat-2 provenance chain may draw left-to-right ONCE per entry (staggered node reveal — this motion is the argument); no count-up numbers, no ambient/looping animation; `prefers-reduced-motion`: everything instant.
 - postMessage type string: `partner-dashboard:height`; first post synchronous (rAF is throttled in offscreen iframes).
-- Fixed-height stage (470px): beats swap inside it, page height never changes between beats. Whole artifact must fit an 850px-tall iframe.
+- Fixed-height stage (420px): beats swap inside it, page height never changes between beats. Whole artifact must fit an 850px-tall iframe.
 - Build stays dependency-free; single file after build.
 
 ## File Structure
