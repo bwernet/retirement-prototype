@@ -60,4 +60,10 @@ for (const hook of ['id="stage"', 'data-beat="1"', 'id="heroCard"', 'id="backBtn
   assert.ok(html.includes(hook), `missing hook ${hook}`);
 }
 assert.ok(html.includes('<link rel="stylesheet" href="fonts.css">'), 'font link (build replaces this exact tag)');
+
+// Script invariants (Task 2+).
+assert.ok(html.includes('partner-dashboard:height'), 'height postMessage type');
+assert.ok(html.includes('prefers-reduced-motion'), 'reduced-motion gate in script');
+assert.ok(html.includes("addEventListener('keydown'"), 'keyboard handling (Esc / focus trap)');
+
 console.log('partner-dashboard content-integrity: all checks passed');

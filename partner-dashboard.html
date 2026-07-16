@@ -260,6 +260,79 @@
 
 <p class="footnote">Credit union, members, and figures are fictional; segment logic is representative of the shipped product.</p>
 <p id="live" class="sr-only" aria-live="polite"></p>
-<script src="partner-dashboard-app-placeholder"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const stage = $('#stage'), live = $('#live'), chain = $('.chain');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let lastFocus = null;
+
+  const MESSAGES = {
+    1: 'Showing all segments.',
+    2: 'Why this segment matters: 1,651 members collecting Social Security, 23 million dollars a year in benefit income identified. Export available.',
+    3: 'Export summary open: 1,651 members, contact fields plus segment reason, delivered to your existing tools.',
+  };
+
+  function setBeat(n) {
+    stage.dataset.beat = String(n);
+    for (const s of document.querySelectorAll('#steps .step')) s.classList.toggle('on', Number(s.dataset.step) <= n);
+    live.textContent = MESSAGES[n];
+    if (n === 2) drawChain();
+    postHeight();
+  }
+
+  function drawChain() {
+    // Story-serving motion: the member-action -> CU-benefit chain draws once per entry.
+    chain.classList.remove('drawn');
+    if (reduced.matches) { chain.classList.remove('veiled'); return; }
+    chain.classList.add('veiled');
+    requestAnimationFrame(() => requestAnimationFrame(() => chain.classList.add('drawn')));
+  }
+
+  $('#heroCard').addEventListener('click', () => { setBeat(2); $('#backBtn').focus(); });
+  $('#backBtn').addEventListener('click', () => { setBeat(1); $('#heroCard').focus(); });
+  $('#exportBtn').addEventListener('click', () => { lastFocus = document.activeElement; setBeat(3); $('#doneBtn').focus(); });
+  $('#doneBtn').addEventListener('click', closeDialog);
+  $('#scrim').addEventListener('click', closeDialog);
+  function closeDialog() { setBeat(2); (lastFocus || $('#exportBtn')).focus(); }
+
+  // Esc closes the dialog; Tab is trapped inside it while open.
+  document.addEventListener('keydown', e => {
+    if (stage.dataset.beat !== '3') return;
+    if (e.key === 'Escape') { e.preventDefault(); return closeDialog(); }
+    if (e.key !== 'Tab') return;
+    const focusables = [...document.querySelector('.beat3').querySelectorAll('button')];
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  const notes = $('#notesToggle');
+  notes.addEventListener('click', () => {
+    const on = notes.getAttribute('aria-pressed') !== 'true';
+    notes.setAttribute('aria-pressed', String(on));
+    document.body.classList.toggle('notes-on', on);
+  });
+
+  // Fixed 980px frame scales down to fit narrow viewports (no bespoke mobile layout).
+  const scaler = $('#scaler'), frame = $('#frame');
+  function fit() {
+    const avail = document.body.clientWidth;
+    const s = Math.min(1, avail / 980);
+    scaler.style.transform = `scale(${s})`;
+    scaler.style.height = frame.offsetHeight * s + 'px';
+    scaler.style.marginLeft = s < 1 ? '0' : '';
+    postHeight();
+  }
+
+  function postHeight() {
+    window.parent.postMessage({ type: 'partner-dashboard:height', height: document.documentElement.scrollHeight }, '*');
+  }
+
+  fit();
+  postHeight(); // synchronous first post — rAF is throttled in offscreen iframes
+  addEventListener('resize', () => requestAnimationFrame(fit));
+})();
+</script>
 </body>
 </html>
