@@ -15,35 +15,41 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'DM Sans', -apple-system, sans-serif; background: var(--canvas);
-    color: var(--ink); font-size: 15px; line-height: 1.45; padding: 18px 24px 14px;
+    color: var(--ink); font-size: 15px; line-height: 1.45; padding: 20px 24px 16px;
   }
+  .wrap { max-width: 1120px; margin: 0 auto; }
   .eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
-  .opening { font-size: 19px; font-weight: 500; margin: 4px 0 14px; max-width: 560px; }
-  .layout { display: grid; grid-template-columns: 220px minmax(320px, 380px) 1fr; gap: 28px; align-items: start; }
-  /* #stage is display:contents, so the real grid items are .rail, #phone, #rolesPanel —
-     min-width:0 keeps their scroll rows from blowing the grid column out past the viewport */
-  .rail, #phone, #rolesPanel { min-width: 0; }
+  .opening { font-size: 20px; font-weight: 500; margin: 5px 0 22px; max-width: 620px; }
 
-  /* ---- intake rail ---- */
-  .rail .eyebrow { color: var(--muted); }
-  .railrow { display: contents; } /* invisible on desktop; becomes the scroll row on mobile */
-  .preset {
-    display: block; width: 100%; text-align: left; background: #fff; border: 1px solid var(--border);
-    border-radius: 14px; padding: 14px; margin-top: 10px; cursor: pointer; font: inherit; color: inherit;
-  }
-  /* inset ring — drawn inside the card so scroll containers can never clip it */
-  .preset[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-  .preset:focus-visible, #customColor:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .preset .cu { font-weight: 500; font-size: 14px; }
-  .chips { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
-  .chip { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--border); }
-  .chips code { font-size: 11px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
-  .custom { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
-  .custom label { font-size: 13px; color: var(--muted); }
-  #customColor { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; padding: 2px; background: #fff; cursor: pointer; }
+  /* three-part transformation: input -> experience -> output; alignment carries the arrow */
+  .layout { display: grid; grid-template-columns: 216px minmax(340px, 400px) minmax(300px, 340px);
+    gap: clamp(28px, 4.5vw, 60px); align-items: start; justify-content: center; }
+  .rail, #stage, #rolesPanel { min-width: 0; }
+  .collabel { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 16px; }
+  #stage .collabel { text-align: center; }
 
-  /* ---- stage: brand changes morph in place — nothing fades out or flashes ---- */
-  #stage { display: contents; }
+  /* ---- partner input: one full card for the active partner, quiet rows for the rest ---- */
+  #activeCard { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 15px 16px; }
+  #activeCard .glyph { color: #1E3A5F; }
+  #activeCard .cu { display: block; font-weight: 500; font-size: 15px; line-height: 1.3; margin-top: 9px; }
+  .chips { display: flex; gap: 7px; margin-top: 10px; align-items: center; }
+  .chip { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--border); flex: none; }
+  #activeCard code { display: block; font-size: 11px; color: var(--muted); font-family: 'DM Sans', sans-serif; margin-top: 8px; }
+  .alt-label { font-size: 12px; color: var(--muted); margin: 20px 0 4px; }
+  .alt { display: flex; align-items: center; gap: 6px; width: 100%; text-align: left; background: none;
+    border: none; border-radius: 8px; padding: 8px 8px; margin: 0 -8px; font: inherit; font-size: 13px;
+    color: var(--ink); cursor: pointer; }
+  .alt:hover { background: #EFF0F4; }
+  .alt[hidden] { display: none; } /* display:flex above would otherwise defeat the hidden attribute */
+  .alt .dot { width: 13px; height: 13px; border-radius: 4px; border: 1px solid rgba(22,29,36,.12); flex: none; }
+  .alt .dot + .dot { margin-left: -2px; margin-right: 4px; }
+  .alt.custom { color: var(--muted); }
+  #customColor { width: 22px; height: 22px; border: 1px solid var(--border); border-radius: 6px; padding: 1px;
+    background: #fff; cursor: pointer; flex: none; margin-right: 2px; }
+  .alt:focus-visible, .alt:focus-within, #customColor:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- member experience: brand changes morph in place — nothing fades out or flashes ---- */
   .band, .cta, .menupill { transition: background-color 260ms ease, color 260ms ease; }
   .card h3, .card .eyebrow, .inprogress, .plantitle span, .plantitle svg { transition: color 260ms ease; }
   .progress i { transition: background-color 260ms ease; }
@@ -52,7 +58,7 @@
     .plantitle span, .plantitle svg, .progress i, .flag, .raw-pair { transition: none !important; }
   }
 
-  /* ---- member phone: device frame (kept) + product-faithful UI ---- */
+  /* ---- member phone: device frame + product-faithful UI (unchanged product internals) ---- */
   #phone {
     width: 336px; margin: 0 auto; background: #14171B; border-radius: 48px; padding: 9px;
     box-shadow: 0 1px 2px rgba(22,29,36,.12), 0 14px 28px rgba(22,29,36,.12), 0 34px 68px rgba(22,29,36,.16);
@@ -89,7 +95,7 @@
   .card.peek { width: 200px; }
   .cta {
     display: flex; justify-content: center; align-items: center; gap: 7px; width: 100%; margin-top: 12px; padding: 11px; border: none; border-radius: 999px;
-    background: var(--cta, #1FA98C); color: var(--on-cta, #161D24); font: inherit; font-weight: 500; font-size: 14.5px;
+    background: var(--cta, #15806B); color: var(--on-cta, #FFFFFF); font: inherit; font-weight: 500; font-size: 14.5px;
   }
   .completed { display: flex; align-items: center; gap: 9px; margin-top: 11px; font-size: 13.5px; color: var(--ink); }
   .completed .radio { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #9D9DA8; flex: none; }
@@ -104,7 +110,7 @@
   .progressrow { display: flex; align-items: center; gap: 10px; }
   /* solid fill — the score gradient belongs to the Retirement Score only, never generic progress */
   .progress { height: 8px; border-radius: 999px; background: var(--panel); overflow: hidden; flex: 1; }
-  .progress i { display: block; height: 100%; width: 32%; border-radius: 999px; background: var(--cta, #1FA98C); }
+  .progress i { display: block; height: 100%; width: 32%; border-radius: 999px; background: var(--cta, #15806B); }
   .progressrow svg { color: var(--muted); flex: none; }
   .plabel { font-size: 12.5px; color: var(--muted); margin-top: 7px; }
   .plantitle { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
@@ -113,85 +119,77 @@
   .powered { text-align: center; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase;
     color: var(--muted); padding: 9px 0 10px; }
 
-  /* ---- derivation panel ---- */
-  #rolesPanel .eyebrow { color: var(--muted); }
-  .role { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 10px; }
-  .role-head { display: flex; justify-content: space-between; font-size: 13px; }
-  .role-name { font-weight: 500; }
-  .role-src { color: var(--muted); }
-  .role-out { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-  .swatch { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--border); transition: background-color 90ms linear; }
-  .arrow { color: var(--muted); }
-  .ratio { font-size: 12px; font-weight: 500; background: var(--panel); border-radius: 999px; padding: 3px 10px; }
-  .badge { font-size: 11px; font-weight: 500; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 8px; visibility: hidden; }
-  .role.adjusted .badge { visibility: visible; }
+  /* ---- system output: one consolidated panel ---- */
+  .panel { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 16px 16px 15px; }
+  .panel-title { font-size: 14px; font-weight: 500; letter-spacing: -0.005em; }
+  .role { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+  .role:last-of-type { border-bottom: none; padding-bottom: 15px; }
+  .role-name { font-size: 13.5px; font-weight: 500; width: 84px; flex: none; }
+  .role-out { display: flex; align-items: center; gap: 8px; }
+  .swatch { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--border); transition: background-color 90ms linear; }
+  .arrow { color: var(--muted); font-size: 12px; }
+  .ratio { font-size: 12px; color: var(--muted); }
+  .role-src { margin-left: auto; font-size: 11px; color: var(--muted); }
   /* collapsed to zero width, grows open when the role is adjusted */
   .role .raw-pair { display: flex; align-items: center; gap: 8px; max-width: 0; opacity: 0; overflow: hidden;
     transition: max-width 240ms ease, opacity 240ms ease; }
-  .role.adjusted .raw-pair { max-width: 80px; opacity: 1; }
+  .role.adjusted .raw-pair { max-width: 72px; opacity: 1; }
   /* per-role flag: grows open inside the adjusted role's row; rows stay compact otherwise */
-  .flag { display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 1.4; color: var(--ink);
-    background: #FDEBC7; border-radius: 9px; overflow: hidden; visibility: hidden;
+  .flag { flex-basis: 100%; display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 1.4; color: var(--ink);
+    background: #FDEBC7; border-radius: 8px; overflow: hidden; visibility: hidden;
     max-height: 0; opacity: 0; margin-top: 0; padding: 0 11px;
     transition: max-height 240ms ease, opacity 240ms ease, margin 240ms ease, padding 240ms ease, visibility 0s 240ms; }
   .flag svg { flex: none; }
-  .role.adjusted .flag { visibility: visible; max-height: 72px; opacity: 1; margin-top: 12px; padding: 8px 11px;
+  .role.adjusted .flag { visibility: visible; max-height: 72px; opacity: 1; margin-top: 2px; padding: 8px 11px;
     transition: max-height 240ms ease, opacity 240ms ease, margin 240ms ease, padding 240ms ease, visibility 0s; }
-  .neutrals { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 14px; }
-  .nswatches { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-  .nswatches .chip { width: 26px; height: 26px; }
-  .gradbar { height: 10px; border-radius: 999px; margin-top: 10px;
-    background: linear-gradient(90deg, #F69835, #F4C355, #529D40); }
-  .ncaption { font-size: 12px; color: var(--muted); margin-top: 10px; }
+  /* shared system — visually secondary to the mapping rows */
+  .shared { border-top: 1px solid var(--border); margin-top: 2px; padding-top: 14px; }
+  .shared-title { font-size: 12.5px; font-weight: 500; color: var(--muted); }
+  .nswatches { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+  .nswatches .chip { width: 18px; height: 18px; border-radius: 5px; }
+  .gradchip { width: 46px; height: 18px; border-radius: 5px; border: 1px solid var(--border);
+    background: linear-gradient(90deg, #F69835, #F4C355, #529D40); flex: none; }
+  .ncaption { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 11px; }
 
-  .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 12px; }
+  .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 18px; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-  @media (max-width: 760px) {
+  @media (max-width: 860px) {
     body { padding-left: 16px; padding-right: 16px; }
-    .layout { grid-template-columns: 1fr; }
+    .layout { grid-template-columns: 1fr; gap: 28px; }
     .opening { max-width: none; }
-    /* section titles sit above their rows, full width */
-    .rail > .eyebrow { display: block; margin-bottom: 10px; }
-    .railrow { display: flex; gap: 10px; overflow-x: auto; padding: 3px 3px 8px; margin: -3px -3px 0; }
-    .preset { width: 212px; min-width: 212px; flex: none; margin-top: 0; }
-    .custom { flex: none; margin-top: 0; align-self: stretch; }
-    /* the whole "what the system did" set — roles AND neutrals — sideways-scrolls
-       like the credit union colors; nothing wider than the viewframe */
-    #roles { display: flex; align-items: flex-start; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
-    #roles .role { width: 272px; min-width: 272px; flex: none; margin-top: 6px; }
-    .neutrals { width: 100%; margin-top: 10px; } /* full width below the carousel, never wider than the viewframe */
+    .alt { width: auto; margin: 0; }
+    #altList { display: flex; flex-wrap: wrap; gap: 4px; }
+    #rolesPanel { max-width: 480px; margin: 0 auto; width: 100%; }
+    .rail { max-width: 480px; margin: 0 auto; width: 100%; }
   }
 </style>
 </head>
 <body>
+<div class="wrap">
 <p class="eyebrow">Silvur — white-label platform · design system</p>
-<h1 class="opening">The entire intake from a new credit union partner: a logo and two brand colors.</h1>
+<h1 class="opening">A logo and two colors became a complete, accessible partner theme.</h1>
 
 <div class="layout">
-  <div class="rail" id="presets" role="group" aria-label="What a new partner sent us">
-    <p class="eyebrow">What a new partner sent us</p>
-    <div class="railrow">
-    <button class="preset" data-id="lanternbay" aria-pressed="true">
-      <span class="cu">Lanternbay Credit Union</span>
-      <span class="chips"><i class="chip" style="background:#1E3A5F"></i><i class="chip" style="background:#15806B"></i><code>#1E3A5F · #15806B</code></span>
-    </button>
-    <button class="preset" data-id="embervalley" aria-pressed="false">
-      <span class="cu">Ember Valley Credit Union</span>
-      <span class="chips"><i class="chip" style="background:#6B1F2F"></i><i class="chip" style="background:#C98A8A"></i><code>#6B1F2F · #C98A8A</code></span>
-    </button>
-    <button class="preset" data-id="sunwise" aria-pressed="false">
-      <span class="cu">Sunwise Credit Union</span>
-      <span class="chips"><i class="chip" style="background:#FFC93C"></i><i class="chip" style="background:#6E6A5E"></i><code>#FFC93C · #6E6A5E</code></span>
-    </button>
-    <div class="custom">
-      <input type="color" id="customColor" value="#1C5C98" aria-label="Try any color as a brand primary">
-      <label for="customColor">Try any color</label>
+  <div class="rail" id="presets" role="group" aria-label="Partner input">
+    <p class="collabel">Partner input</p>
+    <div id="activeCard">
+      <svg class="glyph" id="activeGlyph" width="26" height="26" viewBox="0 0 30 30" fill="none" aria-hidden="true"><circle cx="15" cy="15" r="13.5" stroke="currentColor" stroke-width="2"/><rect x="9" y="15" width="3" height="7" rx="1" fill="currentColor"/><rect x="13.5" y="11" width="3" height="11" rx="1" fill="currentColor"/><rect x="18" y="8" width="3" height="14" rx="1" fill="currentColor"/></svg>
+      <span class="cu" id="activeName">Lanternbay Credit Union</span>
+      <span class="chips"><i class="chip" id="activeP" style="background:#1E3A5F"></i><i class="chip" id="activeS" style="background:#15806B"></i></span>
+      <code id="activeHex">#1E3A5F · #15806B</code>
     </div>
+    <p class="alt-label">Try another partner</p>
+    <div id="altList">
+      <button class="alt" data-id="lanternbay" hidden><i class="dot" style="background:#1E3A5F"></i><i class="dot" style="background:#15806B"></i>Lanternbay Credit Union</button>
+      <button class="alt" data-id="embervalley"><i class="dot" style="background:#6B1F2F"></i><i class="dot" style="background:#C98A8A"></i>Ember Valley Credit Union</button>
+      <button class="alt" data-id="sunwise"><i class="dot" style="background:#FFC93C"></i><i class="dot" style="background:#6E6A5E"></i>Sunwise Credit Union</button>
+      <label class="alt custom" for="customColor"><input type="color" id="customColor" value="#1C5C98" aria-label="Try any color as a brand primary">Custom color +</label>
     </div>
   </div>
 
   <div id="stage">
+    <p class="collabel">Member experience</p>
     <div id="phone" style="--bg:#1E3A5F; --on-bg:#FFFFFF; --headline:#1E3A5F; --cta:#15806B; --on-cta:#FFFFFF">
       <div class="screen">
         <div class="band">
@@ -255,52 +253,55 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <div id="rolesPanel">
-      <p class="eyebrow">What the system did with it</p>
+  <div id="rolesPanel">
+    <p class="collabel">System output</p>
+    <div class="panel">
+      <p class="panel-title">Brand mapping</p>
       <div id="roles">
         <div class="role" data-role="background">
-          <div class="role-head"><span class="role-name">brand/background</span><span class="role-src">← primary</span></div>
-          <div class="role-out">
+          <span class="role-name">Background</span>
+          <span class="role-out">
             <span class="raw-pair"><span class="swatch raw"></span><span class="arrow">→</span></span>
             <span class="swatch out" style="background:#1E3A5F"></span>
-            <span class="ratio">11.5:1 AA</span>
-            <span class="badge">adjusted</span>
-          </div>
+            <span class="ratio">11.5:1 · AA</span>
+          </span>
+          <span class="role-src">Primary</span>
           <p class="flag">
             <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M1 1v12M1 1h9l-2 3 2 3H1" fill="none" stroke="#161D24" stroke-width="1.6" stroke-linejoin="round"/></svg>
             <span>Flagged for partner review — relationship manager notified</span>
           </p>
         </div>
         <div class="role" data-role="headline">
-          <div class="role-head"><span class="role-name">brand/headline</span><span class="role-src">← primary</span></div>
-          <div class="role-out">
+          <span class="role-name">Headline</span>
+          <span class="role-out">
             <span class="raw-pair"><span class="swatch raw"></span><span class="arrow">→</span></span>
             <span class="swatch out" style="background:#1E3A5F"></span>
-            <span class="ratio">11.5:1 AA</span>
-            <span class="badge">adjusted</span>
-          </div>
+            <span class="ratio">11.5:1 · AA</span>
+          </span>
+          <span class="role-src">Primary</span>
           <p class="flag">
             <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M1 1v12M1 1h9l-2 3 2 3H1" fill="none" stroke="#161D24" stroke-width="1.6" stroke-linejoin="round"/></svg>
             <span>Flagged for partner review — relationship manager notified</span>
           </p>
         </div>
         <div class="role" data-role="cta">
-          <div class="role-head"><span class="role-name">brand/CTA</span><span class="role-src">← secondary</span></div>
-          <div class="role-out">
+          <span class="role-name">CTA</span>
+          <span class="role-out">
             <span class="raw-pair"><span class="swatch raw"></span><span class="arrow">→</span></span>
             <span class="swatch out" style="background:#15806B"></span>
-            <span class="ratio">4.9:1 AA</span>
-            <span class="badge">adjusted</span>
-          </div>
+            <span class="ratio">4.9:1 · AA</span>
+          </span>
+          <span class="role-src">Secondary</span>
           <p class="flag">
             <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M1 1v12M1 1h9l-2 3 2 3H1" fill="none" stroke="#161D24" stroke-width="1.6" stroke-linejoin="round"/></svg>
             <span>Flagged for partner review — relationship manager notified</span>
           </p>
         </div>
       </div>
-      <div class="neutrals" id="neutrals">
-        <p class="eyebrow" style="color:#6E6E7D">Reduced to neutral — works with every brand</p>
+      <div class="shared" id="neutrals">
+        <p class="shared-title">Shared across every partner</p>
         <div class="nswatches">
           <i class="chip" style="background:#161D24" title="#161D24"></i>
           <i class="chip" style="background:#6E6E7D" title="#6E6E7D"></i>
@@ -312,15 +313,16 @@
           <i class="chip" style="background:#E15255" title="#E15255"></i>
           <i class="chip" style="background:#FDEBC7" title="#FDEBC7"></i>
           <i class="chip" style="background:#1C5C98" title="#1C5C98"></i>
+          <i class="gradchip" title="#F69835 #F4C355 #529D40"></i>
         </div>
-        <div class="gradbar" title="#F69835 #F4C355 #529D40"></div>
-        <p class="ncaption">Text, cards, borders, icons, errors, announcements — and the Retirement Score gradient, a semantic trust color that never takes brand.</p>
+        <p class="ncaption">Text, surfaces, borders, status colors, and financial semantics remain governed by the shared system.</p>
       </div>
     </div>
   </div>
 </div>
 
 <p class="footnote">Credit unions shown are fictional; member data is synthetic; app copy is a representative reconstruction of the shipped product.</p>
+</div>
 <p id="live" class="sr-only" aria-live="polite"></p>
 <script type="module">
 // Pure color/derivation logic for the white-label brand-system artifact.
@@ -461,7 +463,7 @@ const $ = s => document.querySelector(s);
 const phone = $('#phone'), live = $('#live');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
-const fmt = r => `${(Math.round(r * 10) / 10).toFixed(1)}:1 AA`;
+const fmt = r => `${(Math.round(r * 10) / 10).toFixed(1)}:1 · AA`;
 
 function paintRole(el, { out, raw, ratio, adjusted, steps, quiet }) {
   const token = (el._anim = (el._anim || 0) + 1);
@@ -478,6 +480,16 @@ function paintRole(el, { out, raw, ratio, adjusted, steps, quiet }) {
   } else {
     outSw.style.background = out;
   }
+}
+
+// the active partner owns the single full card; everyone else is a quiet row
+function setChooser(p) {
+  $('#activeName').textContent = p.name;
+  $('#activeGlyph').style.color = p.primary;
+  $('#activeP').style.background = p.primary;
+  $('#activeS').style.background = p.secondary;
+  $('#activeHex').textContent = `${p.primary} · ${p.secondary}`;
+  for (const b of document.querySelectorAll('.alt[data-id]')) b.hidden = b.dataset.id === p.id;
 }
 
 function render(name, primary, secondary, wordmark, quiet = false) {
@@ -501,10 +513,10 @@ function render(name, primary, secondary, wordmark, quiet = false) {
 
 // Brand changes morph in place (CSS transitions on the branded surfaces) —
 // no fade-out, no flash; a click lands immediately.
-for (const btn of document.querySelectorAll('.preset')) {
+for (const btn of document.querySelectorAll('.alt[data-id]')) {
   btn.addEventListener('click', () => {
-    for (const b of document.querySelectorAll('.preset')) b.setAttribute('aria-pressed', String(b === btn));
     const p = PRESETS.find(p => p.id === btn.dataset.id);
+    setChooser(p);
     render(p.name, p.primary, p.secondary, p.name);
   });
 }
@@ -514,16 +526,19 @@ for (const btn of document.querySelectorAll('.preset')) {
 const customInput = $('#customColor');
 let dragColor = null, dragRaf = 0;
 customInput.addEventListener('input', e => {
-  for (const b of document.querySelectorAll('.preset')) b.setAttribute('aria-pressed', 'false');
   dragColor = e.target.value.toUpperCase();
   if (!dragRaf) dragRaf = requestAnimationFrame(() => {
     dragRaf = 0;
-    render('Anytown Credit Union', dragColor, deriveSecondary(dragColor), 'Anytown Credit Union', true);
+    const secondary = deriveSecondary(dragColor);
+    setChooser({ id: null, name: 'Anytown Credit Union', primary: dragColor, secondary });
+    render('Anytown Credit Union', dragColor, secondary, 'Anytown Credit Union', true);
   });
 });
 customInput.addEventListener('change', e => {
   const primary = e.target.value.toUpperCase();
-  render('Anytown Credit Union', primary, deriveSecondary(primary), 'Anytown Credit Union');
+  const secondary = deriveSecondary(primary);
+  setChooser({ id: null, name: 'Anytown Credit Union', primary, secondary });
+  render('Anytown Credit Union', primary, secondary, 'Anytown Credit Union');
 });
 
 function postHeight() {
@@ -533,6 +548,7 @@ postHeight(); // synchronous first post — rAF is throttled in offscreen iframe
 addEventListener('resize', () => requestAnimationFrame(postHeight));
 
 // Re-render Lanternbay from the model so static markup can never drift from the math.
+setChooser(PRESETS[0]);
 render(PRESETS[0].name, PRESETS[0].primary, PRESETS[0].secondary, PRESETS[0].name);
 </script>
 </body>

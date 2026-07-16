@@ -7,7 +7,13 @@ import assert from 'node:assert/strict';
 const html = fs.readFileSync('brand-system.html', 'utf8');
 
 // Framing copy — exact.
-assert.ok(html.includes('The entire intake from a new credit union partner: a logo and two brand colors.'), 'opening line');
+assert.ok(html.includes('A logo and two colors became a complete, accessible partner theme.'), 'opening line (author redesign 2026-07-16)');
+// Redesigned composition: three labeled parts, one consolidated output panel.
+for (const s of ['Partner input', 'Member experience', 'System output', 'Brand mapping',
+  'Try another partner', 'Custom color +', 'Shared across every partner',
+  'Text, surfaces, borders, status colors, and financial semantics remain governed by the shared system.']) {
+  assert.ok(html.includes(s), `redesign copy: ${s}`);
+}
 assert.ok(html.includes('Credit unions shown are fictional; member data is synthetic; app copy is a representative reconstruction of the shipped product.'), 'disclosure footnote');
 assert.ok(html.includes('Flagged for partner review — relationship manager notified'), 'flag chip copy');
 
