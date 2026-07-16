@@ -24,12 +24,13 @@
     display: grid; grid-template-columns: 212px 1fr; overflow: hidden; }
 
   /* ---- sidebar (white — muted text fails AA on gray5) ---- */
-  .sidebar { border-right: 1px solid var(--border); padding: 20px 16px 16px; display: flex; flex-direction: column; min-height: 620px; }
+  .sidebar { border-right: 1px solid var(--border); padding: 20px 16px 16px; display: flex; flex-direction: column; min-height: 560px; }
   .logotype { font-size: 16px; letter-spacing: -0.01em; }
   .logotype .silvur { font-weight: 500; }
   .logotype .partners { font-weight: 500; font-size: 11px; letter-spacing: .16em; color: var(--teal-text); margin-left: 5px; }
   .nav { margin-top: 26px; display: flex; flex-direction: column; gap: 2px; }
-  .nav span { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 9px; font-size: 13.5px; color: var(--muted); }
+  /* direct children only — .notebadge nested inside items must not inherit item styling */
+  .nav > span { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 9px; font-size: 13.5px; color: var(--muted); }
   .nav .active { background: #F2F2F7; color: var(--ink); font-weight: 500; }
   .nav .sub { padding-left: 34px; font-size: 13px; }
   .nav svg { flex: none; }
@@ -48,7 +49,7 @@
     outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* ---- fixed-height stage; beats swap inside, page height never changes ---- */
-  #stage { position: relative; height: 470px; }
+  #stage { position: relative; height: 420px; }
   .beat { position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: translateY(4px);
     transition: opacity 200ms ease, transform 200ms ease, visibility 0s 200ms; }
   #stage[data-beat="1"] .beat1, #stage[data-beat="2"] .beat2 { opacity: 1; visibility: visible; transform: none; transition: opacity 200ms ease, transform 200ms ease, visibility 0s; }
@@ -317,11 +318,13 @@
   // Fixed 980px frame scales down to fit narrow viewports (no bespoke mobile layout).
   const scaler = $('#scaler'), frame = $('#frame');
   function fit() {
-    const avail = document.body.clientWidth;
+    const bs = getComputedStyle(document.body);
+    const avail = document.body.clientWidth - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight);
     const s = Math.min(1, avail / 980);
     scaler.style.transform = `scale(${s})`;
     scaler.style.height = frame.offsetHeight * s + 'px';
-    scaler.style.marginLeft = s < 1 ? '0' : '';
+    // transforms don't shrink the layout box — reconcile it so nothing overflows sideways
+    scaler.style.marginRight = s < 1 ? `${980 * s - 980}px` : '';
     postHeight();
   }
 
