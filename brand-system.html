@@ -413,11 +413,35 @@ customInput.addEventListener('change', e => {
   render('Anytown Credit Union', primary, secondary, 'Anytown Credit Union');
 });
 
+/* ---------- fit-to-frame scaling ----------
+   Above the mobile breakpoint the whole composition scales down uniformly
+   (CSS zoom) to fit BOTH the frame's width and height, so it never crops in
+   a fixed-height iframe. At/below the breakpoint we drop the zoom and let the
+   stacked mobile layout (see the max-width:860px media query) scroll. */
+const DESIGN_W = 1120;  // .wrap natural width (max-width)
+const DESIGN_H = 858;   // .wrap natural height at DESIGN_W
+const MOBILE_BP = 860;  // matches the CSS media query — mobile at <= this width
+const PAD_X = 48, PAD_Y = 36;  // body padding (24*2 horizontal, 20+16 vertical)
+const wrapEl = document.querySelector('.wrap');
+
+function fitScale() {
+  if (window.innerWidth > MOBILE_BP) {
+    const availW = window.innerWidth - PAD_X;
+    const availH = window.innerHeight - PAD_Y;
+    wrapEl.style.width = DESIGN_W + 'px';  // fixed design width; zoom does the shrinking
+    wrapEl.style.zoom = Math.min(1, availW / DESIGN_W, availH / DESIGN_H);
+  } else {
+    wrapEl.style.width = '';  // revert to CSS (max-width + mobile rules), no zoom
+    wrapEl.style.zoom = '';
+  }
+}
+
 function postHeight() {
   window.parent.postMessage({ type: 'brand-system:height', height: document.documentElement.scrollHeight }, '*');
 }
+fitScale();
 postHeight(); // synchronous first post — rAF is throttled in offscreen iframes
-addEventListener('resize', () => requestAnimationFrame(postHeight));
+addEventListener('resize', () => requestAnimationFrame(() => { fitScale(); postHeight(); }));
 
 // Re-render Lanternbay from the model so static markup can never drift from the math.
 setChooser(PRESETS[0]);
