@@ -56,7 +56,7 @@
   /* ---- main ---- */
   .main { padding: 16px 20px 18px; min-width: 0; }
   .topbar { color: var(--muted); margin-bottom: 12px; }
-  #screens { position: relative; height: 680px; }
+  #screens { position: relative; height: 760px; }
   .screen { position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: translateY(4px);
     transition: opacity 200ms ease, transform 200ms ease, visibility 0s 200ms; }
   #screens[data-screen="home"] .screen.home, #screens[data-screen="detail"] .screen.detail {
@@ -287,6 +287,14 @@
                 <td><span class="tag">Wealth Management</span></td>
                 <td><button class="rowexport exportbtn-row" data-seg="Nearing Retirement: $251–$500K" data-leads="114">Export</button></td>
               </tr>
+              <tr>
+                <td><span class="cb" aria-hidden="true"></span></td>
+                <td><span class="seg-name">Just Retired: $1M+</span><span class="seg-desc">Customers who retired in the last 3 years with $1M+ in investable assets</span></td>
+                <td><span class="num-strong">146</span></td>
+                <td>$363M</td>
+                <td><span class="tag">Wealth Management</span></td>
+                <td><button class="rowexport exportbtn-row" data-seg="Just Retired: $1M+" data-leads="146">Export</button></td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -475,11 +483,14 @@
   });
 
   // Fixed 980px frame scales down to fit narrow viewports (no bespoke mobile layout).
+  // The case-study embed may pass ?scale=0.8 (clamped 0.4–1) to shrink the whole
+  // product proportionally — type included — below its real-product size.
   const scaler = $('#scaler');
+  const maxScale = Math.min(1, Math.max(0.4, parseFloat(new URLSearchParams(location.search).get('scale')) || 1));
   function fit() {
     const bs = getComputedStyle(document.body);
     const avail = document.body.clientWidth - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight);
-    const s = Math.min(1, avail / 980);
+    const s = Math.min(maxScale, avail / 980);
     scaler.style.transform = `scale(${s})`;
     scaler.style.height = frame.offsetHeight * s + 'px';
     // transforms don't shrink the layout box — reconcile it so nothing overflows sideways

@@ -19,13 +19,13 @@ assert.ok(html.includes("The workflow ends in the partner's existing tools — p
 for (const s of ['Campaign Segments', 'All Segments', 'Date Range', 'Filters', 'Export Data',
   'Top Wealth Management Leads', 'Direct Deposit: Social Security', 'High Yield Savings Leads',
   'Top Risk', 'Top Opportunity', 'Nearing Retirement: $1M+', 'Nearing Retirement: $500K–$1M',
-  'Nearing Retirement: $251–$500K', '109 New!', 'Wealth Management',
+  'Nearing Retirement: $251–$500K', 'Just Retired: $1M+', '109 New!', 'Wealth Management',
   'Source: member activity on the platform.', 'Recommended campaign', 'Direct-deposit switch']) {
   assert.ok(html.includes(s), `product copy: ${s}`);
 }
 
 // Synthetic figures (fixed).
-for (const n of ['597', '$752M', '1,651', '$23M', '2,146', '$350M', '590', '146', '$110M', '114', '$43M', '1,455', '1,204', '87']) {
+for (const n of ['597', '$752M', '1,651', '$23M', '2,146', '$350M', '590', '146', '$110M', '114', '$43M', '$363M', '1,455', '1,204', '87']) {
   assert.ok(html.includes(n), `figure: ${n}`);
 }
 
