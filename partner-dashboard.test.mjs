@@ -20,7 +20,8 @@ for (const s of ['Campaign Segments', 'All Segments', 'Date Range', 'Filters', '
   'Top Wealth Management Leads', 'Direct Deposit: Social Security', 'High Yield Savings Leads',
   'Top Risk', 'Top Opportunity', 'Nearing Retirement: $1M+', 'Nearing Retirement: $500K–$1M',
   'Nearing Retirement: $251–$500K', 'Just Retired: $1M+', '109 New!', 'Wealth Management',
-  'Source: member activity on the platform.', 'Recommended campaign', 'Direct-deposit switch']) {
+  'Source: member activity on the platform.', 'Recommended campaign', 'Direct-deposit switch',
+  'Questions about this export? Contact your Silvur relationship manager.']) {
   assert.ok(html.includes(s), `product copy: ${s}`);
 }
 
@@ -63,7 +64,7 @@ assert.equal(/\p{Extended_Pictographic}/u.test(html), false, 'no emoji');
 
 // Structure + a11y hooks (product/explanation separation depends on these).
 for (const hook of ['id="screens"', 'data-screen="home"', 'id="heroCard"', 'id="backBtn"', 'id="doneBtn"',
-  'id="scrim"', 'id="notesToggle"', 'id="notesPanel"', 'id="storyRail"', 'class="storybeat"',
+  'id="scrim"', 'id="notesToggle"', 'id="notesPanel"', 'id="storyRail"', 'class="storybeat"', 'id="storyCaption"',
   'id="exportSeg"', 'id="exportLeads"', 'id="live"', 'aria-live="polite"', 'id="scaler"', 'id="frame"',
   'role="dialog"', 'aria-modal="true"']) {
   assert.ok(html.includes(hook), `missing hook ${hook}`);
