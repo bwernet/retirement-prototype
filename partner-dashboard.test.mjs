@@ -9,7 +9,11 @@ const html = fs.readFileSync('partner-dashboard.html', 'utf8');
 
 // Exact copy — outside-the-frame narration (story rail + notes + footnote).
 assert.ok(html.includes('Credit union, members, and figures are fictional; segment logic is representative of the shipped product.'), 'disclosure footnote');
-assert.ok(/never claims data it can't see/.test(html) && /where those deposits land/.test(html), 'caption keeps the platform-cannot-see honesty line');
+// Author caption copy (2026-07-16) — pinned verbatim. Provenance stays
+// platform-only: "grounded in member activity inside Silvur".
+assert.ok(html.includes('Member activity became a new source of insight for credit unions, revealing financial needs their existing systems could not see.'), 'caption 1');
+assert.ok(html.includes('Every opportunity was grounded in member activity inside Silvur, with the underlying behaviors shown directly. Credit unions could see what members were exploring and use that context to shape timely outreach.'), 'caption 2');
+assert.ok(html.includes('We connected those signals to the tools credit unions already used, helping teams turn member interest into timely, relevant outreach.'), 'caption 3');
 for (const b of ['1 · Signal', '2 · Why', '3 · Act']) assert.ok(html.includes(b), `story beat: ${b}`);
 
 // Product-voice copy inside the frame (faithful to the shipped dashboard).

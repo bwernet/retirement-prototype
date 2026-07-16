@@ -184,7 +184,7 @@
   /* captions speak in the case-study's serif voice — the one non-product element */
   #storyCaption { max-width: 660px; margin: 10px auto 0; text-align: center;
     font-family: Georgia, 'Times New Roman', serif; font-size: 14.5px; line-height: 1.6;
-    color: var(--muted); min-height: 48px; opacity: 1; transition: opacity 180ms ease; }
+    color: var(--muted); min-height: 72px; opacity: 1; transition: opacity 180ms ease; }
   @media (prefers-reduced-motion: reduce) { #storyCaption { transition: none !important; } }
 
   .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 14px; }
@@ -368,7 +368,7 @@
   <button class="storybeat" data-beat="2" aria-pressed="false"><span class="dot"></span>2 · Why</button>
   <button class="storybeat" data-beat="3" aria-pressed="false"><span class="dot"></span>3 · Act</button>
 </div>
-<p id="storyCaption">Designed to lead with needs, not metrics — each segment is a campaign a marketing team could run today.</p>
+<p id="storyCaption">Member activity became a new source of insight for credit unions, revealing financial needs their existing systems could not see.</p>
 
 <p class="footnote">Credit union, members, and figures are fictional; segment logic is representative of the shipped product.</p>
 </div>
@@ -386,9 +386,9 @@
     3: 'Export dialog open.',
   };
   const CAPTIONS = {
-    1: 'Designed to lead with needs, not metrics — each segment is a campaign a marketing team could run today.',
-    2: "Provenance is a product decision: every number traces to member activity on the platform, and the tool never claims data it can't see — like where those deposits land.",
-    3: 'Export hands the audience to the tools the team already uses.',
+    1: 'Member activity became a new source of insight for credit unions, revealing financial needs their existing systems could not see.',
+    2: 'Every opportunity was grounded in member activity inside Silvur, with the underlying behaviors shown directly. Credit unions could see what members were exploring and use that context to shape timely outreach.',
+    3: 'We connected those signals to the tools credit unions already used, helping teams turn member interest into timely, relevant outreach.',
   };
   const caption = $('#storyCaption');
   let shownBeat = 1;
