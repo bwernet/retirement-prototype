@@ -21,7 +21,11 @@ for (const s of ['Campaign Segments', 'All Segments', 'Date Range', 'Filters', '
   'Top Wealth Management Leads', 'Direct Deposit: Social Security', 'High Yield Savings Leads',
   'Top Risk', 'Top Opportunity', 'Nearing Retirement: $1M+', 'Nearing Retirement: $500K–$1M',
   'Nearing Retirement: $251–$500K', 'Just Retired: $1M+', '109 New!', 'Wealth Management',
-  'Source: member activity on the platform.', 'Recommended campaign', 'Direct-deposit switch',
+  'Social Security direct-deposit opportunity', 'Activity window: Last 90 days',
+  'eligible members', 'added recently', 'estimated annual volume',
+  'Signals behind this opportunity', 'Reached eligibility age', 'Entered benefit income',
+  'Used Social Security tool', 'View segment criteria', 'Based on activity in Silvur',
+  'Recommended next step', 'Launch direct-deposit outreach', 'Export audience',
   'Questions about this export? Contact your Silvur relationship manager.']) {
   assert.ok(html.includes(s), `product copy: ${s}`);
 }

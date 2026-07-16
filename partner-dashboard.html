@@ -24,9 +24,9 @@
 
   /* ================= product frame (product voice ONLY inside) ================= */
   #scaler { transform-origin: top left; width: 980px; }
-  #frame { position: relative; width: 980px; background: #fff; border: 1px solid var(--border); border-radius: 16px;
+  #frame { position: relative; width: 980px; background: #fff; border: 1px solid var(--border); border-radius: 12px;
     box-shadow: 0 1px 2px rgba(22,29,36,.05), 0 10px 30px rgba(22,29,36,.07);
-    display: grid; grid-template-columns: 238px 1fr; overflow: hidden; }
+    display: grid; grid-template-columns: 222px 1fr; overflow: hidden; }
 
   /* ---- sidebar ---- */
   .sidebar { border-right: 1px solid var(--border); padding: 18px 14px 14px; display: flex; flex-direction: column; }
@@ -35,8 +35,8 @@
   .logotype .partners { font-weight: 500; font-size: 12px; letter-spacing: .18em; color: var(--teal-text); margin-left: 6px; }
   .nav { margin-top: 22px; display: flex; flex-direction: column; gap: 2px; }
   /* every menu item fits on one line */
-  .nav > span { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px;
-    font-size: 13.5px; color: var(--muted); white-space: nowrap; }
+  .nav > span { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: 8px;
+    font-size: 13px; color: var(--muted); white-space: nowrap; }
   .nav .active { background: var(--pill); color: var(--ink); font-weight: 500; }
   .nav .active .chev { margin-left: auto; }
   .nav .sub { padding-left: 37px; font-size: 13px; }
@@ -53,10 +53,9 @@
   .account > svg { margin-left: auto; margin-right: 5px; color: var(--muted); flex: none; }
 
   /* ---- main ---- */
-  .main { padding: 16px 20px 18px; min-width: 0; }
-  .topbar { color: var(--muted); margin-bottom: 12px; }
+  .main { padding: 18px 20px 18px; min-width: 0; }
   /* shorter mock: the product surface scrolls internally; sidebar stays pinned full height */
-  #screens { position: relative; height: 584px; }
+  #screens { position: relative; height: 616px; }
   .screen { position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: translateY(4px);
     overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #C9CBD1 transparent;
     padding-right: 4px;
@@ -72,14 +71,13 @@
 
   /* ---- home: segment cards ---- */
   .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .segcard { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 15px 16px 16px;
+  .segcard { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 15px 16px 16px;
     box-shadow: 0 1px 2px rgba(22,29,36,.04); text-align: left; display: flex; flex-direction: column; }
-  .cardtop { display: flex; justify-content: space-between; align-items: center; }
+  .cardtop { display: flex; align-items: center; }
   .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500;
     letter-spacing: .04em; border-radius: 999px; padding: 4px 10px; }
   .chip.opp { background: var(--opp-bg); color: var(--opp-text); }
   .chip.risk { background: var(--risk-bg); color: var(--risk-text); }
-  .kebab { color: var(--muted); }
   .segcard h3 { font-size: 18.5px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.22; margin: 11px 0 7px; }
   .segcard > p { color: var(--muted); font-size: 13px; line-height: 1.45; min-height: 57px; }
   /* metric labels always fit on one line */
@@ -89,12 +87,12 @@
   .metric .pill { margin-left: auto; background: var(--pill); border-radius: 999px; padding: 3px 10px;
     font-size: 12.5px; font-weight: 500; letter-spacing: 0; text-transform: none; }
   .exportbtn { font: inherit; display: block; width: 108px; margin-top: 13px; padding: 9px 0; border: none;
-    border-radius: 8px; background: var(--teal-text); color: #fff; font-weight: 500; font-size: 13px; cursor: pointer; }
+    border-radius: 7px; background: var(--teal-text); color: #fff; font-weight: 500; font-size: 13px; cursor: pointer; }
   #heroCard { cursor: pointer; transition: border-color 160ms ease, box-shadow 160ms ease; }
   #heroCard:hover { border-color: #C9CBD1; box-shadow: 0 1px 2px rgba(22,29,36,.05), 0 8px 20px rgba(22,29,36,.08); }
 
   /* ---- home: All Segments table ---- */
-  .tablecard { background: #fff; border: 1px solid var(--border); border-radius: 16px; margin-top: 16px;
+  .tablecard { background: #fff; border: 1px solid var(--border); border-radius: 10px; margin-top: 16px;
     box-shadow: 0 1px 2px rgba(22,29,36,.04); }
   .tablehead { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px 10px; }
   .tablehead h2 { font-size: 17px; font-weight: 500; letter-spacing: -0.008em; }
@@ -102,7 +100,7 @@
   .datepill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 999px;
     padding: 5px 13px; font-size: 12.5px; font-weight: 500; }
   .datepill .all { color: var(--muted); font-weight: 400; }
-  .filters { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--border); border-radius: 9px;
+  .filters { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--border); border-radius: 7px;
     padding: 6px 13px; font-size: 12.5px; font-weight: 500; color: var(--ink); }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   thead th { text-align: left; font-weight: 400; color: var(--muted); font-size: 12.5px; padding: 8px 10px;
@@ -119,37 +117,46 @@
   .tag { display: inline-block; white-space: nowrap; background: var(--tag-bg); color: var(--tag-text); border-radius: 999px;
     font-size: 11px; font-weight: 500; padding: 4px 10px; }
   .rowexport { font: inherit; font-size: 12.5px; font-weight: 500; color: var(--ink); background: #fff;
-    border: 1px solid var(--border); border-radius: 8px; padding: 6px 14px; cursor: pointer; }
+    border: 1px solid var(--border); border-radius: 7px; padding: 6px 14px; cursor: pointer; }
   .num-strong { font-weight: 500; }
 
   /* ---- detail: data-heavy segment screen ---- */
   #backBtn { font: inherit; font-size: 13px; font-weight: 500; color: var(--muted); background: none; border: none;
     cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 5px 8px 5px 0; border-radius: 8px; }
   #backBtn:hover { color: var(--ink); }
-  .detailhead { display: flex; align-items: flex-start; gap: 12px; margin-top: 8px; }
-  .detailhead .chip { margin-top: 4px; flex: none; }
+  /* badge sits above the title — never interrupting its left edge */
+  .detailhead { margin-top: 10px; }
+  .detailhead .chip { margin-bottom: 9px; }
   .detailhead h2 { font-size: 21px; font-weight: 500; letter-spacing: -0.012em; }
-  .detailhead p { color: var(--muted); font-size: 13px; margin-top: 2px; }
-  .detailhead .kebab { margin-left: auto; margin-top: 6px; }
-  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
-  .tile { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 13px 16px; }
-  .tile .tlabel { display: block; font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-  .tile .tvalue { display: block; font-size: 23px; font-weight: 500; letter-spacing: -0.015em; margin-top: 3px; }
-  .detailcols { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; margin-top: 14px; }
-  .panel { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 15px 16px; }
+  .detailhead p { color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .detailhead .window { font-size: 12px; margin-top: 6px; }
+  /* summary metrics sit on the page background — no cards */
+  .statline { margin-top: 16px; font-size: 13.5px; color: var(--muted); }
+  .statline .num { font-weight: 500; color: var(--ink); font-size: 15px; }
+  .statline .sep { margin: 0 7px; }
+  .detailcols { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; margin-top: 16px; }
+  .panel { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 15px 16px; }
   .panel h3 { font-size: 14px; font-weight: 500; letter-spacing: -0.005em; }
+  /* only the recommended-action card reads elevated — the clear destination */
+  .panel.action { background: #F2FAF7; border-color: #CBE9DE;
+    box-shadow: 0 1px 2px rgba(22,29,36,.04), 0 6px 18px rgba(7,131,117,.10); }
   .sig { margin-top: 13px; }
   .sigrow { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; }
   .sigrow .count { font-weight: 500; }
-  .sigrow .share { color: var(--muted); font-size: 12px; margin-left: 8px; }
   .sigbar { height: 6px; border-radius: 999px; background: var(--pill); margin-top: 6px; overflow: hidden; }
   .sigbar i { display: block; height: 100%; border-radius: 999px; background: var(--teal); width: var(--w, 0%);
     transition: width 600ms cubic-bezier(.22,.61,.36,1); }
   .grown .sigbar i { width: var(--w); }
-  .source { color: var(--muted); font-size: 11.5px; margin-top: 14px; }
+  .criteria-link { font: inherit; display: block; margin-top: 14px; padding: 0; background: none; border: none;
+    font-size: 12.5px; font-weight: 500; color: var(--teal-text); cursor: pointer; }
+  .criteria-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .criteria { display: none; font-size: 12.5px; line-height: 1.5; color: var(--muted); margin-top: 7px; }
+  .criteria.open { display: block; }
+  .source { color: var(--muted); font-size: 11.5px; margin-top: 12px; }
   .action-title { font-size: 16.5px; font-weight: 500; letter-spacing: -0.008em; margin-top: 10px; }
-  .panel p.body { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top: 6px; }
-  .panel .exportbtn { width: 100%; margin-top: 14px; }
+  .actionline { font-size: 13px; color: var(--ink); margin-top: 8px; }
+  .actionline .alabel { color: var(--muted); }
+  .panel .exportbtn { width: 100%; margin-top: 16px; }
 
   /* ---- export drawer: a real rail — full frame height, flush to the product surface's right edge ---- */
   #scrim { position: absolute; inset: 0; background: rgba(22,29,36,.28); opacity: 0; visibility: hidden;
@@ -221,14 +228,12 @@
   </aside>
 
   <main class="main">
-    <div class="topbar" aria-hidden="true"><svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 1h16M1 7h16M1 13h16"/></svg></div>
-
     <div id="screens" data-screen="home">
       <!-- product screen: Campaign Segments home -->
       <section class="screen home" aria-label="Campaign Segments">
         <div class="cards">
           <div class="segcard">
-            <span class="cardtop"><span class="chip opp">Top Opportunity</span><svg class="kebab" width="3" height="13" viewBox="0 0 3 13" fill="currentColor" aria-hidden="true"><circle cx="1.5" cy="1.5" r="1.5"/><circle cx="1.5" cy="6.5" r="1.5"/><circle cx="1.5" cy="11.5" r="1.5"/></svg></span>
+            <span class="cardtop"><span class="chip opp">Top Opportunity</span></span>
             <h3>Top Wealth Management Leads</h3>
             <p>Customers 0–3 years away from retirement with over $1 million in investable assets</p>
             <span class="metric"><svg width="14" height="12" viewBox="0 0 14 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="3.5" r="2.3"/><path d="M1 11c.5-2.6 2-4 4-4s3.5 1.4 4 4M10 1.6a2.3 2.3 0 0 1 0 3.8M11 7.2c1.2.5 1.8 1.7 2 3.3"/></svg>Leads<span class="pill">597</span></span>
@@ -236,7 +241,7 @@
             <button class="exportbtn" data-seg="Top Wealth Management Leads" data-leads="597">Export Data</button>
           </div>
           <div class="segcard" id="heroCard" role="button" tabindex="0" aria-label="Direct Deposit: Social Security — open segment">
-            <span class="cardtop"><span class="chip risk"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>Top Risk</span><svg class="kebab" width="3" height="13" viewBox="0 0 3 13" fill="currentColor" aria-hidden="true"><circle cx="1.5" cy="1.5" r="1.5"/><circle cx="1.5" cy="6.5" r="1.5"/><circle cx="1.5" cy="11.5" r="1.5"/></svg></span>
+            <span class="cardtop"><span class="chip risk"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>Top Risk</span></span>
             <h3>Direct Deposit: Social Security</h3>
             <p>Customers already collecting Social Security.</p>
             <span class="metric"><svg width="14" height="12" viewBox="0 0 14 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="3.5" r="2.3"/><path d="M1 11c.5-2.6 2-4 4-4s3.5 1.4 4 4M10 1.6a2.3 2.3 0 0 1 0 3.8M11 7.2c1.2.5 1.8 1.7 2 3.3"/></svg>Leads<span class="pill">1,651</span></span>
@@ -244,7 +249,7 @@
             <button class="exportbtn" data-seg="Direct Deposit: Social Security" data-leads="1,651">Export Data</button>
           </div>
           <div class="segcard">
-            <span class="cardtop"><span class="chip opp">Top Opportunity</span><svg class="kebab" width="3" height="13" viewBox="0 0 3 13" fill="currentColor" aria-hidden="true"><circle cx="1.5" cy="1.5" r="1.5"/><circle cx="1.5" cy="6.5" r="1.5"/><circle cx="1.5" cy="11.5" r="1.5"/></svg></span>
+            <span class="cardtop"><span class="chip opp">Top Opportunity</span></span>
             <h3>High Yield Savings Leads</h3>
             <p>Customers who have over $10k in cash earning little to no interest.</p>
             <span class="metric"><svg width="14" height="12" viewBox="0 0 14 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="3.5" r="2.3"/><path d="M1 11c.5-2.6 2-4 4-4s3.5 1.4 4 4M10 1.6a2.3 2.3 0 0 1 0 3.8M11 7.2c1.2.5 1.8 1.7 2 3.3"/></svg>Leads<span class="pill">2,146</span></span>
@@ -254,7 +259,7 @@
         </div>
 
         <div class="tablecard">
-          <div class="tablehead"><h2>All Segments</h2><svg class="kebab" width="3" height="13" viewBox="0 0 3 13" fill="currentColor" aria-hidden="true"><circle cx="1.5" cy="1.5" r="1.5"/><circle cx="1.5" cy="6.5" r="1.5"/><circle cx="1.5" cy="11.5" r="1.5"/></svg></div>
+          <div class="tablehead"><h2>All Segments</h2></div>
           <div class="tablectl">
             <span class="datepill">Date Range<span class="all">All</span></span>
             <span class="filters"><svg width="13" height="11" viewBox="0 0 13 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M1 1.5h11M3 5.5h7M5 9.5h3"/></svg>Filters</span>
@@ -300,40 +305,40 @@
       </section>
 
       <!-- product screen: segment detail (data-heavy) -->
-      <section class="screen detail" aria-label="Direct Deposit: Social Security">
+      <section class="screen detail" aria-label="Social Security direct-deposit opportunity">
         <button id="backBtn"><svg width="6" height="10" viewBox="0 0 6 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 1 1 5l4 4"/></svg>Campaign Segments</button>
         <div class="detailhead">
           <span class="chip risk"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>Top Risk</span>
-          <span><h2>Direct Deposit: Social Security</h2><p>Customers already collecting Social Security.</p></span>
-          <svg class="kebab" width="3" height="13" viewBox="0 0 3 13" fill="currentColor" aria-hidden="true"><circle cx="1.5" cy="1.5" r="1.5"/><circle cx="1.5" cy="6.5" r="1.5"/><circle cx="1.5" cy="11.5" r="1.5"/></svg>
+          <h2>Social Security direct-deposit opportunity</h2>
+          <p>1,651 members are already receiving Social Security income.</p>
+          <p class="window">Activity window: Last 90 days</p>
         </div>
-        <div class="tiles">
-          <div class="tile"><span class="tlabel">Leads</span><span class="tvalue">1,651</span></div>
-          <div class="tile"><span class="tlabel">Annual Deposits</span><span class="tvalue">$23M</span></div>
-          <div class="tile"><span class="tlabel">New this month</span><span class="tvalue">87</span></div>
-        </div>
+        <p class="statline"><span class="num">1,651</span> eligible members<span class="sep">·</span><span class="num">87</span> added recently<span class="sep">·</span><span class="num">$23M</span> estimated annual volume</p>
         <div class="detailcols">
           <div class="panel" id="signals">
-            <h3>Member signals · last 90 days</h3>
+            <h3>Signals behind this opportunity</h3>
             <div class="sig">
-              <div class="sigrow"><span>Set or passed their election age</span><span><span class="count">1,651</span><span class="share">100%</span></span></div>
+              <div class="sigrow"><span>Reached eligibility age</span><span class="count">1,651</span></div>
               <div class="sigbar"><i style="--w:100%"></i></div>
             </div>
             <div class="sig">
-              <div class="sigrow"><span>Entered Social Security benefit income</span><span><span class="count">1,455</span><span class="share">88%</span></span></div>
+              <div class="sigrow"><span>Entered benefit income</span><span class="count">1,455</span></div>
               <div class="sigbar"><i style="--w:88%"></i></div>
             </div>
             <div class="sig">
-              <div class="sigrow"><span>Ran the Social Security calculator</span><span><span class="count">1,204</span><span class="share">73%</span></span></div>
+              <div class="sigrow"><span>Used Social Security tool</span><span class="count">1,204</span></div>
               <div class="sigbar"><i style="--w:73%"></i></div>
             </div>
-            <p class="source">Source: member activity on the platform.</p>
+            <button class="criteria-link" id="criteriaLink" aria-expanded="false">View segment criteria</button>
+            <p class="criteria" id="criteriaText">Election age set or passed, Social Security benefit income entered, and activity within the last 90 days.</p>
+            <p class="source">Based on activity in Silvur</p>
           </div>
-          <div class="panel">
-            <h3>Recommended campaign</h3>
-            <p class="action-title">Direct-deposit switch</p>
-            <p class="body">Reach members whose recurring Social Security deposits may be landing at another institution.</p>
-            <button class="exportbtn" data-seg="Direct Deposit: Social Security" data-leads="1,651">Export Data</button>
+          <div class="panel action">
+            <h3>Recommended next step</h3>
+            <p class="action-title">Launch direct-deposit outreach</p>
+            <p class="actionline"><span class="alabel">Audience:</span> 1,651 members</p>
+            <p class="actionline"><span class="alabel">Destination:</span> Marketing tools</p>
+            <button class="exportbtn" data-seg="Social Security direct-deposit opportunity" data-leads="1,651">Export audience</button>
           </div>
         </div>
       </section>
@@ -380,7 +385,7 @@
 
   const MESSAGES = {
     1: 'Showing the Campaign Segments home screen.',
-    2: 'Showing the Direct Deposit: Social Security segment: 1,651 leads, 23 million dollars a year in deposits, with per-signal member activity counts.',
+    2: 'Showing the Social Security direct-deposit opportunity: 1,651 eligible members, 23 million dollars in estimated annual volume, with per-signal member activity counts.',
     3: 'Export dialog open.',
   };
   const CAPTIONS = {
@@ -449,6 +454,13 @@
   }
   $('#doneBtn').addEventListener('click', () => closeExport());
   $('#scrim').addEventListener('click', () => closeExport());
+
+  const criteriaLink = $('#criteriaLink');
+  criteriaLink.addEventListener('click', () => {
+    const open = criteriaLink.getAttribute('aria-expanded') !== 'true';
+    criteriaLink.setAttribute('aria-expanded', String(open));
+    $('#criteriaText').classList.toggle('open', open);
+  });
 
   // Esc closes the dialog; Tab is trapped inside it while open.
   document.addEventListener('keydown', e => {
