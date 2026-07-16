@@ -113,10 +113,13 @@ Wordmarks are simple text/SVG lockups (no fabricated logo art).
 
 ## Custom color
 
-One native color input, restyled: "Try any color." Selecting it switches the
-wordmark to a neutral "Anytown Credit Union" and fills the three brand roles
-from the single chosen primary (the secondary auto-derived — deterministic
-lightness/hue shift; exact recipe an implementation detail). This is the
+One native color input, restyled: "Try any color." It updates LIVE while the
+visitor drags inside the picker (rAF-throttled; quiet — no step animation or
+screen-reader announcements until the picker closes). Selecting it switches
+the wordmark to a neutral "Anytown Credit Union" and fills the three brand
+roles from the single chosen primary (the secondary auto-derived —
+deterministic lightness/hue shift; exact recipe an implementation detail).
+This is the
 evidence interaction for arbitrary input: whatever the visitor picks, the
 member phone stays legible and the panel shows which roles took the color
 raw and which were adjusted (with the partner-review flag firing on any
@@ -124,14 +127,14 @@ adjustment) — and why. No second color input, no logo upload.
 
 ## Motion
 
-Default is subtle, restrained, realistic. Preset switch triggers ONE
-synchronized crossfade (~450ms) across phone and derivation panel —
-everything arrives together, then stillness. Role rows stay compact and only
-grow when flagged (author-directed 2026-07-15: no empty space waiting for
-error messages); the height change lands behind the crossfade, never in
-front of the viewer. `prefers-reduced-motion`: instant swap. No ambient or
-looping animation. The whole artifact fits a 850px-tall iframe in every
-state.
+Default is subtle, restrained, realistic. Brand switches morph IN PLACE
+(author-directed 2026-07-15: no fade-out flash) — branded surfaces transition
+color over ~260ms while everything else holds still; arrival is synchronized
+because all surfaces morph together. Role rows stay compact and only grow
+when flagged (no empty space waiting for error messages); the flag and
+before→after pair animate open (~240ms). `prefers-reduced-motion`: all
+transitions instant. No ambient or looping animation. The whole artifact
+fits a 850px-tall iframe in every state.
 
 Story-serving exception (permitted where motion IS the argument): on an
 adjusted role, the swatch may visibly step darker until its ratio passes —
