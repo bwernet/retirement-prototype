@@ -19,7 +19,7 @@ assert.ok(html.includes('Top requested guidance'), 'chart label');
 for (const c of ['Tax planning', 'Healthcare', 'Estate planning', 'Social Security']) {
   assert.ok(html.includes(c), `category: ${c}`);
 }
-assert.ok(html.includes('Methodology:'), 'methodology note present');
+assert.ok(html.includes('Methodology: survey of 330 members across 7 partner credit unions, sent shortly after members created their Silvur accounts.'), 'methodology note verbatim (author-supplied 2026-07-16)');
 
 // Fictional-only; forbidden marks absent.
 assert.equal(/NCUA|Equal Housing|Retire Strong|ICCU|MSUFCU|Idaho Central|Olivia/i.test(html), false, 'no regulator marks / real brands / personal names');
@@ -44,4 +44,4 @@ assert.equal(/<canvas|tooltip|legend/i.test(html), false, 'no chart machinery â€
 assert.ok(html.includes('<link rel="stylesheet" href="fonts.css">'), 'font link (build replaces this exact tag)');
 assert.ok(html.includes('evidence-panel:height'), 'height postMessage type');
 console.log('evidence-panel content-integrity: all checks passed');
-console.log('PUBLISH GATE: bar widths + methodology are placeholders until the author supplies real values.');
+console.log('PUBLISH GATE: bar widths are placeholders until the author supplies real proportions (or confirms ordinal-only).');
