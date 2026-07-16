@@ -224,3 +224,9 @@ the chain draw — once per entry from the home screen, never looping);
 **Later 2026-07-16:** the Design-notes layer was removed entirely (author) —
 the cycling story captions carry all narration alone. Sidebar menu items must
 each fit on one line (238px sidebar, nowrap).
+
+**Guided beacons (author 2026-07-16):** a pulsing teal dot marks the single
+intended interaction per screen — the Social Security card on home, the
+Export audience button on the segment detail; none on the drawer (end of the
+story). This is the one sanctioned looping animation (a tour affordance, not
+ambient decoration); `prefers-reduced-motion` renders it as a static halo.

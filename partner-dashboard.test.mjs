@@ -76,7 +76,7 @@ assert.equal(/\p{Extended_Pictographic}/u.test(html), false, 'no emoji');
 
 // Structure + a11y hooks (product/explanation separation depends on these).
 for (const hook of ['id="screens"', 'data-screen="home"', 'id="heroCard"', 'id="backBtn"', 'id="doneBtn"',
-  'id="scrim"', 'id="storyRail"', 'class="storybeat"', 'id="storyCaption"',
+  'id="scrim"', 'id="storyRail"', 'class="storybeat"', 'id="storyCaption"', 'class="beacon"',
   'id="exportSeg"', 'id="exportLeads"', 'id="live"', 'aria-live="polite"', 'id="scaler"', 'id="frame"',
   'role="dialog"', 'aria-modal="true"']) {
   assert.ok(html.includes(hook), `missing hook ${hook}`);
