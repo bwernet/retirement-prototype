@@ -60,3 +60,10 @@ const pl = fs.readFileSync('platform-loop.html', 'utf8')
 if (pl.includes('href="fonts.css"')) throw new Error('platform-loop inline failed');
 fs.writeFileSync('dist/platform-loop.html', pl);
 console.log(`Wrote dist/platform-loop.html (${(pl.length / 1024).toFixed(0)} KB)`);
+
+// evidence-panel is a single page with inline script — only the font link needs inlining.
+const ep = fs.readFileSync('evidence-panel.html', 'utf8')
+  .replace('<link rel="stylesheet" href="fonts.css">', () => `<style>\n${fonts}</style>`);
+if (ep.includes('href="fonts.css"')) throw new Error('evidence-panel inline failed');
+fs.writeFileSync('dist/evidence-panel.html', ep);
+console.log(`Wrote dist/evidence-panel.html (${(ep.length / 1024).toFixed(0)} KB)`);
