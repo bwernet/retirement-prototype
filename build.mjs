@@ -53,3 +53,10 @@ const pd = fs.readFileSync('partner-dashboard.html', 'utf8')
 if (pd.includes('href="fonts.css"')) throw new Error('partner-dashboard inline failed');
 fs.writeFileSync('dist/partner-dashboard.html', pd);
 console.log(`Wrote dist/partner-dashboard.html (${(pd.length / 1024).toFixed(0)} KB)`);
+
+// platform-loop is a single page with inline script — only the font link needs inlining.
+const pl = fs.readFileSync('platform-loop.html', 'utf8')
+  .replace('<link rel="stylesheet" href="fonts.css">', () => `<style>\n${fonts}</style>`);
+if (pl.includes('href="fonts.css"')) throw new Error('platform-loop inline failed');
+fs.writeFileSync('dist/platform-loop.html', pl);
+console.log(`Wrote dist/platform-loop.html (${(pl.length / 1024).toFixed(0)} KB)`);
