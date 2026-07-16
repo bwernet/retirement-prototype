@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- **Fictional only:** the credit union is Lanternbay Credit Union (same fictional CU as the brand-system artifact — connective tissue). NO fictional personal names anywhere including commits (sidebar account reads `Marketing · Lanternbay CU`). No NCUA/Equal-Housing marks, no bare "Federal", no real partner brands (Retire Strong, ICCU, MSUFCU, Idaho Central), no "Olivia" (the template placeholder name from reference screenshots).
+- **Fictional only:** the credit union is Lanternbay Credit Union (same fictional CU as the brand-system artifact — connective tissue). NO fictional personal names anywhere including commits (sidebar account reads `Marketing · Lanternbay CU`). No NCUA/Equal-Housing marks, no capital-F "Federal" (names/marks — lowercase "federal deposits" prose is legitimate), no real partner brands (Retire Strong, ICCU, MSUFCU, Idaho Central), no "Olivia" (the template placeholder name from reference screenshots).
 - **Exact copy** (tests assert verbatim):
   - Footnote: `Credit union, members, and figures are fictional; segment logic is representative of the shipped product.`
   - Chain node headings: `What members did` / `What that means` / `Why Lanternbay cares` / `What to do`
@@ -28,7 +28,7 @@
 - Fonts: DM Sans 400/500 via `<link rel="stylesheet" href="fonts.css">`; **500 is the boldest weight anywhere** (every h1/h2/h3 pinned to 500 — browser default is 700); no `<b>`/`<strong>`, no serif, no emoji (inline SVG icons only).
 - Motion (author's established taste): restrained; beats morph in place (~200ms, no fade-to-blank flash); the Beat-2 provenance chain may draw left-to-right ONCE per entry (staggered node reveal — this motion is the argument); no count-up numbers, no ambient/looping animation; `prefers-reduced-motion`: everything instant.
 - postMessage type string: `partner-dashboard:height`; first post synchronous (rAF is throttled in offscreen iframes).
-- Fixed-height stage (470px): beats swap inside it, page height never changes between beats. Whole artifact must fit an 850px-tall iframe.
+- Fixed-height stage (420px): beats swap inside it, page height never changes between beats. Whole artifact must fit an 850px-tall iframe.
 - Build stays dependency-free; single file after build.
 
 ## File Structure
@@ -80,7 +80,9 @@ for (const s of ['Direct Deposit: Social Security', 'Top Wealth Management Leads
 // Fictional-only + connective tissue; forbidden names/marks absent.
 assert.ok(html.includes('Marketing · Lanternbay CU'), 'account line (no personal names)');
 assert.ok(html.includes('Lanternbay'), 'connective-tissue CU');
-assert.equal(/NCUA|Equal Housing|\bFederal\b|Retire Strong|ICCU|MSUFCU|Idaho Central|Olivia/i.test(html), false, 'no regulator marks / real brands / personal names');
+assert.equal(/NCUA|Equal Housing|Retire Strong|ICCU|MSUFCU|Idaho Central|Olivia/i.test(html), false, 'no regulator marks / real brands / personal names');
+// Capital-F Federal = a name/mark (forbidden); lowercase "federal deposits" is legitimate prose.
+assert.equal(/\bFederal\b/.test(html), false, 'no capital-F Federal (names/marks)');
 
 // Platform-only provenance: the chain must not claim external banking sight.
 assert.ok(/can’t see where|can't see where/.test(html), 'chain states the platform cannot see deposit destinations');

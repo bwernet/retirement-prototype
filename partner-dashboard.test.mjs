@@ -1,0 +1,90 @@
+// Content-integrity checks for the partner-dashboard artifact (author-revised
+// structure 2026-07-16: faithful product frame + story rail outside the UI).
+// Guards honesty rules: exact copy, fictional names only, platform-only
+// provenance, product/explanation separation hooks, font discipline, a11y.
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+
+const html = fs.readFileSync('partner-dashboard.html', 'utf8');
+
+// Exact copy — outside-the-frame narration (story rail + notes + footnote).
+assert.ok(html.includes('Credit union, members, and figures are fictional; segment logic is representative of the shipped product.'), 'disclosure footnote');
+// Author caption copy (2026-07-16) — pinned verbatim. Provenance stays
+// platform-only: "grounded in member activity inside Silvur".
+assert.ok(html.includes('Member activity became a new source of insight for credit unions, revealing financial needs their existing systems could not see.'), 'caption 1');
+assert.ok(html.includes('Every opportunity was grounded in member activity inside Silvur, with the underlying behaviors shown directly. Credit unions could see what members were exploring and use that context to shape timely outreach.'), 'caption 2');
+assert.ok(html.includes('We connected those signals to the tools credit unions already used, helping teams turn member interest into timely, relevant outreach.'), 'caption 3');
+for (const b of ['1 · Signal', '2 · Why', '3 · Act']) assert.ok(html.includes(b), `story beat: ${b}`);
+
+// Product-voice copy inside the frame (faithful to the shipped dashboard).
+for (const s of ['Campaign Segments', 'All Segments', 'Date Range', 'Filters', 'Export Data',
+  'Top Wealth Management Leads', 'Direct Deposit: Social Security', 'High Yield Savings Leads',
+  'Top Risk', 'Top Opportunity', 'Nearing Retirement: $1M+', 'Nearing Retirement: $500K–$1M',
+  'Nearing Retirement: $251–$500K', 'Just Retired: $1M+', '109 New!', 'Wealth Management',
+  'Social Security direct-deposit opportunity', 'Activity window: Last 90 days',
+  'eligible members', 'added recently', 'estimated annual volume',
+  'Signals behind this opportunity', 'Reached eligibility age', 'Entered benefit income',
+  'Used Social Security tool', 'View segment criteria', 'Based on activity in Silvur',
+  'Recommended next step', 'Launch direct-deposit outreach', 'Export audience',
+  'Wealth management opportunity', 'Launch wealth management referrals',
+  'Set a retirement date within 3 years', 'Updated net worth or accounts', 'Explored income-planning lessons',
+  'High-yield savings opportunity', 'Launch high-yield savings outreach',
+  'Entered $10k+ in cash savings', 'Started the Maximize Your Return on Cash path', 'Explored certificate lessons',
+  'Questions about this export? Contact your Silvur relationship manager.']) {
+  assert.ok(html.includes(s), `product copy: ${s}`);
+}
+
+// Synthetic figures (fixed).
+for (const n of ['597', '$752M', '1,651', '$23M', '2,146', '$350M', '590', '146', '$110M', '114', '$43M', '$363M', '1,455', '1,204', '87', '538', '412', '1,289', '976', '41', '132']) {
+  assert.ok(html.includes(n), `figure: ${n}`);
+}
+
+// Fictional-only; forbidden names/marks absent.
+assert.ok(html.includes('Marketing Team'), 'account row (no personal names)');
+assert.ok(html.includes('team@lanternbaycu.org'), 'fictional team email');
+assert.ok(html.includes('Lanternbay'), 'connective-tissue CU');
+assert.equal(/NCUA|Equal Housing|Retire Strong|ICCU|MSUFCU|Idaho Central|Olivia/i.test(html), false, 'no regulator marks / real brands / personal names');
+// Capital-F Federal = a name/mark (forbidden); lowercase prose would be legitimate.
+assert.equal(/\bFederal\b/.test(html), false, 'no capital-F Federal (names/marks)');
+
+// Honesty limits: no fake downloads, no invented charts.
+assert.equal(/\bdownload\b|\.csv/i.test(html), false, 'no fake file download');
+assert.equal(/<canvas|sparkline|chart/i.test(html), false, 'no charts');
+
+// Palette discipline (pre-validated pairs; gray3/gray4 never as text).
+for (const hex of ['#F7F8FA', '#161D24', '#6E6E7D', '#E2E2E5', '#0ABFAB', '#078375', '#0B7D57', '#E6F8F1', '#A65500', '#FDEBC7', '#A81E63', '#FBE7F3']) {
+  assert.ok(html.includes(hex), `palette value ${hex}`);
+}
+assert.equal(/color:\s*#9D9DA8|color:\s*#E2E2E5/i.test(html), false, 'gray3/gray4 must not be text');
+
+// Font discipline: DM Sans only, 500 max, headings pinned (browser default is 700).
+assert.ok(html.includes("'DM Sans'"), 'DM Sans family');
+assert.equal(/font-weight:\s*([6-9]\d\d|bold\b)/.test(html), false, 'no weights above 500');
+assert.equal(/<(b|strong)[\s>]/i.test(html), false, 'no b/strong');
+// Serif is allowed in exactly one place: the story captions (author-directed —
+// the case-study's quote voice); the product frame itself stays sans.
+assert.ok(/#storyCaption\s*{[^}]*Georgia/.test(html), 'captions use the serif voice');
+assert.equal((html.match(/Georgia/g) || []).length, 1, 'serif appears only in the caption rule');
+assert.ok(/\.tablehead h2\s*{[^}]*font-weight:\s*500/.test(html), 'table h2 pinned to 500');
+assert.ok(/\.detailhead h2\s*{[^}]*font-weight:\s*500/.test(html), 'detail h2 pinned to 500');
+assert.ok(/\.exportPanel h2\s*{[^}]*font-weight:\s*500/.test(html), 'dialog h2 pinned to 500');
+assert.ok(/\.segcard h3\s*{[^}]*font-weight:\s*500/.test(html), 'card h3 pinned to 500');
+assert.ok(/\.panel h3\s*{[^}]*font-weight:\s*500/.test(html), 'panel h3 pinned to 500');
+
+// No emoji.
+assert.equal(/\p{Extended_Pictographic}/u.test(html), false, 'no emoji');
+
+// Structure + a11y hooks (product/explanation separation depends on these).
+for (const hook of ['id="screens"', 'data-screen="home"', 'id="heroCard"', 'id="backBtn"', 'id="doneBtn"',
+  'id="scrim"', 'id="storyRail"', 'class="storybeat"', 'id="storyCaption"', 'class="beacon"',
+  'id="exportSeg"', 'id="exportLeads"', 'id="live"', 'aria-live="polite"', 'id="scaler"', 'id="frame"',
+  'role="dialog"', 'aria-modal="true"']) {
+  assert.ok(html.includes(hook), `missing hook ${hook}`);
+}
+assert.ok(html.includes('<link rel="stylesheet" href="fonts.css">'), 'font link (build replaces this exact tag)');
+
+// Script invariants.
+assert.ok(html.includes('partner-dashboard:height'), 'height postMessage type');
+assert.ok(html.includes('reduced.matches'), 'reduced-motion gate in script (matchMedia check)');
+assert.ok(html.includes("addEventListener('keydown'"), 'keyboard handling (Esc / focus trap)');
+console.log('partner-dashboard content-integrity: all checks passed');

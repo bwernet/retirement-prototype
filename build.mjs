@@ -46,3 +46,10 @@ const brand = brandSrc
 if (brand.includes('href="fonts.css"') || brand.includes("from './brand-model.js'")) throw new Error('brand-system inline failed');
 fs.writeFileSync('dist/brand-system.html', brand);
 console.log(`Wrote dist/brand-system.html (${(brand.length / 1024).toFixed(0)} KB)`);
+
+// partner-dashboard is a single page with inline script — only the font link needs inlining.
+const pd = fs.readFileSync('partner-dashboard.html', 'utf8')
+  .replace('<link rel="stylesheet" href="fonts.css">', () => `<style>\n${fonts}</style>`);
+if (pd.includes('href="fonts.css"')) throw new Error('partner-dashboard inline failed');
+fs.writeFileSync('dist/partner-dashboard.html', pd);
+console.log(`Wrote dist/partner-dashboard.html (${(pd.length / 1024).toFixed(0)} KB)`);

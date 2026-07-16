@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Partner dashboard — member actions to campaign</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+  :root {
+    --ink: #161D24; --muted: #6E6E7D; --border: #E2E2E5; --canvas: #F7F8FA;
+    --teal: #0ABFAB; --teal-text: #078375; --accent: #1C5C98;
+    --opp-bg: #E6F8F1; --opp-text: #0B7D57; --risk-bg: #FDEBC7; --risk-text: #A65500;
+    --tag-bg: #FBE7F3; --tag-text: #A81E63; --pill: #F2F2F7;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: var(--canvas); }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; background: var(--canvas); color: var(--ink);
+    font-size: 14px; line-height: 1.45; padding: 18px 16px 14px; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  .pagehead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+  .eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); }
+  .storybeat:focus-visible, .segcard[data-detail]:focus-visible, #backBtn:focus-visible,
+  .exportbtn:focus-visible, #doneBtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ================= product frame (product voice ONLY inside) ================= */
+  #scaler { transform-origin: top left; width: 980px; }
+  #frame { position: relative; width: 980px; background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(22,29,36,.05), 0 10px 30px rgba(22,29,36,.07);
+    display: grid; grid-template-columns: 222px 1fr; overflow: hidden; }
+
+  /* ---- sidebar ---- */
+  .sidebar { border-right: 1px solid var(--border); padding: 18px 14px 14px; display: flex; flex-direction: column; }
+  .logotype { font-size: 19px; letter-spacing: -0.01em; padding-left: 6px; }
+  .logotype .silvur { font-weight: 500; }
+  .logotype .partners { font-weight: 500; font-size: 12px; letter-spacing: .18em; color: var(--teal-text); margin-left: 6px; }
+  .nav { margin-top: 22px; display: flex; flex-direction: column; gap: 2px; }
+  /* every menu item fits on one line */
+  .nav > span { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: 8px;
+    font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .nav .active { background: var(--pill); color: var(--ink); font-weight: 500; }
+  .nav .active .chev { margin-left: auto; }
+  .nav .sub { padding-left: 37px; font-size: 13px; }
+  .nav svg { flex: none; }
+  .sidebar .spacer { flex: 1; }
+  .culockup { display: flex; align-items: center; gap: 9px; padding: 10px 6px 12px; color: #1E3A5F; }
+  .culockup .lname { font-size: 13px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; line-height: 1.15; color: #1E3A5F; }
+  .culockup .lsub { display: block; font-size: 7px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; margin-top: 1px; }
+  .account { border-top: 1px solid var(--border); padding-top: 12px; display: flex; align-items: center; gap: 9px; min-width: 0; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--pill); color: var(--ink);
+    font-size: 11px; font-weight: 500; display: grid; place-items: center; flex: none; }
+  /* text block shrinks with ellipsis so it can never shove the icon into the border */
+  .acct-name { font-size: 12.5px; font-weight: 500; line-height: 1.25; flex: 1; min-width: 0; overflow: hidden; }
+  .acct-mail { display: block; font-size: 11px; font-weight: 400; color: var(--muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .account > svg { margin-left: auto; margin-right: 5px; color: var(--muted); flex: none; }
+
+  /* ---- main ---- */
+  .main { padding: 18px 20px 0; min-width: 0; } /* no bottom pad — the scroll region runs to the frame edge */
+  /* shorter mock: the product surface scrolls internally; sidebar stays pinned full height */
+  #screens { position: relative; height: 634px; }
+  .screen { position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: translateY(4px);
+    overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #C9CBD1 transparent;
+    padding-right: 4px; padding-bottom: 16px; /* inner pad scrolls with the content */
+    transition: opacity 200ms ease, transform 200ms ease, visibility 0s 200ms; }
+  .screen::-webkit-scrollbar { width: 8px; }
+  .screen::-webkit-scrollbar-thumb { background: #C9CBD1; border-radius: 999px; }
+  .screen::-webkit-scrollbar-track { background: transparent; }
+  #screens[data-screen="home"] .screen.home, #screens[data-screen="detail"] .screen.detail {
+    opacity: 1; visibility: visible; transform: none; transition: opacity 200ms ease, transform 200ms ease, visibility 0s; }
+  @media (prefers-reduced-motion: reduce) {
+    .screen, .exportPanel, #scrim, .sigbar i { transition: none !important; }
+  }
+
+  /* ---- home: segment cards ---- */
+  .screen.home { padding-top: 14px; } /* breathing room where the hamburger used to sit */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .segcard { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 15px 16px 16px;
+    box-shadow: 0 1px 2px rgba(22,29,36,.04); text-align: left; display: flex; flex-direction: column; }
+  .cardtop { display: flex; align-items: center; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500;
+    letter-spacing: .04em; border-radius: 999px; padding: 4px 10px; }
+  .chip.opp { background: var(--opp-bg); color: var(--opp-text); }
+  .chip.risk { background: var(--risk-bg); color: var(--risk-text); }
+  .segcard h3 { font-size: 18.5px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.22; margin: 11px 0 7px; }
+  .segcard > p { color: var(--muted); font-size: 13px; line-height: 1.45; min-height: 57px; }
+  /* metric labels always fit on one line */
+  .metric { display: flex; align-items: center; gap: 7px; margin-top: 9px; font-size: 10.5px; font-weight: 500;
+    letter-spacing: .05em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
+  .metric svg { color: var(--muted); flex: none; }
+  .metric .pill { margin-left: auto; background: var(--pill); border-radius: 999px; padding: 3px 10px;
+    font-size: 12.5px; font-weight: 500; letter-spacing: 0; text-transform: none; }
+  .exportbtn { font: inherit; display: block; width: 108px; margin-top: 13px; padding: 9px 0; border: none;
+    border-radius: 7px; background: var(--teal-text); color: #fff; font-weight: 500; font-size: 13px; cursor: pointer; }
+  .segcard[data-detail] { position: relative; cursor: pointer; transition: border-color 160ms ease, box-shadow 160ms ease; }
+  /* guided-tour beacon: marks the one thing to interact with on each screen */
+  .beacon { position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--teal); box-shadow: 0 0 0 2px #fff; pointer-events: none; z-index: 2; }
+  .beacon::before { content: ''; position: absolute; inset: -4px; border-radius: 50%;
+    background: rgba(10,191,171,.35); animation: beacon 2s ease-out infinite; }
+  @keyframes beacon { 0% { transform: scale(.6); opacity: .9; } 70% { transform: scale(1.9); opacity: 0; } 100% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .beacon::before { animation: none !important; transform: scale(1.4); opacity: .25; }
+  }
+  .segcard[data-detail]:hover { border-color: #C9CBD1; box-shadow: 0 1px 2px rgba(22,29,36,.05), 0 8px 20px rgba(22,29,36,.08); }
+
+  /* ---- home: All Segments table ---- */
+  .tablecard { background: #fff; border: 1px solid var(--border); border-radius: 10px; margin-top: 16px;
+    box-shadow: 0 1px 2px rgba(22,29,36,.04); }
+  .tablehead { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px 10px; }
+  .tablehead h2 { font-size: 17px; font-weight: 500; letter-spacing: -0.008em; }
+  .tablectl { display: flex; justify-content: space-between; align-items: center; padding: 0 16px 10px; }
+  .datepill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 999px;
+    padding: 5px 13px; font-size: 12.5px; font-weight: 500; }
+  .datepill .all { color: var(--muted); font-weight: 400; }
+  .filters { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--border); border-radius: 7px;
+    padding: 6px 13px; font-size: 12.5px; font-weight: 500; color: var(--ink); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { text-align: left; font-weight: 400; color: var(--muted); font-size: 12.5px; padding: 8px 10px;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: #FAFAFC; }
+  thead th:first-child, td:first-child { width: 34px; padding-left: 16px; }
+  tbody td { padding: 11px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  .cb { width: 15px; height: 15px; border: 1.5px solid #9D9DA8; border-radius: 4px; display: inline-block; }
+  .seg-name { font-size: 13.5px; font-weight: 500; }
+  .seg-desc { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; font-weight: 400; }
+  /* tags never wrap to two rows */
+  .newpill { display: inline-block; white-space: nowrap; background: var(--opp-bg); color: var(--opp-text); border-radius: 999px;
+    font-size: 11px; font-weight: 500; padding: 2px 8px; margin-top: 3px; }
+  .tag { display: inline-block; white-space: nowrap; background: var(--tag-bg); color: var(--tag-text); border-radius: 999px;
+    font-size: 11px; font-weight: 500; padding: 4px 10px; }
+  .rowexport { font: inherit; font-size: 12.5px; font-weight: 500; color: var(--ink); background: #fff;
+    border: 1px solid var(--border); border-radius: 7px; padding: 6px 14px; cursor: pointer; }
+  .num-strong { font-weight: 500; }
+
+  /* ---- detail: data-heavy segment screen ---- */
+  #backBtn { font: inherit; font-size: 13px; font-weight: 500; color: var(--muted); background: none; border: none;
+    cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 5px 8px 5px 0; border-radius: 8px; }
+  #backBtn:hover { color: var(--ink); }
+  /* badge sits above the title — never interrupting its left edge */
+  .detailhead { margin-top: 10px; }
+  .detailhead .chip { margin-bottom: 9px; }
+  .detailhead h2 { font-size: 21px; font-weight: 500; letter-spacing: -0.012em; }
+  .detailhead p { color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .detailhead .window { font-size: 12px; margin-top: 6px; }
+  /* summary metrics sit on the page background — no cards */
+  .statline { margin-top: 16px; font-size: 13.5px; color: var(--muted); }
+  .statline .num { font-weight: 500; color: var(--ink); font-size: 15px; }
+  .statline .sep { margin: 0 7px; }
+  .detailcols { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; margin-top: 16px; }
+  .panel { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 15px 16px; }
+  .panel h3 { font-size: 14px; font-weight: 500; letter-spacing: -0.005em; }
+  /* only the recommended-action card reads elevated — the clear destination */
+  .panel.action { background: #F2FAF7; border-color: #CBE9DE;
+    box-shadow: 0 1px 2px rgba(22,29,36,.04), 0 6px 18px rgba(7,131,117,.10); }
+  .sig { margin-top: 13px; }
+  .sigrow { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; }
+  .sigrow .count { font-weight: 500; }
+  .sigbar { height: 6px; border-radius: 999px; background: var(--pill); margin-top: 6px; overflow: hidden; }
+  .sigbar i { display: block; height: 100%; border-radius: 999px; background: var(--teal); width: var(--w, 0%);
+    transition: width 600ms cubic-bezier(.22,.61,.36,1); }
+  .grown .sigbar i { width: var(--w); }
+  .criteria-link { font: inherit; display: block; margin-top: 14px; padding: 0; background: none; border: none;
+    font-size: 12.5px; font-weight: 500; color: var(--teal-text); cursor: pointer; }
+  .criteria-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .criteria { display: none; font-size: 12.5px; line-height: 1.5; color: var(--muted); margin-top: 7px; }
+  .criteria.open { display: block; }
+  .source { color: var(--muted); font-size: 11.5px; margin-top: 12px; }
+  .action-title { font-size: 16.5px; font-weight: 500; letter-spacing: -0.008em; margin-top: 10px; }
+  .actionline { font-size: 13px; color: var(--ink); margin-top: 8px; }
+  .actionline .alabel { color: var(--muted); }
+  .panel .exportbtn { width: 100%; margin-top: 16px; position: relative; }
+
+  /* ---- export drawer: a real rail — full frame height, flush to the product surface's right edge ---- */
+  #scrim { position: absolute; inset: 0; background: rgba(22,29,36,.28); opacity: 0; visibility: hidden;
+    transition: opacity 200ms ease, visibility 0s 200ms; z-index: 3; }
+  #frame.exporting #scrim { opacity: 1; visibility: visible; transition: opacity 200ms ease, visibility 0s; }
+  .exportPanel { position: absolute; top: 0; right: 0; bottom: 0; width: 356px; background: #fff;
+    border-left: 1px solid var(--border); padding: 24px 22px; box-shadow: -12px 0 34px rgba(22,29,36,.14);
+    opacity: 0; visibility: hidden; transform: translateX(18px);
+    transition: opacity 200ms ease, transform 200ms ease, visibility 0s 200ms; z-index: 4; }
+  #frame.exporting .exportPanel { opacity: 1; visibility: visible; transform: none;
+    transition: opacity 200ms ease, transform 200ms ease, visibility 0s; }
+  .exportPanel h2 { font-size: 17px; font-weight: 500; }
+  .exportPanel .segline { color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .exportPanel dt { font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 14px; }
+  .exportPanel dd { font-size: 13.5px; line-height: 1.5; margin-top: 3px; }
+  .exportPanel .scopenote { margin-top: 16px; font-size: 12px; line-height: 1.5; color: var(--muted);
+    border-top: 1px solid var(--border); padding-top: 12px; }
+  #doneBtn { font: inherit; display: block; width: 100%; margin-top: 16px; padding: 10px; border: none;
+    border-radius: 8px; background: var(--teal-text); color: #fff; font-weight: 500; font-size: 13.5px; cursor: pointer; }
+
+  /* ================= story layer (all narration lives OUT HERE) =================
+     quiet step indicator + one unboxed caption that cycles with the product state */
+  #storyRail { display: flex; justify-content: center; gap: 26px; margin-top: 18px; }
+  .storybeat { font: inherit; display: inline-flex; align-items: center; gap: 8px; background: none; border: none;
+    padding: 4px 2px; cursor: pointer; font-size: 11px; font-weight: 500; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--muted); }
+  .storybeat .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); }
+  .storybeat[aria-pressed="true"] { color: var(--ink); }
+  .storybeat[aria-pressed="true"] .dot { background: var(--teal-text); }
+  /* captions speak in the case-study's serif voice — the one non-product element */
+  #storyCaption { max-width: 660px; margin: 10px auto 0; text-align: center;
+    font-family: Georgia, 'Times New Roman', serif; font-size: 14.5px; line-height: 1.6;
+    color: var(--muted); min-height: 72px; opacity: 1; transition: opacity 180ms ease; }
+  @media (prefers-reduced-motion: reduce) { #storyCaption { transition: none !important; } }
+
+  .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 14px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="pagehead">
+  <p class="eyebrow">Silvur — white-label platform · partner dashboard</p>
+</div>
+
+<div id="scaler">
+<div id="frame">
+  <aside class="sidebar">
+    <p class="logotype"><span class="silvur">silvur</span><span class="partners">PARTNERS</span></p>
+    <nav class="nav" aria-label="Dashboard sections">
+      <span><svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 7.5 2 13 6.5V13H2z"/></svg>Home</span>
+      <span class="active"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2.5 12.5v-4M7.5 12.5v-7M12.5 12.5v-10"/></svg>Campaign Segments<svg class="chev" width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 5l4-4 4 4"/></svg></span>
+      <span class="sub">All Segments</span>
+    </nav>
+    <span class="spacer"></span>
+    <nav class="nav" aria-label="Account">
+      <span><svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5.5"/><path d="M7.5 5v3l2 1.5" stroke-linecap="round"/></svg>Support</span>
+      <span><svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="7.5" cy="7.5" r="2.2"/><path d="M7.5 1.5v2M7.5 11.5v2M1.5 7.5h2M11.5 7.5h2M3.3 3.3l1.4 1.4M10.3 10.3l1.4 1.4M11.7 3.3l-1.4 1.4M4.7 10.3l-1.4 1.4" stroke-linecap="round"/></svg>Settings</span>
+    </nav>
+    <p class="culockup">
+      <svg width="28" height="28" viewBox="0 0 30 30" fill="none" aria-hidden="true"><circle cx="15" cy="15" r="13.5" stroke="currentColor" stroke-width="2"/><rect x="9" y="15" width="3" height="7" rx="1" fill="currentColor"/><rect x="13.5" y="11" width="3" height="11" rx="1" fill="currentColor"/><rect x="18" y="8" width="3" height="14" rx="1" fill="currentColor"/></svg>
+      <span class="lname">Lanternbay<span class="lsub">Credit Union</span></span>
+    </p>
+    <p class="account">
+      <span class="avatar">MT</span>
+      <span class="acct-name">Marketing Team<span class="acct-mail">team@lanternbaycu.org</span></span>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 1.5H2v11h3.5M9 4l3 3-3 3M12 7H6"/></svg>
+    </p>
+  </aside>
+
+  <main class="main">
+    <div id="screens" data-screen="home">
+      <!-- product screen: Campaign Segments home -->
+      <section class="screen home" aria-label="Campaign Segments">
+        <div class="cards">
+          <div class="segcard" data-detail="wm" role="button" tabindex="0" aria-label="Top Wealth Management Leads — open segment">
+            <span class="cardtop"><span class="chip opp">Top Opportunity</span></span>
+            <h3>Top Wealth Management Leads</h3>
+            <p>Customers 0–3 years away from retirement with over $1 million in investable assets</p>
+            <span class="metric"><svg width="14" height="12" viewBox="0 0 14 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="3.5" r="2.3"/><path d="M1 11c.5-2.6 2-4 4-4s3.5 1.4 4 4M10 1.6a2.3 2.3 0 0 1 0 3.8M11 7.2c1.2.5 1.8 1.7 2 3.3"/></svg>Leads<span class="pill">597</span></span>
+            <span class="metric"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M4.5 1v12M7.5 3.2C6.8 2.5 5.8 2.1 4.5 2.1c-1.6 0-2.9.8-2.9 2.2 0 2.9 5.8 1.5 5.8 4.5 0 1.4-1.3 2.2-2.9 2.2-1.3 0-2.4-.4-3.1-1.2"/></svg>Total Assets<span class="pill">$752M</span></span>
+            <button class="exportbtn" data-seg="Top Wealth Management Leads" data-leads="597">Export Data</button>
+          </div>
+          <div class="segcard" id="heroCard" data-detail="ss" role="button" tabindex="0" aria-label="Direct Deposit: Social Security — open segment">
+            <span class="beacon" aria-hidden="true"></span>
+            <span class="cardtop"><span class="chip risk"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>Top Risk</span></span>
+            <h3>Direct Deposit: Social Security</h3>
+            <p>Customers already collecting Social Security.</p>
+            <span class="metric"><svg width="14" height="12" viewBox="0 0 14 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="3.5" r="2.3"/><path d="M1 11c.5-2.6 2-4 4-4s3.5 1.4 4 4M10 1.6a2.3 2.3 0 0 1 0 3.8M11 7.2c1.2.5 1.8 1.7 2 3.3"/></svg>Leads<span class="pill">1,651</span></span>
+            <span class="metric"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M4.5 1v12M7.5 3.2C6.8 2.5 5.8 2.1 4.5 2.1c-1.6 0-2.9.8-2.9 2.2 0 2.9 5.8 1.5 5.8 4.5 0 1.4-1.3 2.2-2.9 2.2-1.3 0-2.4-.4-3.1-1.2"/></svg>Annual Deposits<span class="pill">$23M</span></span>
+            <button class="exportbtn" data-seg="Direct Deposit: Social Security" data-leads="1,651">Export Data</button>
+          </div>
+          <div class="segcard" data-detail="hys" role="button" tabindex="0" aria-label="High Yield Savings Leads — open segment">
+            <span class="cardtop"><span class="chip opp">Top Opportunity</span></span>
+            <h3>High Yield Savings Leads</h3>
+            <p>Customers who have over $10k in cash earning little to no interest.</p>
+            <span class="metric"><svg width="14" height="12" viewBox="0 0 14 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="3.5" r="2.3"/><path d="M1 11c.5-2.6 2-4 4-4s3.5 1.4 4 4M10 1.6a2.3 2.3 0 0 1 0 3.8M11 7.2c1.2.5 1.8 1.7 2 3.3"/></svg>Leads<span class="pill">2,146</span></span>
+            <span class="metric"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M4.5 1v12M7.5 3.2C6.8 2.5 5.8 2.1 4.5 2.1c-1.6 0-2.9.8-2.9 2.2 0 2.9 5.8 1.5 5.8 4.5 0 1.4-1.3 2.2-2.9 2.2-1.3 0-2.4-.4-3.1-1.2"/></svg>Total Assets<span class="pill">$350M</span></span>
+            <button class="exportbtn" data-seg="High Yield Savings Leads" data-leads="2,146">Export Data</button>
+          </div>
+        </div>
+
+        <div class="tablecard">
+          <div class="tablehead"><h2>All Segments</h2></div>
+          <div class="tablectl">
+            <span class="datepill">Date Range<span class="all">All</span></span>
+            <span class="filters"><svg width="13" height="11" viewBox="0 0 13 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M1 1.5h11M3 5.5h7M5 9.5h3"/></svg>Filters</span>
+          </div>
+          <table>
+            <thead><tr><th><span class="cb" aria-hidden="true"></span></th><th>Segment</th><th>Leads</th><th>Assets</th><th>Product <svg width="9" height="10" viewBox="0 0 9 10" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 1v8M1.5 6l3 3 3-3"/></svg></th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="cb" aria-hidden="true"></span></td>
+                <td><span class="seg-name">Nearing Retirement: $1M+</span><span class="seg-desc">Customers 3–0 years from retirement with $1M+ in investable assets</span></td>
+                <td><span class="num-strong">590</span><br><span class="newpill">109 New!</span></td>
+                <td>$752M</td>
+                <td><span class="tag">Wealth Management</span></td>
+                <td><button class="rowexport exportbtn-row" data-seg="Nearing Retirement: $1M+" data-leads="590">Export</button></td>
+              </tr>
+              <tr>
+                <td><span class="cb" aria-hidden="true"></span></td>
+                <td><span class="seg-name">Nearing Retirement: $500K–$1M</span><span class="seg-desc">Customers 3–0 years from retirement with $500K–1M in investable assets</span></td>
+                <td><span class="num-strong">146</span></td>
+                <td>$110M</td>
+                <td><span class="tag">Wealth Management</span></td>
+                <td><button class="rowexport exportbtn-row" data-seg="Nearing Retirement: $500K–$1M" data-leads="146">Export</button></td>
+              </tr>
+              <tr>
+                <td><span class="cb" aria-hidden="true"></span></td>
+                <td><span class="seg-name">Nearing Retirement: $251–$500K</span><span class="seg-desc">Customers 3–0 years from retirement with $251–500K in investable assets</span></td>
+                <td><span class="num-strong">114</span></td>
+                <td>$43M</td>
+                <td><span class="tag">Wealth Management</span></td>
+                <td><button class="rowexport exportbtn-row" data-seg="Nearing Retirement: $251–$500K" data-leads="114">Export</button></td>
+              </tr>
+              <tr>
+                <td><span class="cb" aria-hidden="true"></span></td>
+                <td><span class="seg-name">Just Retired: $1M+</span><span class="seg-desc">Customers who retired in the last 3 years with $1M+ in investable assets</span></td>
+                <td><span class="num-strong">146</span></td>
+                <td>$363M</td>
+                <td><span class="tag">Wealth Management</span></td>
+                <td><button class="rowexport exportbtn-row" data-seg="Just Retired: $1M+" data-leads="146">Export</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- product screen: segment detail (data-heavy) -->
+      <section class="screen detail" aria-label="Social Security direct-deposit opportunity">
+        <button id="backBtn"><svg width="6" height="10" viewBox="0 0 6 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 1 1 5l4 4"/></svg>Campaign Segments</button>
+        <div class="detailhead">
+          <span class="chip risk" id="dChip"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>Top Risk</span>
+          <h2 id="dTitle">Social Security direct-deposit opportunity</h2>
+          <p id="dSub">1,651 members are already receiving Social Security income.</p>
+          <p class="window">Activity window: Last 90 days</p>
+        </div>
+        <p class="statline" id="dStats"><span class="num">1,651</span> eligible members<span class="sep">·</span><span class="num">87</span> added recently<span class="sep">·</span><span class="num">$23M</span> estimated annual volume</p>
+        <div class="detailcols">
+          <div class="panel" id="signals">
+            <h3>Signals behind this opportunity</h3>
+            <div class="sig">
+              <div class="sigrow"><span>Reached eligibility age</span><span class="count">1,651</span></div>
+              <div class="sigbar"><i style="--w:100%"></i></div>
+            </div>
+            <div class="sig">
+              <div class="sigrow"><span>Entered benefit income</span><span class="count">1,455</span></div>
+              <div class="sigbar"><i style="--w:88%"></i></div>
+            </div>
+            <div class="sig">
+              <div class="sigrow"><span>Used Social Security tool</span><span class="count">1,204</span></div>
+              <div class="sigbar"><i style="--w:73%"></i></div>
+            </div>
+            <button class="criteria-link" id="criteriaLink" aria-expanded="false">View segment criteria</button>
+            <p class="criteria" id="criteriaText">Election age set or passed, Social Security benefit income entered, and activity within the last 90 days.</p>
+            <p class="source">Based on activity in Silvur</p>
+          </div>
+          <div class="panel action">
+            <h3>Recommended next step</h3>
+            <p class="action-title" id="dActionTitle">Launch direct-deposit outreach</p>
+            <p class="actionline"><span class="alabel">Audience:</span> <span id="dAudience">1,651 members</span></p>
+            <p class="actionline"><span class="alabel">Destination:</span> Marketing tools</p>
+            <button class="exportbtn" id="dExport" data-seg="Social Security direct-deposit opportunity" data-leads="1,651"><span class="beacon" aria-hidden="true"></span>Export audience</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- export drawer (product voice) — frame-level: full height, flush right edge -->
+  <div id="scrim"></div>
+  <section class="exportPanel" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+    <h2 id="exportTitle">Export Data</h2>
+    <p class="segline" id="exportSeg">Direct Deposit: Social Security</p>
+    <dl>
+      <dt>Leads</dt>
+      <dd id="exportLeads">1,651</dd>
+      <dt>Fields</dt>
+      <dd>Member contact via your system of record, plus the segment reason.</dd>
+      <dt>Delivery</dt>
+      <dd>Sent to your email and marketing tools.</dd>
+    </dl>
+    <p class="scopenote">Questions about this export? Contact your Silvur relationship manager.</p>
+    <button id="doneBtn">Done</button>
+  </section>
+</div>
+</div>
+
+<!-- story layer: ALL narration lives outside the product frame -->
+<div id="storyRail" role="group" aria-label="Walkthrough">
+  <button class="storybeat" data-beat="1" aria-pressed="true"><span class="dot"></span>1 · Signal</button>
+  <button class="storybeat" data-beat="2" aria-pressed="false"><span class="dot"></span>2 · Why</button>
+  <button class="storybeat" data-beat="3" aria-pressed="false"><span class="dot"></span>3 · Act</button>
+</div>
+<p id="storyCaption">Member activity became a new source of insight for credit unions, revealing financial needs their existing systems could not see.</p>
+
+<p class="footnote">Credit union, members, and figures are fictional; segment logic is representative of the shipped product.</p>
+</div>
+<p id="live" class="sr-only" aria-live="polite"></p>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const screens = $('#screens'), frame = $('#frame'), live = $('#live'), signals = $('#signals');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let lastFocus = null;
+
+  // Every segment's detail screen is the same product template, populated from
+  // platform-only signals (score inputs, entered accounts, tool + lesson activity).
+  const RISK_ICON = '<svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0 10 9H0z"/></svg>';
+  const SEGMENTS = {
+    ss: { chip: 'risk', chipLabel: 'Top Risk', title: 'Social Security direct-deposit opportunity',
+      sub: '1,651 members are already receiving Social Security income.',
+      stats: [['1,651', 'eligible members'], ['87', 'added recently'], ['$23M', 'estimated annual volume']],
+      signals: [['Reached eligibility age', '1,651', 100], ['Entered benefit income', '1,455', 88], ['Used Social Security tool', '1,204', 73]],
+      criteria: 'Election age set or passed, Social Security benefit income entered, and activity within the last 90 days.',
+      action: 'Launch direct-deposit outreach', audience: '1,651 members', leads: '1,651' },
+    wm: { chip: 'opp', chipLabel: 'Top Opportunity', title: 'Wealth management opportunity',
+      sub: '597 members are approaching retirement with $1M+ in investable assets.',
+      stats: [['597', 'eligible members'], ['41', 'added recently'], ['$752M', 'investable assets']],
+      signals: [['Set a retirement date within 3 years', '597', 100], ['Updated net worth or accounts', '538', 90], ['Explored income-planning lessons', '412', 69]],
+      criteria: 'Retirement date within 3 years, investable assets of $1M or more entered, and activity within the last 90 days.',
+      action: 'Launch wealth management referrals', audience: '597 members', leads: '597' },
+    hys: { chip: 'opp', chipLabel: 'Top Opportunity', title: 'High-yield savings opportunity',
+      sub: '2,146 members hold cash savings earning little to no interest.',
+      stats: [['2,146', 'eligible members'], ['132', 'added recently'], ['$350M', 'in cash savings']],
+      signals: [['Entered $10k+ in cash savings', '2,146', 100], ['Started the Maximize Your Return on Cash path', '1,289', 60], ['Explored certificate lessons', '976', 45]],
+      criteria: 'Cash savings of $10k or more entered, earning little or no interest, and activity within the last 90 days.',
+      action: 'Launch high-yield savings outreach', audience: '2,146 members', leads: '2,146' },
+  };
+  let currentSeg = 'ss', lastCard = null;
+
+  const MESSAGES = {
+    1: 'Showing the Campaign Segments home screen.',
+    2: () => `Showing ${SEGMENTS[currentSeg].title}: ${SEGMENTS[currentSeg].audience} eligible, with per-signal member activity counts.`,
+    3: 'Export dialog open.',
+  };
+  const CAPTIONS = {
+    1: 'Member activity became a new source of insight for credit unions, revealing financial needs their existing systems could not see.',
+    2: 'Every opportunity was grounded in member activity inside Silvur, with the underlying behaviors shown directly. Credit unions could see what members were exploring and use that context to shape timely outreach.',
+    3: 'We connected those signals to the tools credit unions already used, helping teams turn member interest into timely, relevant outreach.',
+  };
+  const caption = $('#storyCaption');
+  let shownBeat = 1;
+
+  function currentBeat() {
+    if (frame.classList.contains('exporting')) return 3;
+    return screens.dataset.screen === 'detail' ? 2 : 1;
+  }
+
+  function sync() {
+    const b = currentBeat();
+    for (const s of document.querySelectorAll('.storybeat')) s.setAttribute('aria-pressed', String(Number(s.dataset.beat) === b));
+    live.textContent = typeof MESSAGES[b] === 'function' ? MESSAGES[b]() : MESSAGES[b];
+    if (b !== shownBeat) {
+      shownBeat = b;
+      // swap text synchronously, then fade in from 0 — no timers (throttled offscreen)
+      caption.textContent = CAPTIONS[b];
+      if (!reduced.matches) { caption.style.opacity = '0'; void caption.offsetWidth; caption.style.opacity = '1'; }
+    }
+    postHeight();
+  }
+
+  function setScreen(name) {
+    const prev = screens.dataset.screen;
+    screens.dataset.screen = name;
+    if (name === 'detail' && prev === 'home' && !reduced.matches) {
+      // data-native entry motion: signal bars grow once per entry from home
+      signals.classList.remove('grown');
+      void signals.offsetWidth; // commit collapsed start state synchronously (rAF unreliable offscreen)
+      signals.classList.add('grown');
+    } else if (reduced.matches) {
+      signals.classList.add('grown');
+    }
+    sync();
+  }
+
+  function openExport(btn) {
+    lastFocus = btn || document.activeElement;
+    if (btn) { $('#exportSeg').textContent = btn.dataset.seg; $('#exportLeads').textContent = btn.dataset.leads; }
+    frame.classList.add('exporting');
+    sync();
+    $('#doneBtn').focus();
+  }
+  function closeExport(focusBack = true) {
+    frame.classList.remove('exporting');
+    sync();
+    if (focusBack && lastFocus) lastFocus.focus();
+  }
+
+  function populateDetail(id) {
+    const s = SEGMENTS[id]; currentSeg = id;
+    const chip = $('#dChip');
+    chip.className = 'chip ' + s.chip;
+    chip.innerHTML = (s.chip === 'risk' ? RISK_ICON : '') + s.chipLabel;
+    $('#dTitle').textContent = s.title;
+    $('#dSub').textContent = s.sub;
+    $('#dStats').innerHTML = s.stats.map(([n, l], i) => `${i ? '<span class="sep">·</span>' : ''}<span class="num">${n}</span> ${l}`).join('');
+    document.querySelectorAll('#signals .sig').forEach((el, i) => {
+      const [label, count, w] = s.signals[i];
+      el.querySelector('.sigrow span').textContent = label;
+      el.querySelector('.count').textContent = count;
+      el.querySelector('.sigbar i').style.setProperty('--w', w + '%');
+    });
+    $('#criteriaText').textContent = s.criteria;
+    $('#criteriaText').classList.remove('open');
+    criteriaLink.setAttribute('aria-expanded', 'false');
+    $('#dActionTitle').textContent = s.action;
+    $('#dAudience').textContent = s.audience;
+    const btn = $('#dExport');
+    btn.dataset.seg = s.title; btn.dataset.leads = s.leads;
+    const screen = document.querySelector('.screen.detail');
+    screen.setAttribute('aria-label', s.title);
+    screen.scrollTop = 0;
+  }
+
+  function openDetail(id, card) {
+    lastCard = card || lastCard;
+    populateDetail(id);
+    setScreen('detail');
+  }
+
+  for (const card of document.querySelectorAll('.segcard[data-detail]')) {
+    card.addEventListener('click', e => {
+      if (e.target.closest('.exportbtn')) return; // the card's Export button exports; the card itself navigates
+      openDetail(card.dataset.detail, card); $('#backBtn').focus();
+    });
+    card.addEventListener('keydown', e => {
+      if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('.exportbtn')) { e.preventDefault(); openDetail(card.dataset.detail, card); $('#backBtn').focus(); }
+    });
+  }
+  $('#backBtn').addEventListener('click', () => { setScreen('home'); (lastCard || $('#heroCard')).focus(); });
+  for (const btn of document.querySelectorAll('.exportbtn, .exportbtn-row')) {
+    btn.addEventListener('click', () => openExport(btn));
+  }
+  $('#doneBtn').addEventListener('click', () => closeExport());
+  $('#scrim').addEventListener('click', () => closeExport());
+
+  const criteriaLink = $('#criteriaLink');
+  criteriaLink.addEventListener('click', () => {
+    const open = criteriaLink.getAttribute('aria-expanded') !== 'true';
+    criteriaLink.setAttribute('aria-expanded', String(open));
+    $('#criteriaText').classList.toggle('open', open);
+  });
+
+  // Esc closes the dialog; Tab is trapped inside it while open.
+  document.addEventListener('keydown', e => {
+    if (!frame.classList.contains('exporting')) return;
+    if (e.key === 'Escape') { e.preventDefault(); return closeExport(); }
+    if (e.key !== 'Tab') return;
+    const done = $('#doneBtn');
+    if (!document.querySelector('.exportPanel').contains(document.activeElement)) { e.preventDefault(); return done.focus(); }
+    e.preventDefault(); done.focus();
+  });
+
+  // story rail drives the product; the product drives the rail (sync()).
+  for (const beat of document.querySelectorAll('.storybeat')) {
+    beat.addEventListener('click', () => {
+      const n = Number(beat.dataset.beat);
+      if (n === 1) { closeExport(false); setScreen('home'); }
+      if (n === 2) { closeExport(false); openDetail('ss'); }
+      if (n === 3) { if (screens.dataset.screen !== 'detail' || currentSeg !== 'ss') openDetail('ss'); openExport($('#dExport')); }
+    });
+  }
+
+  // Fixed 980px frame scales down to fit narrow viewports (no bespoke mobile layout).
+  // The case-study embed may pass ?scale=0.8 (clamped 0.4–1) to shrink the whole
+  // product proportionally — type included — below its real-product size.
+  const scaler = $('#scaler');
+  const maxScale = Math.min(1, Math.max(0.4, parseFloat(new URLSearchParams(location.search).get('scale')) || 1));
+  function fit() {
+    const bs = getComputedStyle(document.body);
+    const avail = document.body.clientWidth - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight);
+    const s = Math.min(maxScale, avail / 980);
+    scaler.style.transform = `scale(${s})`;
+    scaler.style.height = frame.offsetHeight * s + 'px';
+    // transforms don't shrink the layout box — reconcile it so nothing overflows sideways
+    scaler.style.marginRight = s < 1 ? `${980 * s - 980}px` : '';
+    postHeight();
+  }
+
+  function postHeight() {
+    window.parent.postMessage({ type: 'partner-dashboard:height', height: document.documentElement.scrollHeight }, '*');
+  }
+
+  fit();
+  postHeight(); // synchronous first post — rAF is throttled in offscreen iframes
+  addEventListener('resize', () => requestAnimationFrame(fit));
+  sync();
+})();
+</script>
+</body>
+</html>
