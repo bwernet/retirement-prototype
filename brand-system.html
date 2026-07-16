@@ -35,12 +35,14 @@
   .custom label { font-size: 13px; color: var(--muted); }
   #customColor { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; padding: 2px; background: #fff; cursor: pointer; }
 
-  /* ---- stage (phone + roles crossfade together) ---- */
+  /* ---- stage: brand changes morph in place — nothing fades out or flashes ---- */
   #stage { display: contents; }
-  #phone, #rolesPanel { transition: opacity 220ms ease; }
-  .fading #phone, .fading #rolesPanel { opacity: 0; }
+  .band, .cta, .menupill { transition: background-color 260ms ease, color 260ms ease; }
+  .card h3, .card .eyebrow, .inprogress, .plantitle span, .plantitle svg { transition: color 260ms ease; }
+  .progress i { transition: background-color 260ms ease; }
   @media (prefers-reduced-motion: reduce) {
-    #phone, #rolesPanel, .swatch { transition: none !important; }
+    .swatch, .band, .cta, .menupill, .card h3, .card .eyebrow, .inprogress,
+    .plantitle span, .plantitle svg, .progress i, .flag, .raw-pair { transition: none !important; }
   }
 
   /* ---- member phone: device frame (kept) + product-faithful UI ---- */
@@ -116,14 +118,18 @@
   .ratio { font-size: 12px; font-weight: 500; background: var(--panel); border-radius: 999px; padding: 3px 10px; }
   .badge { font-size: 11px; font-weight: 500; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 8px; visibility: hidden; }
   .role.adjusted .badge { visibility: visible; }
-  .role .raw-pair { display: none; align-items: center; gap: 8px; }
-  .role.adjusted .raw-pair { display: flex; }
-  /* per-role flag: appears inside the adjusted role's row; rows stay compact
-     otherwise (height change lands behind the crossfade) */
-  .flag { display: none; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; line-height: 1.4; color: var(--ink);
-    background: #FDEBC7; border-radius: 9px; padding: 8px 11px; }
+  /* collapsed to zero width, grows open when the role is adjusted */
+  .role .raw-pair { display: flex; align-items: center; gap: 8px; max-width: 0; opacity: 0; overflow: hidden;
+    transition: max-width 240ms ease, opacity 240ms ease; }
+  .role.adjusted .raw-pair { max-width: 80px; opacity: 1; }
+  /* per-role flag: grows open inside the adjusted role's row; rows stay compact otherwise */
+  .flag { display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 1.4; color: var(--ink);
+    background: #FDEBC7; border-radius: 9px; overflow: hidden; visibility: hidden;
+    max-height: 0; opacity: 0; margin-top: 0; padding: 0 11px;
+    transition: max-height 240ms ease, opacity 240ms ease, margin 240ms ease, padding 240ms ease, visibility 0s 240ms; }
   .flag svg { flex: none; }
-  .role.adjusted .flag { display: flex; }
+  .role.adjusted .flag { visibility: visible; max-height: 72px; opacity: 1; margin-top: 12px; padding: 8px 11px;
+    transition: max-height 240ms ease, opacity 240ms ease, margin 240ms ease, padding 240ms ease, visibility 0s; }
   .neutrals { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 14px; }
   .nswatches { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
   .nswatches .chip { width: 26px; height: 26px; }
@@ -135,10 +141,14 @@
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
   @media (max-width: 760px) {
+    body { padding-left: 16px; padding-right: 16px; }
     .layout { grid-template-columns: 1fr; }
     .rail { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
     .rail > .eyebrow { flex-basis: 100%; }
     .preset { min-width: 190px; }
+    /* role cards sideways-scroll like the credit union colors */
+    #roles { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+    #roles .role { width: 272px; min-width: 272px; flex: none; margin-top: 6px; }
   }
 </style>
 </head>
@@ -307,14 +317,14 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
 const fmt = r => `${(Math.round(r * 10) / 10).toFixed(1)}:1 AA`;
 
-function paintRole(el, { out, raw, ratio, adjusted, steps }) {
+function paintRole(el, { out, raw, ratio, adjusted, steps, quiet }) {
   const token = (el._anim = (el._anim || 0) + 1);
   el.classList.toggle('adjusted', adjusted);
   const outSw = el.querySelector('.swatch.out');
   const rawSw = el.querySelector('.swatch.raw');
   if (rawSw) rawSw.style.background = raw;
   el.querySelector('.ratio').textContent = fmt(ratio);
-  if (adjusted && steps && steps.length && !reduced.matches) {
+  if (adjusted && steps && steps.length && !quiet && !reduced.matches) {
     // Story-serving motion: perform the guardrail — step darker until it passes.
     const frames = steps.filter((_, i) => i % Math.ceil(steps.length / 6) === 0).concat(out);
     outSw.style.background = raw;
@@ -324,7 +334,7 @@ function paintRole(el, { out, raw, ratio, adjusted, steps }) {
   }
 }
 
-function render(name, primary, secondary, wordmark) {
+function render(name, primary, secondary, wordmark, quiet = false) {
   const r = deriveRoles(primary, secondary);
   phone.style.setProperty('--bg', r.background.fill);
   phone.style.setProperty('--on-bg', r.background.onColor);
@@ -332,35 +342,42 @@ function render(name, primary, secondary, wordmark) {
   phone.style.setProperty('--cta', r.cta.fill);
   phone.style.setProperty('--on-cta', r.cta.onColor);
   $('#phoneWordmark').textContent = wordmark.replace(/ Credit Union$/, '');
-  paintRole($('[data-role="background"]'), { out: r.background.fill, raw: r.background.raw, ratio: r.background.ratio, adjusted: r.background.adjusted });
-  paintRole($('[data-role="headline"]'), { out: r.headline.color, raw: r.headline.raw, ratio: r.headline.ratio, adjusted: r.headline.adjusted, steps: r.headline.steps });
-  paintRole($('[data-role="cta"]'), { out: r.cta.fill, raw: r.cta.raw, ratio: r.cta.ratio, adjusted: r.cta.adjusted });
-  live.textContent = r.flagged.length
-    ? `Now showing ${name}. ${r.flagged.join(' and ')} adjusted for contrast and flagged for partner review.`
-    : `Now showing ${name}. All brand roles pass contrast as sent.`;
+  paintRole($('[data-role="background"]'), { out: r.background.fill, raw: r.background.raw, ratio: r.background.ratio, adjusted: r.background.adjusted, quiet });
+  paintRole($('[data-role="headline"]'), { out: r.headline.color, raw: r.headline.raw, ratio: r.headline.ratio, adjusted: r.headline.adjusted, steps: r.headline.steps, quiet });
+  paintRole($('[data-role="cta"]'), { out: r.cta.fill, raw: r.cta.raw, ratio: r.cta.ratio, adjusted: r.cta.adjusted, quiet });
+  if (!quiet) {
+    live.textContent = r.flagged.length
+      ? `Now showing ${name}. ${r.flagged.join(' and ')} adjusted for contrast and flagged for partner review.`
+      : `Now showing ${name}. All brand roles pass contrast as sent.`;
+  }
   postHeight();
 }
 
-let switchGen = 0;
-function switchTo(fn) {
-  if (reduced.matches) { switchGen++; return fn(); }
-  const gen = ++switchGen;
-  document.body.classList.add('fading');
-  setTimeout(() => { if (gen !== switchGen) return; fn(); document.body.classList.remove('fading'); }, 230);
-}
-
+// Brand changes morph in place (CSS transitions on the branded surfaces) —
+// no fade-out, no flash; a click lands immediately.
 for (const btn of document.querySelectorAll('.preset')) {
   btn.addEventListener('click', () => {
     for (const b of document.querySelectorAll('.preset')) b.setAttribute('aria-pressed', String(b === btn));
     const p = PRESETS.find(p => p.id === btn.dataset.id);
-    switchTo(() => render(p.name, p.primary, p.secondary, p.name));
+    render(p.name, p.primary, p.secondary, p.name);
   });
 }
 
-$('#customColor').addEventListener('change', e => {
+// Live while dragging inside the picker (rAF-throttled, quiet: no step
+// animation, no screen-reader chatter), full treatment when the picker closes.
+const customInput = $('#customColor');
+let dragColor = null, dragRaf = 0;
+customInput.addEventListener('input', e => {
   for (const b of document.querySelectorAll('.preset')) b.setAttribute('aria-pressed', 'false');
+  dragColor = e.target.value.toUpperCase();
+  if (!dragRaf) dragRaf = requestAnimationFrame(() => {
+    dragRaf = 0;
+    render('Anytown Credit Union', dragColor, deriveSecondary(dragColor), 'Anytown Credit Union', true);
+  });
+});
+customInput.addEventListener('change', e => {
   const primary = e.target.value.toUpperCase();
-  switchTo(() => render('Anytown Credit Union', primary, deriveSecondary(primary), 'Anytown Credit Union'));
+  render('Anytown Credit Union', primary, deriveSecondary(primary), 'Anytown Credit Union');
 });
 
 function postHeight() {
