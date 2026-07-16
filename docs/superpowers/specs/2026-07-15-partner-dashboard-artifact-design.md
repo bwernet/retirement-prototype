@@ -163,3 +163,60 @@ here). Height re-reported on load, resize, and beat change.
 - No business outcome claims (conversion rates, revenue) — case-study prose
   carries any real figures.
 - No fictional personal names, anywhere, including commits.
+
+---
+
+## Author revision — 2026-07-16 (supersedes: Structure, Anti-generic rules, Motion, honesty-line placement)
+
+After reviewing the built artifact against the shipped product, the author
+redirected the structure:
+
+**1. The product frame must match the shipped silvur PARTNERS dashboard
+faithfully** (reference: the real Campaign Segments screen). That means:
+segment cards with chip + kebab, LEADS / TOTAL ASSETS (or ANNUAL DEPOSITS)
+labeled rows with count pills, and a teal "Export Data" button per card; below
+the cards, the **All Segments table** — header with kebab, "Date Range · All"
+pill, "Filters" button, checkbox column, segment name + description rows,
+Leads (with a mint "109 New!" pill on the first row), Assets, pink product
+tags ("Wealth Management"), and a per-row Export button. Sidebar: logotype,
+Home, Campaign Segments (active, chevron), All Segments sub-item, Support,
+Settings, the Lanternbay lockup, and an account row (initials avatar +
+"Marketing Team" + fictional team email — still no personal names). A
+hamburger icon tops the main column.
+
+**2. Product UI and explanation UI never mix.** The frame renders only what
+the product would render, in product voice. All narration — the Signal → Why
+→ Act story, the member-actions-to-benefit chain, the honesty framing — lives
+OUTSIDE the frame in a **story rail** beneath it: three numbered clickable
+beats that drive the product to the matching state (and stay in sync when the
+visitor drives the product directly). Design-notes callouts also live outside
+the frame; no badges inside the product.
+
+**3. The segment detail screen is a data-heavy product screen**, not a story
+chain: back link, chip + title + description header, stat tiles (LEADS 1,651 ·
+ANNUAL DEPOSITS $23M · NEW THIS MONTH 87), a "Member signals" panel with
+per-signal counts and proportion bars (Ran the Social Security calculator
+1,204 · Set or passed their election age 1,651 · Entered Social Security
+benefit income 1,455) with the in-product source note "Source: member
+activity on the platform.", and a "Recommended campaign" panel (direct-deposit
+switch) with Export Data. The four-part causal narrative moves to the story
+rail's Why beat, which keeps the load-bearing honesty line ("Lanternbay can't
+see where those deposits land").
+
+**Anti-generic reframed:** the earlier "no filters/date pickers/tables" rule
+gives way to faithfulness — that chrome now appears because the shipped
+product had it, rendered as present-but-inert decoration (not focusable, not
+clickable-looking beyond what the product showed). Still banned: charts the
+product didn't have, fake file downloads, invented analytics, personal names,
+regulator marks.
+
+**Interactions that are live:** hero card → detail screen; every "Export
+Data" button (cards, table rows, detail) opens the product-voice Export
+dialog populated with that segment's name and lead count; Done/scrim/Esc
+closes; story rail beats drive the same states. Everything else is inert
+chrome.
+
+**Motion:** screens morph in place (~200ms); the signal-proportion bars may
+grow once on first entry to the detail screen (the data-native descendant of
+the chain draw — once per entry from the home screen, never looping);
+`prefers-reduced-motion`: instant.
