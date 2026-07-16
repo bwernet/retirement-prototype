@@ -37,7 +37,7 @@ for (const n of ['597', '$752M', '1,651', '$23M', '2,146', '$350M', '590', '146'
 
 // Fictional-only; forbidden names/marks absent.
 assert.ok(html.includes('Marketing Team'), 'account row (no personal names)');
-assert.ok(html.includes('marketing@lanternbaycu.org'), 'fictional team email');
+assert.ok(html.includes('team@lanternbaycu.org'), 'fictional team email');
 assert.ok(html.includes('Lanternbay'), 'connective-tissue CU');
 assert.equal(/NCUA|Equal Housing|Retire Strong|ICCU|MSUFCU|Idaho Central|Olivia/i.test(html), false, 'no regulator marks / real brands / personal names');
 // Capital-F Federal = a name/mark (forbidden); lowercase prose would be legitimate.

@@ -47,11 +47,13 @@
   .culockup { display: flex; align-items: center; gap: 9px; padding: 10px 6px 12px; color: #1E3A5F; }
   .culockup .lname { font-size: 13px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; line-height: 1.15; color: #1E3A5F; }
   .culockup .lsub { display: block; font-size: 7px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; margin-top: 1px; }
-  .account { border-top: 1px solid var(--border); padding-top: 12px; display: flex; align-items: center; gap: 9px; }
+  .account { border-top: 1px solid var(--border); padding-top: 12px; display: flex; align-items: center; gap: 9px; min-width: 0; }
   .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--pill); color: var(--ink);
     font-size: 11px; font-weight: 500; display: grid; place-items: center; flex: none; }
-  .acct-name { font-size: 12.5px; font-weight: 500; line-height: 1.25; }
-  .acct-mail { display: block; font-size: 11px; font-weight: 400; color: var(--muted); }
+  /* text block shrinks with ellipsis so it can never shove the icon into the border */
+  .acct-name { font-size: 12.5px; font-weight: 500; line-height: 1.25; flex: 1; min-width: 0; overflow: hidden; }
+  .acct-mail { display: block; font-size: 11px; font-weight: 400; color: var(--muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .account > svg { margin-left: auto; margin-right: 5px; color: var(--muted); flex: none; }
 
   /* ---- main ---- */
@@ -224,7 +226,7 @@
     </p>
     <p class="account">
       <span class="avatar">MT</span>
-      <span class="acct-name">Marketing Team<span class="acct-mail">marketing@lanternbaycu.org</span></span>
+      <span class="acct-name">Marketing Team<span class="acct-mail">team@lanternbaycu.org</span></span>
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 1.5H2v11h3.5M9 4l3 3-3 3M12 7H6"/></svg>
     </p>
   </aside>
