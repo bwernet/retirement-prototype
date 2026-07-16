@@ -71,9 +71,9 @@ export const SCORE = {
 };
 
 export const PRESETS = [
-  { id: 'lanternbay', name: 'Lanternbay Credit Union', primary: '#1E3A5F', secondary: '#1FA98C' },
-  { id: 'sunwise', name: 'Sunwise Credit Union', primary: '#FFC93C', secondary: '#6E6A5E' },
+  { id: 'lanternbay', name: 'Lanternbay Credit Union', primary: '#1E3A5F', secondary: '#15806B' },
   { id: 'embervalley', name: 'Ember Valley Credit Union', primary: '#6B1F2F', secondary: '#C98A8A' },
+  { id: 'sunwise', name: 'Sunwise Credit Union', primary: '#FFC93C', secondary: '#6E6A5E' },
 ];
 
 export function onColorFor(fill) {

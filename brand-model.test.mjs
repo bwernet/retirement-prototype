@@ -53,7 +53,7 @@ test('Lanternbay: every role passes raw, nothing flagged', () => {
   assert.deepEqual(r.flagged, []);
   assert.equal(r.headline.adjusted, false);
   assert.equal(r.background.onColor, NEUTRALS.white);
-  assert.equal(r.cta.onColor, NEUTRALS.gray1, 'teal CTA takes ink text');
+  assert.equal(r.cta.onColor, NEUTRALS.white, 'deep teal CTA takes white text');
   assert.ok(r.cta.ratio >= 4.5);
 });
 

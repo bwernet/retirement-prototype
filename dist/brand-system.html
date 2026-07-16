@@ -9,7 +9,7 @@
 </style>
 <style>
   :root {
-    --ink: #161D24; --muted: #6E6E7D; --border: #E2E2E5; --canvas: #FFFFFF;
+    --ink: #161D24; --muted: #6E6E7D; --border: #E2E2E5; --canvas: #F7F8FA; /* same page bg as the retirement score prototype */
     --panel: #F2F2F7; /* panel bg: ink text only — gray2 on panel is 4.49:1, below AA */ --accent: #1C5C98;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -76,8 +76,8 @@
   .band h2 { font-size: 20px; font-weight: 500; letter-spacing: -0.01em; }
   .cardrow { display: flex; gap: 10px; margin-top: 14px; overflow: hidden; }
   .card { background: #fff; border-radius: 16px; padding: 18px 16px 16px; flex: none; width: calc(100% - 40px); }
-  .card .eyebrow { color: var(--headline, #1E3A5F); font-size: 10.5px; letter-spacing: .11em; line-height: 1.5; }
-  .card h3 { color: var(--headline, #1E3A5F); font-size: 19px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.28; margin: 7px 0 8px; }
+  .card .eyebrow { color: var(--headline, #1E3A5F); font-size: 10.5px; letter-spacing: .11em; line-height: 1.35; }
+  .card h3 { color: var(--headline, #1E3A5F); font-size: 19px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.18; margin: 6px 0 8px; }
   .card p { color: var(--ink); font-size: 13.5px; line-height: 1.5; }
   .card.peek { width: 200px; }
   .cta {
@@ -108,7 +108,7 @@
 
   /* ---- derivation panel ---- */
   #rolesPanel .eyebrow { color: var(--muted); }
-  .role { border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 10px; min-height: 96px; }
+  .role { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 10px; }
   .role-head { display: flex; justify-content: space-between; font-size: 13px; }
   .role-name { font-weight: 500; }
   .role-src { color: var(--muted); }
@@ -121,18 +121,19 @@
   /* space reserved even when hidden — layout must never reflow on toggle */
   .role .raw-pair { display: flex; visibility: hidden; align-items: center; gap: 8px; }
   .role.adjusted .raw-pair { visibility: visible; }
-  .flag { display: flex; align-items: center; gap: 7px; margin-top: 20px; font-size: 13px; color: var(--ink);
-    background: #FDEBC7; border-radius: 10px; padding: 10px 12px; visibility: hidden; }
-  .flagged .flag { visibility: visible; }
-  .neutrals { border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 14px; }
+  /* per-role flag: shown beside the adjusted role; space reserved so nothing reflows */
+  .flag { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; line-height: 1.4; color: var(--ink);
+    background: #FDEBC7; border-radius: 9px; padding: 8px 11px; visibility: hidden; }
+  .flag svg { flex: none; }
+  .role.adjusted .flag { visibility: visible; }
+  .neutrals { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 14px; }
   .nswatches { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
   .nswatches .chip { width: 26px; height: 26px; }
   .gradbar { height: 10px; border-radius: 999px; margin-top: 10px;
     background: linear-gradient(90deg, #F69835, #F4C355, #529D40); }
   .ncaption { font-size: 12px; color: var(--muted); margin-top: 10px; }
 
-  .closing { text-align: center; font-style: italic; color: var(--muted); font-size: 13px; margin-top: 30px; }
-  .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 8px; }
+  .footnote { text-align: center; color: var(--muted); font-size: 11px; margin-top: 30px; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
   @media (max-width: 760px) {
@@ -152,15 +153,15 @@
     <p class="eyebrow">What a new partner sent us</p>
     <button class="preset" data-id="lanternbay" aria-pressed="true">
       <span class="cu">Lanternbay Credit Union</span>
-      <span class="chips"><i class="chip" style="background:#1E3A5F"></i><i class="chip" style="background:#1FA98C"></i><code>#1E3A5F · #1FA98C</code></span>
-    </button>
-    <button class="preset" data-id="sunwise" aria-pressed="false">
-      <span class="cu">Sunwise Credit Union</span>
-      <span class="chips"><i class="chip" style="background:#FFC93C"></i><i class="chip" style="background:#6E6A5E"></i><code>#FFC93C · #6E6A5E</code></span>
+      <span class="chips"><i class="chip" style="background:#1E3A5F"></i><i class="chip" style="background:#15806B"></i><code>#1E3A5F · #15806B</code></span>
     </button>
     <button class="preset" data-id="embervalley" aria-pressed="false">
       <span class="cu">Ember Valley Credit Union</span>
       <span class="chips"><i class="chip" style="background:#6B1F2F"></i><i class="chip" style="background:#C98A8A"></i><code>#6B1F2F · #C98A8A</code></span>
+    </button>
+    <button class="preset" data-id="sunwise" aria-pressed="false">
+      <span class="cu">Sunwise Credit Union</span>
+      <span class="chips"><i class="chip" style="background:#FFC93C"></i><i class="chip" style="background:#6E6A5E"></i><code>#FFC93C · #6E6A5E</code></span>
     </button>
     <div class="custom">
       <input type="color" id="customColor" value="#1C5C98" aria-label="Try any color as a brand primary">
@@ -169,7 +170,7 @@
   </div>
 
   <div id="stage">
-    <div id="phone" style="--bg:#1E3A5F; --on-bg:#FFFFFF; --headline:#1E3A5F; --cta:#1FA98C; --on-cta:#161D24">
+    <div id="phone" style="--bg:#1E3A5F; --on-bg:#FFFFFF; --headline:#1E3A5F; --cta:#15806B; --on-cta:#FFFFFF">
       <div class="screen">
         <div class="band">
           <div class="statusbar">
@@ -244,6 +245,10 @@
             <span class="ratio">11.5:1 AA</span>
             <span class="badge">adjusted</span>
           </div>
+          <p class="flag">
+            <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M1 1v12M1 1h9l-2 3 2 3H1" fill="none" stroke="#161D24" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            <span>Flagged for partner review — relationship manager notified</span>
+          </p>
         </div>
         <div class="role" data-role="headline">
           <div class="role-head"><span class="role-name">brand/headline</span><span class="role-src">← primary</span></div>
@@ -253,21 +258,25 @@
             <span class="ratio">11.5:1 AA</span>
             <span class="badge">adjusted</span>
           </div>
+          <p class="flag">
+            <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M1 1v12M1 1h9l-2 3 2 3H1" fill="none" stroke="#161D24" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            <span>Flagged for partner review — relationship manager notified</span>
+          </p>
         </div>
         <div class="role" data-role="cta">
           <div class="role-head"><span class="role-name">brand/CTA</span><span class="role-src">← secondary</span></div>
           <div class="role-out">
             <span class="raw-pair"><span class="swatch raw"></span><span class="arrow">→</span></span>
-            <span class="swatch out" style="background:#1FA98C"></span>
-            <span class="ratio">5.8:1 AA</span>
+            <span class="swatch out" style="background:#15806B"></span>
+            <span class="ratio">4.9:1 AA</span>
             <span class="badge">adjusted</span>
           </div>
+          <p class="flag">
+            <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M1 1v12M1 1h9l-2 3 2 3H1" fill="none" stroke="#161D24" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            <span>Flagged for partner review — relationship manager notified</span>
+          </p>
         </div>
       </div>
-      <p class="flag" id="flag">
-        <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M1 1v12M1 1h9l-2 3 2 3H1" fill="none" stroke="#161D24" stroke-width="1.6" stroke-linejoin="round"/></svg>
-        <span>Flagged for partner review — relationship manager notified</span>
-      </p>
       <div class="neutrals" id="neutrals">
         <p class="eyebrow" style="color:#6E6E7D">Reduced to neutral — works with every brand</p>
         <div class="nswatches">
@@ -289,7 +298,6 @@
   </div>
 </div>
 
-<p class="closing">Two colors, three jobs — background, headline, CTA. Everything else was reduced to a neutral system that had to work beside any brand that arrived.</p>
 <p class="footnote">Credit unions shown are fictional; member data is synthetic; app copy is a representative reconstruction of the shipped product.</p>
 <p id="live" class="sr-only" aria-live="polite"></p>
 <script type="module">
@@ -366,9 +374,9 @@ const SCORE = {
 };
 
 const PRESETS = [
-  { id: 'lanternbay', name: 'Lanternbay Credit Union', primary: '#1E3A5F', secondary: '#1FA98C' },
-  { id: 'sunwise', name: 'Sunwise Credit Union', primary: '#FFC93C', secondary: '#6E6A5E' },
+  { id: 'lanternbay', name: 'Lanternbay Credit Union', primary: '#1E3A5F', secondary: '#15806B' },
   { id: 'embervalley', name: 'Ember Valley Credit Union', primary: '#6B1F2F', secondary: '#C98A8A' },
+  { id: 'sunwise', name: 'Sunwise Credit Union', primary: '#FFC93C', secondary: '#6E6A5E' },
 ];
 
 function onColorFor(fill) {
@@ -428,7 +436,7 @@ function deriveSecondary(primary) {
 
 
 const $ = s => document.querySelector(s);
-const phone = $('#phone'), rolesPanel = $('#rolesPanel'), live = $('#live');
+const phone = $('#phone'), live = $('#live');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
 const fmt = r => `${(Math.round(r * 10) / 10).toFixed(1)}:1 AA`;
@@ -461,7 +469,6 @@ function render(name, primary, secondary, wordmark) {
   paintRole($('[data-role="background"]'), { out: r.background.fill, raw: r.background.raw, ratio: r.background.ratio, adjusted: r.background.adjusted });
   paintRole($('[data-role="headline"]'), { out: r.headline.color, raw: r.headline.raw, ratio: r.headline.ratio, adjusted: r.headline.adjusted, steps: r.headline.steps });
   paintRole($('[data-role="cta"]'), { out: r.cta.fill, raw: r.cta.raw, ratio: r.cta.ratio, adjusted: r.cta.adjusted });
-  rolesPanel.classList.toggle('flagged', r.flagged.length > 0);
   live.textContent = r.flagged.length
     ? `Now showing ${name}. ${r.flagged.join(' and ')} adjusted for contrast and flagged for partner review.`
     : `Now showing ${name}. All brand roles pass contrast as sent.`;

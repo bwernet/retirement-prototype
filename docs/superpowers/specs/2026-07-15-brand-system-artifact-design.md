@@ -68,8 +68,9 @@ and raises a flag to Silvur's internal relationship manager, who reviews the
 adjustment with the credit union client. The partner is never silently
 overridden. The artifact renders this as part of the derivation panel: on an
 adjusted role, alongside the before → after swatches, a small flag chip —
-"Flagged for partner review — relationship manager notified" — with a
-one-line note that this routed a human conversation, not just a color change.
+"Flagged for partner review — relationship manager notified" — shown INSIDE
+the adjusted role's own row (author-directed 2026-07-15: the flag sits beside
+the thing that was adjusted, so cause and consequence read together).
 (ICCU's gray CTAs were simply their preferred secondary, not a fallback; a
 neutral secondary is a valid partner choice, represented by Sunwise.)
 - **Reduced to neutral — works with every brand** — the rest of the UI, shown
@@ -97,11 +98,14 @@ Chosen to span difficulty, so the derivation visibly earns its keep:
 Each preset sends primary (→ background + headline) and secondary (→ CTA),
 matching the real intake:
 
+Order (author-directed 2026-07-15): first example, second example, then the
+example that needs the flag.
+
 | Credit union (fictional) | Colors sent | Why it's in the set |
 |---|---|---|
-| Lanternbay Credit Union | primary navy `#1E3A5F` + secondary teal `#1FA98C` | Well-behaved: every role passes raw. Structurally echoes the Retire Strong reference instance (dark primary band, vivid CTA). Establishes the baseline. |
-| Sunwise Credit Union | primary yellow `#FFC93C` + secondary warm gray `#6E6A5E` | Hostile primary: yellow fails headline contrast on white (~1.6:1) → darkened for headlines, kept raw on the background band with ink text, and the partner-review flag fires. Gray CTA mirrors the real neutral-secondary case (a partner's deliberate choice). This is the money moment. |
+| Lanternbay Credit Union | primary navy `#1E3A5F` + secondary deep teal `#15806B` | Well-behaved: every role passes raw, white CTA text (4.85:1). Structurally echoes the Retire Strong reference instance (dark primary band, vivid CTA). Establishes the baseline. |
 | Ember Valley Credit Union | primary burgundy `#6B1F2F` + secondary dusty rose `#C98A8A` | Dark primary (white on-band text); light-mid secondary exercises the on-CTA text choice (ink, not white). Proves the system isn't tuned to light brands. |
+| Sunwise Credit Union | primary yellow `#FFC93C` + secondary warm gray `#6E6A5E` | Hostile primary: yellow fails headline contrast on white (~1.6:1) → darkened for headlines, kept raw on the background band with ink text, and the partner-review flag fires. Gray CTA mirrors the real neutral-secondary case (a partner's deliberate choice). This is the money moment. |
 
 Names must be collision-checked against real credit unions before publishing;
 "Federal" is deliberately avoided in fictional names so no charter is implied.
@@ -134,9 +138,8 @@ the guardrail performed, once per switch, never looping.
 
 - Opening line (top): "The entire intake from a new credit union partner: a
   logo and two brand colors."
-- Closing caption (bottom, small italic): "Two colors, three jobs —
-  background, headline, CTA. Everything else was reduced to a neutral system
-  that had to work beside any brand that arrived."
+- No closing caption (removed by the author 2026-07-15 — the footnote alone
+  closes the artifact).
 - Footnote: "Credit unions shown are fictional; member data is synthetic; app
   copy is a representative reconstruction of the shipped product."
 

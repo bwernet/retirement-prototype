@@ -8,7 +8,6 @@ const html = fs.readFileSync('brand-system.html', 'utf8');
 
 // Framing copy — exact.
 assert.ok(html.includes('The entire intake from a new credit union partner: a logo and two brand colors.'), 'opening line');
-assert.ok(html.includes('Two colors, three jobs — background, headline, CTA. Everything else was reduced to a neutral system that had to work beside any brand that arrived.'), 'closing caption');
 assert.ok(html.includes('Credit unions shown are fictional; member data is synthetic; app copy is a representative reconstruction of the shipped product.'), 'disclosure footnote');
 assert.ok(html.includes('Flagged for partner review — relationship manager notified'), 'flag chip copy');
 
