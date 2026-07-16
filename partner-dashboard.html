@@ -102,12 +102,12 @@
 
   /* ---- beat 3: export slide-over ---- */
   #scrim { position: absolute; inset: 0; background: rgba(22,29,36,.28); opacity: 0; visibility: hidden;
-    transition: opacity 200ms ease, visibility 0s 200ms; border-radius: 0 0 16px 0; }
+    transition: opacity 200ms ease, visibility 0s 200ms; border-radius: 0 0 16px 0; z-index: 3; }
   #stage[data-beat="3"] #scrim { opacity: 1; visibility: visible; transition: opacity 200ms ease, visibility 0s; }
   .beat3 { position: absolute; top: 0; right: 0; bottom: 0; width: 372px; background: #fff;
     border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: -12px 0 34px rgba(22,29,36,.12);
     opacity: 0; visibility: hidden; transform: translateX(14px);
-    transition: opacity 200ms ease, transform 200ms ease, visibility 0s 200ms; }
+    transition: opacity 200ms ease, transform 200ms ease, visibility 0s 200ms; z-index: 4; }
   #stage[data-beat="3"] .beat3 { opacity: 1; visibility: visible; transform: none;
     transition: opacity 200ms ease, transform 200ms ease, visibility 0s; }
   .beat3 h2 { font-size: 17px; font-weight: 500; }
@@ -132,7 +132,7 @@
     font-size: 11px; font-weight: 500; line-height: 18px; text-align: center; flex: none; }
   body.notes-on .notebadge { display: inline-block; }
   #notesPanel { display: none; position: absolute; right: 0; bottom: -6px; width: 340px; background: #fff; border: 1px solid var(--accent);
-    border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(22,29,36,.14); }
+    border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(22,29,36,.14); z-index: 2; }
   body.notes-on #notesPanel { display: block; }
   #notesPanel ol { list-style: none; }
   #notesPanel li { display: flex; gap: 9px; font-size: 12.5px; line-height: 1.5; margin-top: 8px; }
@@ -287,7 +287,7 @@
     chain.classList.remove('drawn');
     if (reduced.matches) { chain.classList.remove('veiled'); return; }
     chain.classList.add('veiled');
-    requestAnimationFrame(() => requestAnimationFrame(() => chain.classList.add('drawn')));
+    requestAnimationFrame(() => requestAnimationFrame(() => { chain.classList.add('drawn'); chain.classList.remove('veiled'); }));
   }
 
   $('#heroCard').addEventListener('click', () => { setBeat(2); $('#backBtn').focus(); });

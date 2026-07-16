@@ -63,7 +63,7 @@ assert.ok(html.includes('<link rel="stylesheet" href="fonts.css">'), 'font link 
 
 // Script invariants (Task 2+).
 assert.ok(html.includes('partner-dashboard:height'), 'height postMessage type');
-assert.ok(html.includes('prefers-reduced-motion'), 'reduced-motion gate in script');
+assert.ok(html.includes('reduced.matches'), 'reduced-motion gate in script (matchMedia check)');
 assert.ok(html.includes("addEventListener('keydown'"), 'keyboard handling (Esc / focus trap)');
 
 console.log('partner-dashboard content-integrity: all checks passed');
