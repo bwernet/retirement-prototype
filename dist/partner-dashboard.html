@@ -29,7 +29,7 @@
 
   /* ================= product frame (product voice ONLY inside) ================= */
   #scaler { transform-origin: top left; width: 980px; }
-  #frame { width: 980px; background: #fff; border: 1px solid var(--border); border-radius: 16px;
+  #frame { position: relative; width: 980px; background: #fff; border: 1px solid var(--border); border-radius: 16px;
     box-shadow: 0 1px 2px rgba(22,29,36,.05), 0 10px 30px rgba(22,29,36,.07);
     display: grid; grid-template-columns: 224px 1fr; overflow: hidden; }
 
@@ -146,15 +146,15 @@
   .panel p.body { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top: 6px; }
   .panel .exportbtn { width: 100%; margin-top: 14px; }
 
-  /* ---- export dialog (product voice) ---- */
+  /* ---- export drawer: a real rail — full frame height, flush to the product surface's right edge ---- */
   #scrim { position: absolute; inset: 0; background: rgba(22,29,36,.28); opacity: 0; visibility: hidden;
     transition: opacity 200ms ease, visibility 0s 200ms; z-index: 3; }
-  #screens.exporting #scrim { opacity: 1; visibility: visible; transition: opacity 200ms ease, visibility 0s; }
+  #frame.exporting #scrim { opacity: 1; visibility: visible; transition: opacity 200ms ease, visibility 0s; }
   .exportPanel { position: absolute; top: 0; right: 0; bottom: 0; width: 356px; background: #fff;
-    border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: -12px 0 34px rgba(22,29,36,.12);
-    opacity: 0; visibility: hidden; transform: translateX(14px);
+    border-left: 1px solid var(--border); padding: 24px 22px; box-shadow: -12px 0 34px rgba(22,29,36,.14);
+    opacity: 0; visibility: hidden; transform: translateX(18px);
     transition: opacity 200ms ease, transform 200ms ease, visibility 0s 200ms; z-index: 4; }
-  #screens.exporting .exportPanel { opacity: 1; visibility: visible; transform: none;
+  #frame.exporting .exportPanel { opacity: 1; visibility: visible; transform: none;
     transition: opacity 200ms ease, transform 200ms ease, visibility 0s; }
   .exportPanel h2 { font-size: 17px; font-weight: 500; }
   .exportPanel .segline { color: var(--muted); font-size: 13px; margin-top: 3px; }
@@ -333,24 +333,25 @@
         </div>
       </section>
 
-      <!-- export dialog (product voice) -->
-      <div id="scrim"></div>
-      <section class="exportPanel" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
-        <h2 id="exportTitle">Export Data</h2>
-        <p class="segline" id="exportSeg">Direct Deposit: Social Security</p>
-        <dl>
-          <dt>Leads</dt>
-          <dd id="exportLeads">1,651</dd>
-          <dt>Fields</dt>
-          <dd>Member contact via your system of record, plus the segment reason.</dd>
-          <dt>Delivery</dt>
-          <dd>Sent to your email and marketing tools.</dd>
-        </dl>
-        <p class="scopenote">Exports end at the audience — campaigns run in your own tools.</p>
-        <button id="doneBtn">Done</button>
-      </section>
     </div>
   </main>
+
+  <!-- export drawer (product voice) — frame-level: full height, flush right edge -->
+  <div id="scrim"></div>
+  <section class="exportPanel" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+    <h2 id="exportTitle">Export Data</h2>
+    <p class="segline" id="exportSeg">Direct Deposit: Social Security</p>
+    <dl>
+      <dt>Leads</dt>
+      <dd id="exportLeads">1,651</dd>
+      <dt>Fields</dt>
+      <dd>Member contact via your system of record, plus the segment reason.</dd>
+      <dt>Delivery</dt>
+      <dd>Sent to your email and marketing tools.</dd>
+    </dl>
+    <p class="scopenote">Exports end at the audience — campaigns run in your own tools.</p>
+    <button id="doneBtn">Done</button>
+  </section>
 </div>
 </div>
 
@@ -384,9 +385,9 @@
 <script>
 (() => {
   const $ = s => document.querySelector(s);
-  const screens = $('#screens'), live = $('#live'), signals = $('#signals');
+  const screens = $('#screens'), frame = $('#frame'), live = $('#live'), signals = $('#signals');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let lastFocus = null, grownOnce = false;
+  let lastFocus = null;
 
   const MESSAGES = {
     1: 'Showing the Campaign Segments home screen.',
@@ -395,7 +396,7 @@
   };
 
   function currentBeat() {
-    if (screens.classList.contains('exporting')) return 3;
+    if (frame.classList.contains('exporting')) return 3;
     return screens.dataset.screen === 'detail' ? 2 : 1;
   }
 
@@ -423,12 +424,12 @@
   function openExport(btn) {
     lastFocus = btn || document.activeElement;
     if (btn) { $('#exportSeg').textContent = btn.dataset.seg; $('#exportLeads').textContent = btn.dataset.leads; }
-    screens.classList.add('exporting');
+    frame.classList.add('exporting');
     sync();
     $('#doneBtn').focus();
   }
   function closeExport(focusBack = true) {
-    screens.classList.remove('exporting');
+    frame.classList.remove('exporting');
     sync();
     if (focusBack && lastFocus) lastFocus.focus();
   }
@@ -449,7 +450,7 @@
 
   // Esc closes the dialog; Tab is trapped inside it while open.
   document.addEventListener('keydown', e => {
-    if (!screens.classList.contains('exporting')) return;
+    if (!frame.classList.contains('exporting')) return;
     if (e.key === 'Escape') { e.preventDefault(); return closeExport(); }
     if (e.key !== 'Tab') return;
     const done = $('#doneBtn');
@@ -476,7 +477,7 @@
   });
 
   // Fixed 980px frame scales down to fit narrow viewports (no bespoke mobile layout).
-  const scaler = $('#scaler'), frame = $('#frame');
+  const scaler = $('#scaler');
   function fit() {
     const bs = getComputedStyle(document.body);
     const avail = document.body.clientWidth - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight);
