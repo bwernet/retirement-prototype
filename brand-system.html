@@ -156,10 +156,16 @@
     body { padding-left: 16px; padding-right: 16px; }
     .layout { grid-template-columns: 1fr; gap: 28px; }
     .opening { max-width: none; }
-    .alt { width: auto; margin: 0; }
-    #altList { display: flex; flex-wrap: wrap; gap: 4px; }
     #rolesPanel { max-width: 480px; margin: 0 auto; width: 100%; }
-    .rail { max-width: 480px; margin: 0 auto; width: 100%; }
+    /* partner input goes side by side: active card left, choices right */
+    .rail { max-width: 480px; margin: 0 auto; width: 100%;
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto 1fr;
+      column-gap: 18px; }
+    .rail .collabel { grid-column: 1 / -1; }
+    #activeCard { grid-column: 1; grid-row: 2 / 4; }
+    .alt-label { grid-column: 2; grid-row: 2; margin: 0 0 2px; }
+    #altList { grid-column: 2; grid-row: 3; }
+    .alt { margin: 0; padding: 7px 8px 7px 0; }
   }
 </style>
 </head>
