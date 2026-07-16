@@ -159,7 +159,7 @@
        like the credit union colors; nothing wider than the viewframe */
     #roles { display: flex; align-items: flex-start; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
     #roles .role { width: 272px; min-width: 272px; flex: none; margin-top: 6px; }
-    #roles .neutrals { width: 300px; min-width: 300px; flex: none; margin-top: 6px; }
+    .neutrals { width: 100%; margin-top: 10px; } /* full width below the carousel, never wider than the viewframe */
   }
 </style>
 </head>
@@ -297,7 +297,8 @@
             <span>Flagged for partner review — relationship manager notified</span>
           </p>
         </div>
-        <div class="neutrals" id="neutrals">
+      </div>
+      <div class="neutrals" id="neutrals">
         <p class="eyebrow" style="color:#6E6E7D">Reduced to neutral — works with every brand</p>
         <div class="nswatches">
           <i class="chip" style="background:#161D24" title="#161D24"></i>
@@ -313,7 +314,6 @@
         </div>
         <div class="gradbar" title="#F69835 #F4C355 #529D40"></div>
         <p class="ncaption">Text, cards, borders, icons, errors, announcements — and the Retirement Score gradient, a semantic trust color that never takes brand.</p>
-        </div>
       </div>
     </div>
   </div>
