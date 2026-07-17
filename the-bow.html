@@ -108,11 +108,48 @@
 
   #panel{position:absolute;top:12px;right:24px;bottom:24px;width:420px;background:var(--card);border-radius:var(--r-lg);overflow-y:auto}
   #panel[hidden]{display:none}
+  #panel .panel-placeholder{padding:24px;color:var(--gray);font-size:14px}
+  #thread.panel-open{margin-right:440px}
   #interstitial[hidden]{display:none}
+  #interstitial{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(23,23,25,.85);color:#fff;border-radius:var(--r-lg);opacity:0;transition:opacity .2s;z-index:40;text-align:center}
+  #interstitial.show{opacity:1}
+  #interstitial .line1{font-size:22px;font-weight:800}
+  #interstitial .line2{font-size:14px;font-weight:400;opacity:.75;margin-top:8px}
 
   #concept-pill{position:fixed;right:20px;bottom:20px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:12px;color:var(--gray);display:flex;align-items:center;gap:4px;box-shadow:0 2px 10px rgba(0,0,0,.06);z-index:50}
   #restart{text-decoration:underline;text-underline-offset:2px;color:var(--gray);font-size:12px}
   #restart:hover{color:var(--ink)}
+
+  /* ---- engine: transcripts, chips, blocks (Task 7 — Task 8/9/10 will restyle) ---- */
+  .beat{margin-bottom:22px}
+  .msg{max-width:640px;padding:12px 16px;border-radius:16px;font-size:15px;line-height:1.55;margin-bottom:10px}
+  .msg p{margin:0 0 8px}
+  .msg p:last-child{margin-bottom:0}
+  .msg .md-list{margin:4px 0 8px;padding-left:0}
+  .msg .md-list li{list-style:none;padding-left:0;margin-bottom:4px}
+  .msg-user{background:var(--pink-pale);margin-left:auto;border-bottom-right-radius:4px}
+  .msg-agent{background:#fff;border:1px solid var(--line);margin-right:auto;border-bottom-left-radius:4px;cursor:default}
+  .msg.typing{display:flex;align-items:center;gap:4px;padding:14px 16px;width:fit-content}
+  .msg.typing span{width:6px;height:6px;border-radius:50%;background:var(--gray);opacity:.4;animation:bow-typing 1s infinite ease-in-out}
+  .msg.typing span:nth-child(2){animation-delay:.15s}
+  .msg.typing span:nth-child(3){animation-delay:.3s}
+  @keyframes bow-typing{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+  .block-placeholder{border:1px dashed var(--line);border-radius:12px;padding:14px 16px;color:var(--gray);font-size:13px;margin-bottom:14px;opacity:0;transition:opacity .15s}
+  .block-placeholder.show{opacity:1}
+  .venue-list{margin-bottom:14px;opacity:0;transition:opacity .15s}
+  .venue-list.show{opacity:1}
+  .venue-list ol{padding-left:0}
+  .venue-row{list-style:none;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+  .venue-row:last-child{border-bottom:0}
+  .chip{display:inline-flex;align-items:center;background:var(--chip-pink);color:var(--ink);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:600;opacity:1;transition:opacity .2s,transform .15s}
+  .chip:hover{transform:translateY(-1px)}
+  #chips .chip{background:var(--chip-blue)}
+  .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion: reduce){
+    .msg.typing span{animation:none}
+    .block-placeholder,.venue-list,.chip,.toast,#interstitial{transition:none}
+  }
 </style>
 </head>
 <body>
@@ -322,7 +359,423 @@
   <div id="concept-pill">Concept prototype — not affiliated with any marketplace · <button id="restart">Restart</button></div>
   <script type="module">
     import { BRAND, VENUES, SCRIPT, COMPOSER, matchInput, initialBudget, applyVenuePackage, applyRebalance, applyGoalIncrease, applyBooking, fmtMoney, fmtK } from './bow-model.js';
-    // Task 7 fills this in.
+
+    // ---- dom refs ----------------------------------------------------------
+    const homeEl = document.getElementById('home');
+    const threadEl = document.getElementById('thread');
+    const threadTitleEl = document.getElementById('thread-title');
+    const streamEl = document.getElementById('stream');
+    const chipsEl = document.getElementById('chips');
+    const askEl = document.getElementById('ask');
+    const askThreadEl = document.getElementById('ask-thread');
+    const panelEl = document.getElementById('panel');
+    const interstitialEl = document.getElementById('interstitial');
+    const backBtn = document.getElementById('back');
+    const restartBtn = document.getElementById('restart');
+    const chipSpentEl = document.getElementById('chip-spent');
+    const chipGoalEl = document.getElementById('chip-goal');
+    const statVendorsEl = document.getElementById('stat-vendors');
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wait = ms => new Promise(r => setTimeout(r, reducedMotion ? 0 : ms));
+
+    // ---- state ---------------------------------------------------------------
+    // state = { beat, budget, venueRental, homeState, transcripts: Map<thread, {el, rendered:Set, beatNodes:Map}> }
+    function freshState() {
+      return {
+        beat: 'home',
+        budget: initialBudget(),
+        venueRental: undefined,
+        homeState: 'fresh',
+        transcripts: new Map(),
+      };
+    }
+    let state = freshState();
+
+    // ---- markdown-lite + escaping ---------------------------------------------
+    function escapeHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function withRecipientCount(s) {
+      const n = window.__bowRecipients ?? 5;
+      return s.replace(/\{N\}/g, String(n));
+    }
+    function mdToHtml(md) {
+      let s = escapeHtml(withRecipientCount(md));
+      s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      return s.split(/\n\n+/).map(para => {
+        const lines = para.split('\n');
+        if (lines.length && lines.every(l => l.startsWith('• '))) {
+          return '<ul class="md-list">' + lines.map(l => `<li>${l.slice(2)}</li>`).join('') + '</ul>';
+        }
+        return '<p>' + lines.join('<br>') + '</p>';
+      }).join('');
+    }
+
+    // ---- transcripts ------------------------------------------------------
+    function getThread(name) {
+      if (!state.transcripts.has(name)) {
+        const el = document.createElement('div');
+        el.className = 'transcript';
+        state.transcripts.set(name, { el, rendered: new Set(), beatNodes: new Map() });
+      }
+      return state.transcripts.get(name);
+    }
+    function showThreadContainer(name) {
+      const t = getThread(name);
+      streamEl.replaceChildren(t.el);
+      return t;
+    }
+    function scrollStreamToBottom() {
+      streamEl.scrollTop = streamEl.scrollHeight;
+    }
+
+    // ---- view toggles -------------------------------------------------------
+    function showHomeView() {
+      threadEl.hidden = true;
+      homeEl.hidden = false;
+    }
+    function showThreadView() {
+      homeEl.hidden = true;
+      threadEl.hidden = false;
+    }
+
+    // ---- chips / panel / toast ----------------------------------------------
+    function renderChips(chips) {
+      chipsEl.replaceChildren();
+      (chips ?? []).forEach((c, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'chip';
+        btn.type = 'button';
+        btn.textContent = c.label;
+        btn.addEventListener('click', () => go(c.goto));
+        chipsEl.appendChild(btn);
+        if (reducedMotion) return;
+        btn.style.opacity = '0';
+        setTimeout(() => { btn.style.opacity = '1'; }, i * 40);
+      });
+    }
+    function applyPanel(name) {
+      panelEl.innerHTML = '';
+      if (name) {
+        const div = document.createElement('div');
+        div.className = 'panel-placeholder';
+        div.textContent = `[panel: ${name}]`;
+        panelEl.appendChild(div);
+        panelEl.hidden = false;
+        threadEl.classList.add('panel-open');
+      } else {
+        panelEl.hidden = true;
+        threadEl.classList.remove('panel-open');
+      }
+    }
+    let toastTimer = null;
+    function showToast(msg) {
+      let el = document.getElementById('bow-toast');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'bow-toast';
+        el.className = 'toast';
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+    }
+
+    // ---- messages / blocks --------------------------------------------------
+    function appendUserBubble(container, text) {
+      const el = document.createElement('div');
+      el.className = 'msg msg-user';
+      el.textContent = text; // always textContent — never render user input as markup
+      container.appendChild(el);
+      scrollStreamToBottom();
+    }
+
+    async function showTyping(container) {
+      if (reducedMotion) return;
+      const el = document.createElement('div');
+      el.className = 'msg msg-agent typing';
+      el.innerHTML = '<span></span><span></span><span></span>';
+      container.appendChild(el);
+      scrollStreamToBottom();
+      await wait(600);
+      el.remove();
+    }
+
+    async function renderTextBlock(container, md) {
+      const el = document.createElement('div');
+      el.className = 'msg msg-agent';
+      container.appendChild(el);
+      let done = false;
+      const complete = () => {
+        if (done) return;
+        done = true;
+        el.innerHTML = mdToHtml(md);
+      };
+      el.addEventListener('click', complete, { once: true });
+      if (reducedMotion) { complete(); scrollStreamToBottom(); return; }
+      const tokens = md.match(/\S+|\s+/g) || [];
+      let acc = '';
+      for (const tok of tokens) {
+        if (done) return;
+        acc += tok;
+        if (/\S/.test(tok)) {
+          el.innerHTML = mdToHtml(acc);
+          scrollStreamToBottom();
+          await wait(28);
+        }
+      }
+      done = true;
+    }
+
+    async function fadeInWhole(el) {
+      if (reducedMotion) { el.classList.add('show'); return; }
+      await wait(0); // let the initial opacity:0 paint before transitioning — setTimeout (not rAF)
+      el.classList.add('show'); // stays reliable if the tab is backgrounded, unlike rAF
+      await wait(150);
+    }
+
+    async function renderVenueList(container) {
+      const el = document.createElement('div');
+      el.className = 'venue-list';
+      const ol = document.createElement('ol');
+      VENUES.forEach((v, i) => {
+        const li = document.createElement('li');
+        li.className = 'venue-row';
+        const strong = document.createElement('strong');
+        strong.textContent = `${i + 1}. ${v.name}`;
+        li.appendChild(strong);
+        li.appendChild(document.createTextNode(` – ${v.priceK} • ${v.blurb}`));
+        if (v.id === 'willow') {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'chip';
+          btn.textContent = 'Tell me more';
+          btn.addEventListener('click', () => go('willow-detail'));
+          li.appendChild(btn);
+        }
+        ol.appendChild(li);
+      });
+      el.appendChild(ol);
+      container.appendChild(el);
+      scrollStreamToBottom();
+      await fadeInWhole(el);
+    }
+
+    async function renderPlaceholder(container, type) {
+      const el = document.createElement('div');
+      el.className = 'block-placeholder';
+      el.dataset.block = type;
+      el.textContent = `[${type}]`;
+      container.appendChild(el);
+      scrollStreamToBottom();
+      await fadeInWhole(el);
+    }
+
+    async function renderBlock(container, block) {
+      if (block.t === 'text') return renderTextBlock(container, block.md);
+      if (block.t === 'venueList') return renderVenueList(container);
+      return renderPlaceholder(container, block.t);
+    }
+
+    // ---- effects --------------------------------------------------------------
+    // setTimeout-driven (not requestAnimationFrame): rAF is fully suspended while
+    // a tab is backgrounded/hidden, which would leave the displayed number stuck
+    // at a stale value indefinitely; setTimeout is merely throttled, so it still
+    // converges on the correct final value.
+    function animateNumber(el, from, to, format) {
+      el.dataset.raw = to;
+      if (reducedMotion || from === to) { el.textContent = format(to); return; }
+      const start = Date.now();
+      const duration = 700;
+      const tick = () => {
+        const p = Math.min(1, (Date.now() - start) / duration);
+        el.textContent = format(Math.round(from + (to - from) * p));
+        if (p < 1) setTimeout(tick, 16);
+      };
+      tick();
+    }
+
+    const INTERSTITIAL_TEXT = {
+      sent: ['Messages sent.', '3 days later…'],
+      toured: ['Tour booked — Fri Oct 3, 3:00 pm.', 'Two weeks later…'],
+    };
+    async function showInterstitial(variant) {
+      const [line1, line2] = INTERSTITIAL_TEXT[variant] ?? ['', ''];
+      interstitialEl.innerHTML = '';
+      const l1 = document.createElement('div'); l1.className = 'line1'; l1.textContent = line1;
+      const l2 = document.createElement('div'); l2.className = 'line2'; l2.textContent = line2;
+      interstitialEl.append(l1, l2);
+      interstitialEl.hidden = false;
+      await wait(0);
+      interstitialEl.classList.add('show');
+      await wait(2200);
+      interstitialEl.classList.remove('show');
+      await wait(200);
+      interstitialEl.hidden = true;
+    }
+
+    function applyEffect(eff) {
+      switch (eff.e) {
+        case 'homeState':
+          state.homeState = eff.state;
+          homeEl.dataset.state = eff.state;
+          break;
+        case 'budget': {
+          const prevSpent = Number(chipSpentEl.dataset.raw ?? state.budget.spent);
+          const prevGoal = Number(chipGoalEl.dataset.raw ?? state.budget.goal);
+          if (eff.apply === 'package') state.budget = applyVenuePackage(state.budget);
+          else if (eff.apply === 'rebalance') state.budget = applyRebalance(state.budget);
+          else if (eff.apply === 'goal') state.budget = applyGoalIncrease(state.budget);
+          else if (eff.apply === 'book') state.budget = applyBooking(state.budget, state.venueRental ?? 7450);
+          animateNumber(chipSpentEl, prevSpent, state.budget.spent, fmtK);
+          animateNumber(chipGoalEl, prevGoal, state.budget.goal, fmtK);
+          break;
+        }
+        case 'negotiated':
+          state.venueRental = eff.venueRental;
+          break;
+        case 'stat': {
+          const prev = Number(statVendorsEl.dataset.raw ?? statVendorsEl.textContent);
+          animateNumber(statVendorsEl, prev, eff.value, String);
+          break;
+        }
+        case 'interstitial':
+          showInterstitial(eff.variant); // fire-and-forget; overlay blocks input meanwhile
+          break;
+      }
+    }
+
+    // ---- go() — the single entry point --------------------------------------
+    async function go(id, opts = {}) {
+      const beat = SCRIPT[id];
+      if (!beat) return;
+
+      if (!beat.thread) {
+        // home-type beat (home, home-responded): no chat thread to render
+        state.beat = id;
+        showHomeView();
+        return;
+      }
+
+      const already = getThread(beat.thread).rendered.has(id);
+      state.beat = id;
+      showThreadView();
+      threadTitleEl.textContent = beat.thread;
+      const t = showThreadContainer(beat.thread);
+
+      if (already) {
+        const node = t.beatNodes.get(id);
+        node?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+        renderChips(beat.chips ?? []);
+        applyPanel(beat.panel);
+        return;
+      }
+
+      t.rendered.add(id);
+      const wrap = document.createElement('div');
+      wrap.className = 'beat';
+      wrap.dataset.beatId = id;
+      t.el.appendChild(wrap);
+      t.beatNodes.set(id, wrap);
+
+      const userText = opts.userText ?? beat.userBubble;
+      if (userText) appendUserBubble(wrap, userText);
+
+      await showTyping(wrap);
+
+      for (const block of beat.blocks ?? []) {
+        await renderBlock(wrap, block);
+      }
+
+      renderChips(beat.chips ?? []);
+      applyPanel(beat.panel);
+      for (const eff of beat.effects ?? []) applyEffect(eff);
+
+      if (beat.autoGoto) {
+        await wait(600);
+        await go(beat.autoGoto);
+      }
+    }
+
+    // ---- fallback (typed input, no match) ------------------------------------
+    async function renderFallback(text) {
+      const current = SCRIPT[state.beat];
+      const threadName = current?.thread ?? '__fallback__';
+      showThreadView();
+      threadTitleEl.textContent = current?.thread ?? '';
+      const t = showThreadContainer(threadName);
+      const wrap = document.createElement('div');
+      wrap.className = 'beat beat-fallback';
+      t.el.appendChild(wrap);
+
+      appendUserBubble(wrap, text);
+      await showTyping(wrap);
+      await renderTextBlock(wrap, SCRIPT.fallback.blocks[0].md);
+      renderChips(current?.chips ?? []);
+      // state.beat intentionally left unchanged — fallback never changes it
+    }
+
+    function handleTypedInput(raw) {
+      const text = raw.trim();
+      if (!text) return;
+      const match = matchInput(text, state.beat);
+      if (match) go(match, { userText: text });
+      else renderFallback(text);
+    }
+
+    function wireAsk(el) {
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          const text = el.value;
+          el.value = '';
+          handleTypedInput(text);
+        }
+      });
+    }
+    wireAsk(askEl);
+    wireAsk(askThreadEl);
+
+    // ---- home entry points (suggestions + cards) ------------------------------
+    homeEl.addEventListener('click', e => {
+      const btn = e.target.closest('[data-goto]');
+      if (!btn) return;
+      const dest = btn.dataset.goto;
+      if (!dest) { showToast('This part of the concept isn’t built yet.'); return; }
+      go(dest);
+    });
+
+    // ---- back / restart ---------------------------------------------------
+    backBtn.addEventListener('click', () => {
+      state.beat = state.homeState === 'responded' ? 'home-responded' : 'home';
+      showHomeView();
+    });
+    restartBtn.addEventListener('click', () => {
+      state = freshState();
+      homeEl.dataset.state = 'fresh';
+      chipSpentEl.dataset.raw = String(state.budget.spent);
+      chipSpentEl.textContent = fmtK(state.budget.spent);
+      chipGoalEl.dataset.raw = String(state.budget.goal);
+      chipGoalEl.textContent = fmtK(state.budget.goal);
+      statVendorsEl.dataset.raw = '0';
+      statVendorsEl.textContent = '0';
+      applyPanel(null);
+      chipsEl.replaceChildren();
+      streamEl.replaceChildren();
+      showHomeView();
+    });
+
+    // ---- init -----------------------------------------------------------------
+    chipSpentEl.dataset.raw = String(state.budget.spent);
+    chipGoalEl.dataset.raw = String(state.budget.goal);
+    statVendorsEl.dataset.raw = '0';
+    homeEl.dataset.state = state.homeState;
+    showHomeView();
   </script>
 </body>
 </html>
