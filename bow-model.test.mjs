@@ -105,7 +105,7 @@ test('Act 1 copy pins', () => {
   assert.ok(SCRIPT['venue-results'].blocks[0].md.includes('**Saturday • Sept 20 2026**'));
   assert.equal(SCRIPT['venue-results'].userBubble, 'Tell me about the venues you found!');
   assert.ok(SCRIPT['accessibility-draft'].userBubble.startsWith(
-    "I don't see specific answers about wheelchair accessibility."));
+    'I don’t see specific answers about wheelchair accessibility.'));
   assert.ok(SCRIPT['accessibility-draft'].blocks[0].md.startsWith(
-    "Absolutely — here's a ready-to-send draft."));
+    'Absolutely — here’s a ready-to-send draft.'));
 });
