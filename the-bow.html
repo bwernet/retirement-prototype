@@ -895,6 +895,21 @@
     // chips render INTO the beat's wrap so they flow after the answer and
     // scroll with the conversation (author note 2026-07-17); earlier beats'
     // chips stay live in the scrollback — clicking one re-navigates.
+    // once a suggestion is chosen (or the user types instead) its guidance is
+    // spent — fade the group out so the choice reads as made (author 2026-07-17)
+    function dismissChipGroup(group) {
+      if (!group || group.dataset.dismissed) return;
+      group.dataset.dismissed = '1';
+      if (reducedMotion) { group.remove(); return; }
+      group.style.transition = 'opacity .2s ease, transform .2s ease';
+      group.style.opacity = '0';
+      group.style.transform = 'translateY(-4px)';
+      setTimeout(() => group.remove(), 200);
+    }
+    function dismissLiveChips() {
+      const groups = streamEl.querySelectorAll('.chips-inline:not([data-dismissed])');
+      if (groups.length) dismissChipGroup(groups[groups.length - 1]);
+    }
     function renderChips(chips, host) {
       if (!chips?.length || !host) return;
       const group = document.createElement('div');
@@ -906,7 +921,7 @@
         btn.className = 'chip';
         btn.type = 'button';
         btn.textContent = liveText(c.label);
-        btn.addEventListener('click', () => go(c.goto));
+        btn.addEventListener('click', () => { dismissChipGroup(group); go(c.goto); });
         group.appendChild(btn);
         if (reducedMotion) return;
         btn.style.opacity = '0';
@@ -2623,6 +2638,7 @@
     function handleTypedInput(raw) {
       const text = raw.trim();
       if (!text) return;
+      dismissLiveChips(); // typing is also a choice — retire the on-screen guidance
       const match = matchInput(text, state.beat);
       if (match) go(match, { userText: text });
       else renderFallback(text);
