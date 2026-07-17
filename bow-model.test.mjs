@@ -186,7 +186,7 @@ test('liveDates swaps every canonical fallback date', () => {
     ['September 20 2026', w.longNC],
     ['9/20/26', w.chip],
     ['Available Sept 20, 2026', `Available Sept ${w.day}, ${w.year}`],
-    ['Unavailable on September 20 — next open date: September 19, 2026', `Unavailable on September ${w.day} — next open date: ${w.fridayLong}`],
+    ['Unavailable Sept 20 · next open Sept 19', `Unavailable Sept ${w.day} · next open Sept ${w.day - 1}`],
     ['355 days away', `${w.daysToGo} days away`],
     ['Apr & Aug 2026', w.installments],
     ['besides the 20th?', `besides the ${w.dayOrd}?`],

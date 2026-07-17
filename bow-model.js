@@ -51,7 +51,7 @@ export const VENUES = [
     rainPlan: 'Retractable canopy system', replied: true, access: 'full',
     accessLabel: 'Full access',
     accessQuote: 'All guest areas — including the rooftop terrace, restrooms, and ballroom — are fully accessible. Elevators connect all floors, flooring is smooth and level, and accessible parking is adjacent to the main entrance. The rooftop canopy closes automatically during rain.',
-    availability: 'Unavailable on September 20 — next open date: September 19, 2026', photo: 'bluehorizon' },
+    availability: 'Unavailable Sept 20 · next open Sept 19', photo: 'bluehorizon' },
   { id: 'evergreen', name: 'Evergreen Point Estate', priceK: '$8.4 k', quote: 8400,
     blurb: 'manicured-lawn vows, 1930s mansion reception',
     fit: 'Garden vows with a grand 1930s mansion fallback if the weather turns.',
@@ -599,8 +599,6 @@ export function liveDates(s, w = WEDDING) {
   return s
     .replace(/Saturday • Sept 20 2026/g, `Saturday • ${w.story}`)
     .replace(/Sat · Sept 20 2026/g, `Sat · ${w.story}`)
-    .replace(/September 20 — next open date: September 19, 2026/g, `September ${w.day} — next open date: ${w.fridayLong}`)
-    .replace(/Unavailable on September 20\b/g, `Unavailable on September ${w.day}`)
     .replace(/September 20, 2026/g, w.long)
     .replace(/September 20 2026/g, w.longNC)
     .replace(/September 2026/g, `September ${w.year}`)
