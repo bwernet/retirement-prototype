@@ -181,6 +181,18 @@
   .venue-panel .thumb-grid img{width:100%;height:100%;object-fit:cover;border-radius:12px}
   .venue-panel .pill-blue{display:inline-flex;align-items:center;background:var(--chip-blue);color:var(--ink);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;margin-bottom:14px}
   .venue-panel h2{font-family:'Figtree';font-weight:800;font-size:32px;margin:0 0 8px;line-height:1.15}
+  /* ---- panel: full venue reply ---- */
+  .reply-panel .photo-placeholder{width:100%;height:180px;border-radius:12px;margin-bottom:16px}
+  .reply-panel h2{font-family:'Figtree';font-weight:800;font-size:26px;margin:0 0 8px;line-height:1.15}
+  .reply-panel h3{font-size:14px;font-weight:800;margin:22px 0 10px}
+  .reply-panel-quote{display:inline-flex;background:var(--chip-blue);color:var(--ink);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700;margin-bottom:16px}
+  .reply-panel-line{font-size:14px;line-height:1.55;margin-bottom:12px}
+  .reply-panel-quote-text{font-size:14px;line-height:1.6;color:var(--gray);font-style:italic;margin-bottom:14px}
+  .reply-panel-meta{display:flex;flex-direction:column;gap:8px}
+  .reply-panel-meta-row{display:flex;justify-content:space-between;gap:12px;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:8px}
+  .reply-panel-meta-row .k{color:var(--gray)}
+  .reply-panel-meta-row .v{font-weight:600;text-align:right}
+  .reply-panel .floorplan{margin-top:4px}
   .venue-panel .rating-row{font-size:14px;color:var(--gray);display:flex;align-items:center;gap:6px;margin-bottom:20px}
   .venue-panel .rating-row .star{color:var(--gold)}
   .venue-panel .rating-row .rv{color:var(--ink);font-weight:600}
@@ -1643,6 +1655,7 @@ const PHOTOS = {
       // else: chat beat, no panel — leave whatever's open as-is
     }
     let lastChipTrigger = null; // which header chip opened the current panel
+    let replyPanelVenue = null; // venue whose full reply the panel is showing
     function closePanel() {
       applyPanel(null);
       // return focus somewhere sensible: the thread input when the thread is
@@ -1650,7 +1663,7 @@ const PHOTOS = {
       if (!threadEl.hidden) askThreadEl.focus();
       else (lastChipTrigger ?? document.getElementById('chip-budget')).focus();
     }
-    const PANEL_LABELS = { venue: 'Venue details', composer: 'Compose message to venues', budget: 'Budget overview', location: 'Location', date: 'Wedding date', guests: 'Guest count' };
+    const PANEL_LABELS = { venue: 'Venue details', composer: 'Compose message to venues', budget: 'Budget overview', location: 'Location', date: 'Wedding date', guests: 'Guest count', reply: 'Full venue reply' };
     // ---- resizable panel (author request 2026-07-17) ----------------------
     // One persistent handle element; applyPanel re-appends it after clearing
     // the panel, so its listeners survive content swaps.
@@ -1748,6 +1761,7 @@ const PHOTOS = {
         else if (name === 'location') renderLocationPanel(body);
         else if (name === 'date') renderDatePanel(body);
         else if (name === 'guests') renderGuestsPanel(body);
+        else if (name === 'reply') renderReplyPanel(body);
 
         // move focus to the panel's heading (tabindex="-1" — not part of the
         // normal tab order, just a programmatic landing point). preventScroll
@@ -2760,35 +2774,62 @@ const PHOTOS = {
       });
       return svg;
     }
-    function openReplyModal(v, trigger) {
-      lastModalTrigger = trigger;
-      const overlay = document.createElement('div');
-      overlay.id = 'bow-reply-modal';
-      overlay.className = 'modal-overlay';
-      overlay.addEventListener('click', e => { if (e.target === overlay) closeReplyModal(); });
-      const card = document.createElement('div');
-      card.className = 'modal-card';
-      card.setAttribute('role', 'dialog');
-      card.setAttribute('aria-modal', 'true');
-      const h3 = document.createElement('h3');
-      h3.textContent = v.name;
-      card.appendChild(h3);
-      const q = document.createElement('p');
-      q.className = 'modal-quote';
-      q.textContent = v.accessQuote;
-      card.appendChild(q);
-      card.appendChild(buildFloorplanSvg());
-      const closeBtn = document.createElement('button');
-      closeBtn.type = 'button';
-      closeBtn.className = 'btn-outline';
-      closeBtn.textContent = 'Close';
-      closeBtn.addEventListener('click', closeReplyModal);
-      card.appendChild(closeBtn);
-      overlay.appendChild(card);
-      document.body.appendChild(overlay);
-      document.addEventListener('keydown', onModalKeydown);
-      closeBtn.focus();
+    // ---- panel: full venue reply (author 2026-07-17 — was a modal) ---------
+    function renderReplyPanel(container) {
+      container.classList.add('reply-panel');
+      const v = replyPanelVenue;
+      if (!v) return;
+      container.appendChild(makePhotoImg(v));
+
+      const h2 = document.createElement('h2');
+      h2.textContent = v.name;
+      container.appendChild(h2);
+
+      const quotePill = document.createElement('span');
+      quotePill.className = 'reply-panel-quote';
+      quotePill.textContent = `Quote: ${fmtMoney(v.quote)}`;
+      container.appendChild(quotePill);
+
+      const access = document.createElement('p');
+      access.className = 'reply-panel-line';
+      const al = document.createElement('strong');
+      al.textContent = 'Accessibility Overview: ';
+      access.appendChild(al);
+      access.appendChild(document.createTextNode(`${ACCESS_ICON[v.access] ?? ''} ${v.accessLabel}`));
+      container.appendChild(access);
+
+      const quote = document.createElement('p');
+      quote.className = 'reply-panel-quote-text';
+      quote.textContent = `“${v.accessQuote}”`;
+      container.appendChild(quote);
+
+      const avail = document.createElement('p');
+      avail.className = 'reply-panel-line';
+      const avl = document.createElement('strong');
+      avl.textContent = 'Availability: ';
+      avail.appendChild(avl);
+      avail.appendChild(document.createTextNode(liveText(v.availability)));
+      container.appendChild(avail);
+
+      const metaH = document.createElement('h3');
+      metaH.textContent = 'At a glance';
+      container.appendChild(metaH);
+      const meta = document.createElement('div');
+      meta.className = 'reply-panel-meta';
+      [['Capacity', `${v.capacity} guests`], ['Setting', v.setting], ['Rain plan', v.rainPlan]].forEach(([k, val]) => {
+        const row = document.createElement('div'); row.className = 'reply-panel-meta-row';
+        const key = document.createElement('span'); key.className = 'k'; key.textContent = k;
+        const value = document.createElement('span'); value.className = 'v'; value.textContent = val;
+        row.append(key, value); meta.appendChild(row);
+      });
+      container.appendChild(meta);
+
+      const fpH = document.createElement('h3');
+      fpH.textContent = 'Floor plan they shared';
+      container.appendChild(fpH);
+      container.appendChild(buildFloorplanSvg());
     }
+
 
     async function renderReplyCards(container) {
       const replied = VENUES.filter(v => v.replied);
@@ -2845,7 +2886,7 @@ const PHOTOS = {
         viewBtn.type = 'button';
         viewBtn.className = 'btn-outline';
         viewBtn.textContent = 'View full reply';
-        viewBtn.addEventListener('click', () => openReplyModal(v, viewBtn));
+        viewBtn.addEventListener('click', () => { replyPanelVenue = v; lastChipTrigger = viewBtn; applyPanel('reply'); });
         actions.appendChild(viewBtn);
 
         const holdBtn = document.createElement('button');
