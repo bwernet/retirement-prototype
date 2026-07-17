@@ -955,8 +955,8 @@
       setTimeout(() => group.remove(), 200);
     }
     function dismissLiveChips() {
-      const groups = streamEl.querySelectorAll('.chips-inline:not([data-dismissed])');
-      if (groups.length) dismissChipGroup(groups[groups.length - 1]);
+      // every navigation retires ALL on-screen guidance — nothing lingers
+      streamEl.querySelectorAll('.chips-inline:not([data-dismissed])').forEach(dismissChipGroup);
     }
     function renderChips(chips, host) {
       if (!chips?.length || !host) return;
@@ -1310,13 +1310,7 @@
       chip2.type = 'button';
       chip2.className = 'action-chip';
       chip2.textContent = 'Show me photos of ceremonies on the terrace';
-      chip2.addEventListener('click', () => {
-        if (otherChips.nextElementSibling?.classList.contains('panel-note')) return; // already shown
-        const noteEl = document.createElement('div');
-        noteEl.className = 'panel-note';
-        noteEl.textContent = "(Photo galleries aren't part of this concept — the venues' replies later include floor plans.)";
-        otherChips.insertAdjacentElement('afterend', noteEl);
-      });
+      chip2.addEventListener('click', () => showToast("Photo galleries aren't part of this concept — the venues' replies later include floor plans."));
       otherChips.append(chip1, chip2);
       container.appendChild(otherChips);
     }
@@ -2661,6 +2655,7 @@
 
       if (!beat.thread) {
         // home-type beat (home, home-responded): no chat thread to render
+        dismissLiveChips();
         state.beat = id;
         applyPanel(null); // returning to the dashboard closes any open panel
         showHomeView();
@@ -2673,6 +2668,7 @@
       const hasSlotsBlock = (beat.blocks ?? []).some(b => b.t === 'slots');
 
       const already = getThread(beat.thread).rendered.has(id);
+      if (!already) dismissLiveChips(); // fresh navigation retires prior guidance (revisit keeps its own)
       state.beat = id;
       showThreadView();
       threadTitleEl.textContent = beat.thread;
