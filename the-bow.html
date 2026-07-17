@@ -30,14 +30,14 @@
   .rail-item .label{font-size:11px;font-weight:500;letter-spacing:.01em}
   .rail-item[aria-current="page"]{position:relative}
   .rail-item[aria-current="page"] .icon-wrap{position:relative;display:flex;align-items:center;justify-content:center}
-  .rail-item[aria-current="page"] .icon-wrap::before{content:'';position:absolute;inset:-10px;border-radius:50%;background:radial-gradient(circle, rgba(255,62,180,.35) 0%, rgba(255,62,180,0) 70%);z-index:0}
+  .rail-item[aria-current="page"] .icon-wrap::before{content:'';position:absolute;inset:-10px;border-radius:50%;background:rgba(255,62,180,.14);z-index:0}
   .rail-item[aria-current="page"] svg{position:relative;z-index:1}
   .rail-item[aria-current="page"] .label{color:var(--pink-deep);font-weight:700}
   #rail .rail-bottom{display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:auto}
   .chat-btn{position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%}
   .chat-btn:hover{background:rgba(0,0,0,.04)}
   .chat-badge{position:absolute;top:-2px;right:-2px;background:var(--pink);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid var(--cream)}
-  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg, var(--pink) 0%, var(--label-blue) 100%);border:0;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;letter-spacing:.02em}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--pink);border:0;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;letter-spacing:.02em}
 
   /* ---- topbar ---- */
   #topbar{grid-row:1;grid-column:2;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 8px;background:var(--cream)}
@@ -60,9 +60,9 @@
   .stat .lbl{font-size:14px;color:var(--gray)}
   .chevron{color:var(--line);font-size:16px}
 
-  h1{font-family:'Figtree';font-weight:800;font-size:44px;line-height:1.1;letter-spacing:-.01em;text-align:center;margin-bottom:28px}
+  h1{font-family:'Figtree';font-weight:800;font-size:44px;line-height:1.1;letter-spacing:-.01em;text-align:left;margin-bottom:28px}
 
-  .askwrap{max-width:820px;margin:0 auto;border-radius:22px;padding:2px;background:linear-gradient(90deg, var(--pink) 0%, var(--label-blue) 100%)}
+  .askwrap{border-radius:22px;padding:2px;background:linear-gradient(90deg, var(--pink) 0%, var(--label-blue) 100%)}
   .askbox{background:#fff;border-radius:20px;padding:18px 20px 14px}
   #ask{width:100%;border:0;resize:none;font-size:17px;outline:none;font-family:'Figtree';background:transparent;min-height:26px}
   #ask::placeholder{color:#9B9B9B}
@@ -73,12 +73,24 @@
   .icon-btn:hover{background:rgba(0,0,0,.05)}
   .send-btn{width:36px;height:36px;border-radius:50%;background:#E5E1DA;display:flex;align-items:center;justify-content:center;color:#A6A29A}
 
-  .suggestions{max-width:820px;margin:0 auto;background:linear-gradient(135deg, rgba(255,62,180,.07) 0%, rgba(74,159,232,.07) 100%);border:1px solid var(--line);border-top:0;border-radius:0 0 20px 20px;overflow:hidden;margin-top:-8px;padding-top:8px}
+  /* suggestion rows only appear while the ask-anything field is focused (author note 2026-07-17) */
+  .suggestions{display:none;background:linear-gradient(135deg, rgba(255,62,180,.07) 0%, rgba(74,159,232,.07) 100%);border:1px solid var(--line);border-top:0;border-radius:0 0 20px 20px;overflow:hidden;margin-top:-8px;padding-top:8px}
+  #home[data-state="fresh"] .suggestions.open{display:block}
   .suggestion{display:flex;align-items:center;gap:12px;width:100%;padding:14px 22px;text-align:left;border-top:1px solid rgba(232,224,214,.6)}
   .suggestion:hover{background:rgba(255,255,255,.5)}
-  .suggestion .emoji{font-size:17px}
+  .suggestion .s-icon{display:flex;align-items:center}
   .suggestion .label{flex:1;font-size:16px}
   .suggestion .arrow{color:var(--gray);font-size:16px}
+
+  /* inline SVG icon system — no emoji as icons (author note 2026-07-17) */
+  .i{width:18px;height:18px;flex-shrink:0;vertical-align:-3px}
+  .i use{stroke-width:inherit}
+  .i-pink{color:var(--pink)}
+  .i-orange{color:#E88A00}
+  .i-blue{color:var(--label-blue)}
+  .i-red{color:#E0483E}
+  .hchip .i{width:15px;height:15px;vertical-align:-2px}
+  .stat .i{width:20px;height:20px;align-self:center}
 
   h2{font-family:'Figtree';font-weight:800;font-size:22px;margin:48px 0 20px}
 
@@ -179,7 +191,8 @@
   .budget-bar .seg-quoted{background:#F48FD0}
   .budget-bar .seg-planned{background:var(--pink-pale)}
   .budget-goal-marker{position:absolute;top:-22px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--gray);white-space:nowrap}
-  .budget-goal-marker .pig{font-size:14px}
+  .budget-goal-marker .pig{display:flex;align-items:center}
+  .budget-goal-marker .pig .i{width:14px;height:14px}
   .budget-goal-marker::after{content:'';position:absolute;bottom:-14px;width:2px;height:14px;background:var(--ink)}
   .budget-legend{display:flex;flex-wrap:wrap;gap:12px 18px;font-size:12px;color:var(--gray);margin-bottom:8px}
   .budget-legend .leg-item{display:flex;align-items:center;gap:6px}
@@ -344,6 +357,32 @@
 </style>
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-piggy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="11.5" cy="13" rx="8" ry="6.2"/><path d="M19.2 11.2c1.2.2 1.9 1 1.9 1.9 0 .9-.7 1.6-1.9 1.8"/><path d="M8.2 19v2M14.8 19v2"/><path d="M9.2 5.4 11 3.6l1.9 1.8"/><path d="M9.7 9.3h4.2"/><circle cx="16" cy="11.4" r=".4" fill="currentColor" stroke="none"/></g></symbol>
+      <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17"/><path d="M8 2.5v4M16 2.5v4"/></g></symbol>
+      <symbol id="i-people" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8.5" cy="8" r="3.2"/><path d="M2.8 20c0-3.4 2.5-5.6 5.7-5.6s5.7 2.2 5.7 5.6"/><circle cx="16.5" cy="8.6" r="2.6"/><path d="M15.4 14.6c2.9.2 5 2.2 5 5.1"/></g></symbol>
+      <symbol id="i-person" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="7.5" r="3.5"/><path d="M4.8 20.5c0-4 3.2-6.5 7.2-6.5s7.2 2.5 7.2 6.5"/></g></symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 21.2s-7-5.4-7-11.2a7 7 0 0 1 14 0c0 5.8-7 11.2-7 11.2z"/><circle cx="12" cy="9.8" r="2.6"/></g></symbol>
+      <symbol id="i-lamp" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.2 3.5h7.6l3.2 7.5H5l3.2-7.5z"/><path d="M12 11v7.5"/><path d="M7.5 20.5h9"/></g></symbol>
+      <symbol id="i-monitor" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="4.5" width="18" height="12.5" rx="1.8"/><path d="M9 20.5h6M12 17v3.5"/></g></symbol>
+      <symbol id="i-chat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.3 3.4a.4.4 0 0 1-.7-.3V16h1.5A2.5 2.5 0 0 1 4 13.5v-7z"/><circle cx="8.5" cy="10" r=".5" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r=".5" fill="currentColor" stroke="none"/><circle cx="15.5" cy="10" r=".5" fill="currentColor" stroke="none"/></g></symbol>
+      <symbol id="i-bank" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9.5 12 4l8.5 5.5"/><path d="M5.5 10v7.5M10 10v7.5M14 10v7.5M18.5 10v7.5"/><path d="M4 18h16M3 21h18"/></g></symbol>
+      <symbol id="i-sparkle" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.8l2 6.4 6.4 2-6.4 2-2 6.4-2-6.4-6.4-2 6.4-2 2-6.4z"/><path fill="currentColor" d="M19 15.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9.9-2.6z"/></symbol>
+      <symbol id="i-dollar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.7"/><path d="M12 6.8v10.4M14.8 9.1c-.5-1-1.6-1.5-2.8-1.5-1.5 0-2.7.9-2.7 2.1 0 1.3 1.1 1.8 2.7 2.1 1.6.3 2.9 1 2.9 2.3 0 1.3-1.3 2.2-2.9 2.2-1.3 0-2.4-.6-2.9-1.7"/></g></symbol>
+      <symbol id="i-pencil" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L15.6 5.4a2.05 2.05 0 0 1 2.9 2.9L7.9 19 4 20z"/><path d="M13.7 7.3l2.9 2.9"/></g></symbol>
+      <symbol id="i-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="6.8" width="18" height="13" rx="2"/><path d="M8.5 6.8l1.6-2.6h3.8l1.6 2.6"/><circle cx="12" cy="13" r="3.4"/></g></symbol>
+      <symbol id="i-video" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="2.8" y="6.8" width="12.6" height="10.4" rx="2"/><path d="M15.4 10.7 21 7.9v8.2l-5.6-2.8z"/></g></symbol>
+      <symbol id="i-flower" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="9.5" r="2"/><circle cx="12" cy="5.3" r="2.2"/><circle cx="8" cy="8.2" r="2.2"/><circle cx="9.5" cy="12.9" r="2.2"/><circle cx="14.5" cy="12.9" r="2.2"/><circle cx="16" cy="8.2" r="2.2"/><path d="M12 15.2V21m0 0c0-1.9 1.6-2.9 3.2-2.9M12 21c0-1.9-1.6-2.9-3.2-2.9"/></g></symbol>
+      <symbol id="i-disc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.7"/><circle cx="12" cy="12" r="2.1"/><path d="M17.5 12a5.5 5.5 0 0 0-5.5-5.5" stroke-linecap="round"/></g></symbol>
+      <symbol id="i-dress" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3l3 3.2L15 3"/><path d="M9 3v3.5L7.6 9.5l1.7 1.7L6.5 21h11l-2.8-9.8 1.7-1.7L15 6.5V3"/><path d="M7.6 9.5h8.8"/></g></symbol>
+      <symbol id="i-tux" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M11 12 4.5 8.6v6.8L11 12z"/><path d="M13 12l6.5-3.4v6.8L13 12z"/><rect x="10.4" y="10.2" width="3.2" height="3.6" rx=".8"/></g></symbol>
+      <symbol id="i-cake" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20.5v-6h14v6"/><path d="M3.5 20.5h17"/><path d="M7.5 14.5v-4h9v4"/><path d="M12 10.5V8"/><path d="M12 5.5v.01"/></g></symbol>
+      <symbol id="i-brush" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.8" y="11" width="6.4" height="9.5" rx="1"/><path d="M10.4 11V6c0-1.4 1-2.4 1.6-2.9.6.5 1.6 1.5 1.6 2.9v5"/></g></symbol>
+      <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M4 7.5l8 5.7 8-5.7"/></g></symbol>
+      <symbol id="i-send" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3.5 11.7 20.5 4l-3.7 15.5-5.6-5.6-7.7-2.2z"/><path d="M11.2 13.9 20.5 4"/></g></symbol>
+    </defs>
+  </svg>
   <nav id="rail" aria-label="Product areas">
     <button class="hamburger" aria-label="Menu">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2 5H18M2 10H18M2 15H18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -412,9 +451,9 @@
       </g>
     </svg>
     <div class="chips">
-      <span class="hchip">📅 9/20/26</span><span class="hchip">👥 125 guests</span>
-      <span class="hchip">📍 Columbus, OH</span>
-      <span class="hchip">🐷 <b id="chip-spent">$17.5k</b> <small>spent</small> | <b id="chip-goal">$40k</b> <small>budget</small></span>
+      <span class="hchip"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg> 9/20/26</span><span class="hchip"><svg class="i i-blue" aria-hidden="true"><use href="#i-people"/></svg> 125 guests</span>
+      <span class="hchip"><svg class="i i-red" aria-hidden="true"><use href="#i-pin"/></svg> Columbus, OH</span>
+      <span class="hchip"><svg class="i i-pink" aria-hidden="true"><use href="#i-piggy"/></svg> <b id="chip-spent">$17.5k</b> <small>spent</small> | <b id="chip-goal">$40k</b> <small>budget</small></span>
     </div>
   </header>
   <main id="canvas">
@@ -422,13 +461,13 @@
       <div class="inner">
         <p class="days">355 DAYS TO GO!</p>
         <div class="stats">
-          <span class="stat">🐷 <span class="val">$40k</span> <span class="lbl">budget</span></span>
+          <span class="stat"><svg class="i i-pink" aria-hidden="true"><use href="#i-piggy"/></svg> <span class="val">$40k</span> <span class="lbl">budget</span></span>
           <span class="chevron">›</span>
-          <span class="stat">🏮 <span class="val" id="stat-vendors">0</span> <span class="lbl">vendors saved</span></span>
+          <span class="stat"><svg class="i i-orange" aria-hidden="true"><use href="#i-lamp"/></svg> <span class="val" id="stat-vendors">0</span> <span class="lbl">vendors saved</span></span>
           <span class="chevron">›</span>
-          <span class="stat">🖥️ <span class="val">0</span> <span class="lbl">website visitors</span></span>
+          <span class="stat"><svg class="i" aria-hidden="true"><use href="#i-monitor"/></svg> <span class="val">0</span> <span class="lbl">website visitors</span></span>
           <span class="chevron">›</span>
-          <span class="stat">👤 <span class="val">0</span> <span class="lbl">attending</span></span>
+          <span class="stat"><svg class="i i-blue" aria-hidden="true"><use href="#i-person"/></svg> <span class="val">0</span> <span class="lbl">attending</span></span>
         </div>
         <h1>Hello Tony &amp; Carmella! What can I help with?</h1>
         <div class="askwrap">
@@ -452,9 +491,9 @@
           </div>
         </div>
         <div class="suggestions" data-when="fresh">
-          <button class="suggestion" data-goto="venue-results"><span class="emoji">🐷</span><span class="label">Find places in my budget I could save</span><span class="arrow">→</span></button>
-          <button class="suggestion" data-goto="venue-results"><span class="emoji">💬</span><span class="label">Summarize the (4) vendor responses I’ve gotten</span><span class="arrow">→</span></button>
-          <button class="suggestion" data-goto="venue-results"><span class="emoji">🏛️</span><span class="label">Find perfect venues still available for my wedding dates</span><span class="arrow">→</span></button>
+          <button class="suggestion" data-goto="venue-results"><span class="s-icon"><svg class="i i-pink" aria-hidden="true"><use href="#i-piggy"/></svg></span><span class="label">Find places in my budget I could save</span><span class="arrow">→</span></button>
+          <button class="suggestion" data-goto="venue-results"><span class="s-icon"><svg class="i" aria-hidden="true"><use href="#i-chat"/></svg></span><span class="label">Summarize the (4) vendor responses I’ve gotten</span><span class="arrow">→</span></button>
+          <button class="suggestion" data-goto="venue-results"><span class="s-icon"><svg class="i" aria-hidden="true"><use href="#i-bank"/></svg></span><span class="label">Find perfect venues still available for my wedding dates</span><span class="arrow">→</span></button>
         </div>
 
         <h2>Some things I’ve gathered for you while you were gone:</h2>
@@ -716,15 +755,33 @@
       }
     }
 
+    // ---- inline SVG icons (no emoji as icons — author note 2026-07-17) -------
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    function icon(name, cls) {
+      const svg = document.createElementNS(SVG_NS, 'svg');
+      svg.setAttribute('class', 'i' + (cls ? ' ' + cls : ''));
+      svg.setAttribute('aria-hidden', 'true');
+      const use = document.createElementNS(SVG_NS, 'use');
+      use.setAttribute('href', '#i-' + name);
+      svg.appendChild(use);
+      return svg;
+    }
+    // budget item icons keyed by label (bow-model's emoji field is not rendered)
+    const ITEM_ICONS = {
+      'Photographer': 'camera', 'Videographer': 'video', 'Florist': 'flower',
+      'DJ': 'disc', 'Wedding dress': 'dress', 'Tuxedo or suit': 'tux',
+      'Cake & desserts': 'cake', 'Hair & makeup': 'brush', 'Stationery': 'mail',
+    };
+
     // ---- panel content helper: [Token] substitution as pills -----------------
-    function appendTextWithPill(parent, text, token, icon, pillLabel) {
+    function appendTextWithPill(parent, text, token, iconName, pillLabel) {
       const parts = text.split(token);
       parts.forEach((part, i) => {
         if (part) parent.appendChild(document.createTextNode(part));
         if (i < parts.length - 1) {
           const pill = document.createElement('span');
           pill.className = 'token-pill';
-          pill.textContent = `${icon} ${pillLabel}`;
+          pill.append(icon(iconName), ' ' + pillLabel);
           parent.appendChild(pill);
         }
       });
@@ -769,12 +826,12 @@
       const star = document.createElement('span'); star.className = 'star'; star.textContent = '★';
       const rv = document.createElement('span'); rv.className = 'rv'; rv.textContent = String(v.rating);
       const u = document.createElement('u'); u.textContent = `${v.reviews} reviews`;
-      ratingRow.append(star, rv, document.createTextNode(' '), u, document.createTextNode(' · 📍 Columbus, OH'));
+      ratingRow.append(star, rv, document.createTextNode(' '), u, document.createTextNode(' · '), icon('pin', 'i-red'), document.createTextNode(' Columbus, OH'));
       container.appendChild(ratingRow);
 
       const caps = document.createElement('div');
       caps.className = 'quote-caps';
-      caps.textContent = '✨ PERSONALIZED QUOTE';
+      caps.append(icon('sparkle'), ' PERSONALIZED QUOTE');
       container.appendChild(caps);
 
       const quoteRow = document.createElement('div');
@@ -783,12 +840,12 @@
       const amtStrong = document.createElement('strong');
       amtStrong.className = 'amt';
       amtStrong.textContent = fmtMoney(v.quote);
-      priceSpan.append('💲 ', amtStrong, ' Quoted Price');
+      priceSpan.append(icon('dollar'), ' ', amtStrong, ' Quoted Price');
       const note = document.createElement('span');
       note.className = 'quote-note';
       note.textContent = '(Quote details unlock after the venues reply.)';
       const guests = document.createElement('span');
-      guests.textContent = '👥 101-150 guests';
+      guests.append(icon('people', 'i-blue'), ' 101-150 guests');
       quoteRow.append(priceSpan, note, guests);
       container.appendChild(quoteRow);
 
@@ -804,7 +861,7 @@
       perfectCard.className = 'perfect-card';
       const perfectTitle = document.createElement('span');
       perfectTitle.className = 'title';
-      perfectTitle.textContent = "✨ Why it's perfect:";
+      perfectTitle.append(icon('sparkle', 'i-pink'), " Why it's perfect:");
       perfectCard.appendChild(perfectTitle);
       const ul = document.createElement('ul');
       const bullets = [
@@ -861,16 +918,16 @@
       const subjLabel = document.createElement('strong');
       subjLabel.textContent = 'Subject: ';
       subjectEl.appendChild(subjLabel);
-      appendTextWithPill(subjectEl, COMPOSER.subject, '[Venue Name]', '🏛️', 'Venue Name');
+      appendTextWithPill(subjectEl, COMPOSER.subject, '[Venue Name]', 'bank', 'Venue Name');
       container.appendChild(subjectEl);
 
       const greetEl = document.createElement('div');
       greetEl.className = 'greeting-line';
-      appendTextWithPill(greetEl, COMPOSER.greeting, '[Coordinator First Name]', '👤', 'Coordinator First Name');
+      appendTextWithPill(greetEl, COMPOSER.greeting, '[Coordinator First Name]', 'person', 'Coordinator First Name');
       container.appendChild(greetEl);
 
       const p0 = document.createElement('p');
-      appendTextWithPill(p0, COMPOSER.body[0], '[Venue Name]', '🏛️', 'Venue Name');
+      appendTextWithPill(p0, COMPOSER.body[0], '[Venue Name]', 'bank', 'Venue Name');
       container.appendChild(p0);
 
       const ol = document.createElement('ol');
@@ -939,7 +996,8 @@
           }
           chipsWrap.appendChild(chip);
         });
-        sendBtn.textContent = `➤ Message (${state.composerRecipients.length}) venues`;
+        sendBtn.textContent = '';
+        sendBtn.append(icon('send'), ` Message (${state.composerRecipients.length}) venues`);
       }
       renderRecipients();
       window.__bowRecipients = state.composerRecipients.length;
@@ -965,11 +1023,11 @@
       items.forEach(item => {
         const card = document.createElement('div');
         card.className = 'budget-item-card';
-        const icon = document.createElement('span'); icon.className = 'bi-icon'; icon.textContent = item.icon;
+        const iconWrap = document.createElement('span'); iconWrap.className = 'bi-icon'; iconWrap.appendChild(icon(ITEM_ICONS[item.label] ?? 'sparkle'));
         const label = document.createElement('span'); label.className = 'bi-label'; label.textContent = item.label;
         const amt = animatedAmount('item-' + item.label, item.amount, 'span', 'bi-amt');
         const chev = document.createElement('span'); chev.className = 'bi-chevron'; chev.textContent = '›';
-        card.append(icon, label, amt, chev);
+        card.append(iconWrap, label, amt, chev);
         grid.appendChild(card);
       });
       return grid;
@@ -1009,7 +1067,7 @@
 
       const meta = document.createElement('div');
       meta.className = 'budget-meta-row';
-      meta.textContent = '📅 9/20/26 · 👥 125 guests · 📍 Columbus, OH';
+      meta.append(icon('cal'), ' 9/20/26 · ', icon('people', 'i-blue'), ' 125 guests · ', icon('pin', 'i-red'), ' Columbus, OH');
       container.appendChild(meta);
 
       const figures = document.createElement('div');
@@ -1020,7 +1078,7 @@
       goalFig.appendChild(animatedAmount('goal', goal, 'span', 'fig-amt'));
       const goalLbl = document.createElement('span');
       goalLbl.className = 'fig-label';
-      goalLbl.textContent = '🐷 Goal budget ✏️';
+      goalLbl.append(icon('piggy', 'i-pink'), ' Goal budget ', icon('pencil'));
       goalFig.appendChild(goalLbl);
       figures.appendChild(goalFig);
 
@@ -1049,7 +1107,7 @@
       const marker = document.createElement('div');
       marker.className = 'budget-goal-marker';
       marker.style.left = goalPct + '%';
-      const pig = document.createElement('span'); pig.className = 'pig'; pig.textContent = '🐷';
+      const pig = document.createElement('span'); pig.className = 'pig'; pig.appendChild(icon('piggy', 'i-pink'));
       const tag = document.createElement('span'); tag.textContent = fmtK(goal);
       marker.append(pig, tag);
       barWrap.appendChild(marker);
@@ -1082,7 +1140,7 @@
       container.appendChild(legend);
 
       const itemsH3 = document.createElement('h3');
-      itemsH3.textContent = 'My budget items ✏️';
+      itemsH3.append('My budget items ', icon('pencil'));
       container.appendChild(itemsH3);
 
       const booked = b.items.filter(i => i.status === 'booked');
@@ -1230,7 +1288,7 @@
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'action-chip';
-        btn.textContent = '✨ Tell me more';
+        btn.append(icon('sparkle', 'i-pink'), ' Tell me more');
         if (v.id === 'willow') {
           btn.addEventListener('click', () => go('willow-detail'));
         } else {
@@ -1510,7 +1568,7 @@
       subject.appendChild(document.createTextNode(before));
       const pill = document.createElement('span');
       pill.className = 'token-pill';
-      pill.textContent = '🏛️ Venue Name';
+      pill.append(icon('bank'), ' Venue Name');
       subject.appendChild(pill);
       if (after) subject.appendChild(document.createTextNode(after));
       card.appendChild(subject);
@@ -1929,7 +1987,21 @@
       if (!btn) return;
       const dest = btn.dataset.goto;
       if (!dest) { showToast('This part of the concept isn’t built yet.'); return; }
+      suggestionsEl.classList.remove('open');
       go(dest);
+    });
+
+    // suggestion rows only while the ask field is focused (author note 2026-07-17)
+    const suggestionsEl = document.querySelector('.suggestions');
+    askEl.addEventListener('focus', () => suggestionsEl.classList.add('open'));
+    document.querySelector('#home .askwrap').addEventListener('mousedown', () => suggestionsEl.classList.add('open'));
+    document.addEventListener('mousedown', e => {
+      if (!e.target.closest('#home .askwrap') && !e.target.closest('.suggestions')) {
+        suggestionsEl.classList.remove('open');
+      }
+    });
+    askEl.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { suggestionsEl.classList.remove('open'); askEl.blur(); }
     });
 
     // ---- back / restart ---------------------------------------------------
@@ -1948,6 +2020,7 @@
       interstitialEl.classList.remove('show');
       interstitialEl.hidden = true;
       document.querySelector('.chat-badge')?.classList.remove('pulse');
+      suggestionsEl.classList.remove('open');
       // cancel an in-flight finale bow redraw: clearing the inline styles with
       // transition:'none' snaps the wordmark back to its resting state instantly;
       // playWordmarkRedraw() re-sets all of these from scratch on the next run
