@@ -1948,6 +1948,14 @@
       interstitialEl.classList.remove('show');
       interstitialEl.hidden = true;
       document.querySelector('.chat-badge')?.classList.remove('pulse');
+      // cancel an in-flight finale bow redraw: clearing the inline styles with
+      // transition:'none' snaps the wordmark back to its resting state instantly;
+      // playWordmarkRedraw() re-sets all of these from scratch on the next run
+      document.querySelectorAll('#wordmark g path').forEach(p => {
+        p.style.transition = 'none';
+        p.style.strokeDasharray = '';
+        p.style.strokeDashoffset = '';
+      });
       state = freshState();
       window.__bowRecipients = state.composerRecipients.length;
       prevBudgetAmounts = {};
