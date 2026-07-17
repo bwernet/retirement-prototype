@@ -470,8 +470,15 @@ export const SCRIPT = {
   },
 };
 
+// Non-content words never score on their own — beats like hold-willow carry
+// "hold the date" in their match keys, and without this filter a stray "the"
+// in any input would count as a hit. Phrase-bonus matching below still sees
+// the full raw text, so multi-word keys like "tell me about" keep working.
+const MATCH_STOPWORDS = new Set(['the', 'and', 'for', 'you', 'your', 'what', 'whats', 'with', 'like']);
+
 export function matchInput(text, currentBeatId) {
-  const words = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').split(/\s+/).filter(w => w.length > 2);
+  const words = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').split(/\s+/)
+    .filter(w => w.length > 2 && !MATCH_STOPWORDS.has(w));
   if (!words.length) return null;
   // Direct chip targets only: the whole graph is reachable from home, so a
   // wider net would let "book willow shore lodge" skip the entire story.
@@ -484,7 +491,7 @@ export function matchInput(text, currentBeatId) {
     for (const w of words) if (keys.includes(w)) score++;
     // phrase bonus: multi-word match keys that appear whole in the input
     for (const k of SCRIPT[id].match ?? []) {
-      if (k.includes(' ') && text.toLowerCase().includes(k)) score += 2;
+      if (k.includes(' ') && text.toLowerCase().includes(k.toLowerCase())) score += 2;
     }
     if (score > bestScore) { bestScore = score; best = id; }
   }

@@ -143,4 +143,7 @@ test('matcher', () => {
   assert.equal(matchInput('xyzzy plugh', 'home'), null);
   // never returns an unreachable beat: booking flow not reachable from home
   assert.equal(matchInput('book willow shore lodge', 'home'), null);
+  // regression: stopwords alone must not score ("the" appears in hold-willow's
+  // "hold the date" match key and used to count as a hit)
+  assert.equal(matchInput("what's the weather like", 'recommendation'), null);
 });
