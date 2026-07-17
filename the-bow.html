@@ -1011,7 +1011,7 @@
       'Photographer': 'camera', 'Videographer': 'video', 'Florist': 'flower',
       'DJ': 'disc', 'Wedding dress': 'dress', 'Tuxedo or suit': 'tux',
       'Cake & desserts': 'cake', 'Hair & makeup': 'brush', 'Stationery': 'mail',
-      'Venue & catering (estimate)': 'bank',
+      'Venue & catering': 'bank',
     };
 
     // ---- panel content helper: [Token] substitution as pills -----------------
@@ -1486,8 +1486,14 @@
       const planned = b.items.filter(i => i.status === 'planned');
 
       const bookedHead = document.createElement('div');
-      bookedHead.className = 'budget-section-head';
-      bookedHead.textContent = `Booked (${booked.length})`;
+      bookedHead.className = 'budget-section-head remaining-head';
+      const bookedTitle = document.createElement('span');
+      bookedTitle.textContent = `Booked (${booked.length})`;
+      const bookedAmtWrap = document.createElement('span');
+      bookedAmtWrap.className = 'remaining-amt';
+      bookedAmtWrap.appendChild(animatedAmount('booked-total', bookedAmt, 'strong'));
+      bookedAmtWrap.appendChild(document.createTextNode(' Booked total'));
+      bookedHead.append(bookedTitle, bookedAmtWrap);
       container.appendChild(bookedHead);
       container.appendChild(buildBudgetItemsGrid(booked));
 

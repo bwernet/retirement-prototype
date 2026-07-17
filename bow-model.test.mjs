@@ -44,7 +44,7 @@ test('initial budget: committed 17,500 exactly', () => {
 test('venue package: projected 51,300, over 11,300', () => {
   const b = applyVenuePackage(initialBudget());
   assert.equal(b.quoted.reduce((s, i) => s + i.amount, 0), 27300);
-  assert.ok(!b.items.some(i => i.label === 'Venue & catering (estimate)'),
+  assert.ok(!b.items.some(i => i.label === 'Venue & catering'),
     'the quoted actuals must replace the pre-quote estimate line');
   assert.equal(b.projected, 51300); // 38,000 − 14,000 estimate + 27,300 quoted
   assert.equal(b.projected - b.goal, 11300);
