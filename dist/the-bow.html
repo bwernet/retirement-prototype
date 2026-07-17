@@ -377,10 +377,11 @@
   .carousel-track{display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;padding:4px 44px 8px 2px;scrollbar-width:none}
   .carousel-track::-webkit-scrollbar{display:none}
   .carousel-card{flex:0 0 232px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,box-shadow .15s}
-  /* the agent's per-venue insight — tinted + sparkled so it reads as the
-     agent's note, distinct from standard listing metadata */
-  .card-insight{display:flex;align-items:flex-start;gap:6px;background:#FDEEF7;border-radius:8px;padding:6px 8px;font-size:12px;line-height:1.4;color:var(--ink)}
-  .card-insight .i{width:13px;height:13px;flex-shrink:0;margin-top:1px}
+  /* the agent's per-venue insight — sparkle + ink text, no nested box:
+     the glyph and weight distinguish it from the gray metadata line */
+  .card-insight{display:flex;align-items:flex-start;gap:6px;font-size:12.5px;line-height:1.45;color:var(--ink);font-weight:500}
+  .card-insight .i{width:13px;height:13px;flex-shrink:0;margin-top:2px}
+  .card-meta .star{color:var(--gold)}
   .carousel-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
   .carousel-card .photo-wrap{position:relative}
   .carousel-card .photo-placeholder{width:100%;height:130px;border-radius:0}
@@ -932,8 +933,10 @@ const SCRIPT = {
   'willow-detail': {
     thread: 'Accessible lake-view venues with indoor backup',
     userBubble: 'Tell me more about Willow Shore Lodge',
-    blocks: [{ t: 'text', md: 'Here’s the full picture on Willow Shore Lodge — I’ve opened it alongside so you can dig in.' }],
-    panel: 'venue',
+    // author round 2026-07-17: 'tell me more' is an explicit ask for why this
+    // fits THEM — answered in chat; opening the card is free exploration and
+    // opens the side panel instead. The two never happen at once.
+    blocks: [{ t: 'text', md: 'Here’s why it stood out for you:\n\n• Your must-have indoor backup, solved — the terrace’s glass-walled ballroom keeps the lake in view, rain or shine\n• Seats 150 comfortably, so your whole list fits without rentals\n• **$7,200** quoted — $1,800 under your venue cap\n• BYO bar allowed, which keeps beverage costs in your control\n\nI’m holding **Sat · Sept 20 2026** with a 72-hour courtesy hold. Tap its card whenever you want the full profile.' }],
     chips: [
       { label: 'What Saturdays in September 2026 are still open besides the 20th?', goto: 'willow-saturdays' }, // PIN
       { label: 'I don’t see answers about wheelchair accessibility — ask all 5 venues', goto: 'accessibility-draft' },
@@ -945,7 +948,6 @@ const SCRIPT = {
     thread: 'Accessible lake-view venues with indoor backup',
     userBubble: 'What Saturdays in September 2026 are still open besides the 20th?', // PIN
     blocks: [{ t: 'text', md: 'Willow Shore’s calendar shows two other open Saturdays that month: **Sept 5** and **Sept 26**. The 12th is booked and the 19th just went to a courtesy hold. Your 72-hour hold on the 20th is still active — want me to keep it?' }],
-    panel: 'venue',
     chips: [
       { label: 'Keep my hold on the 20th', goto: 'accessibility-nudge' },
       { label: 'Ask all five about wheelchair accessibility', goto: 'accessibility-draft' },
@@ -956,7 +958,6 @@ const SCRIPT = {
   'accessibility-nudge': {
     thread: 'Accessible lake-view venues with indoor backup',
     blocks: [{ t: 'text', md: 'Done — the hold on **Sat · Sept 20 2026** stays active. One thing I noticed: none of the five listings answer your wheelchair-accessibility questions directly. Want me to ask all of them at once?' }],
-    panel: 'venue',
     chips: [{ label: 'Yes — draft a message to all 5', goto: 'accessibility-draft' }],
     match: ['keep', 'hold'],
   },
@@ -1327,6 +1328,7 @@ function computeWedding(now = new Date()) {
     fridayLong: `September ${day - 1}, ${year}`,
     altOpen1: `Sept ${day - 14}`, altOpen2: `Sept ${day + 7}`,
     bookedOrd: ordinal(day - 7), holdOrd: ordinal(day - 1),
+    dayOrd: ordinal(day),
     tourFri: slot(fri), tourSat: slot(new Date(fri.getTime() + DAY_MS)), tourSun: slot(new Date(fri.getTime() + 2 * DAY_MS)),
     installments: inst,
   };
@@ -1352,6 +1354,8 @@ function liveDates(s, w = WEDDING) {
     .replace(/The 12th is booked and the 19th just went to a courtesy hold/g, `The ${w.bookedOrd} is booked and the ${w.holdOrd} just went to a courtesy hold`)
     .replace(/\*\*Friday, September 19\*\*/g, `**Friday, September ${w.day - 1}**`)
     .replace(/Friday the 19th/g, `Friday the ${w.holdOrd}`)
+    .replace(/besides the 20th/g, `besides the ${w.dayOrd}`)
+    .replace(/hold on the 20th/g, `hold on the ${w.dayOrd}`)
     .replace(/Fri Sept 19/g, `Fri Sept ${w.day - 1}`)
     .replace(/Fri Oct 3/g, w.tourFri)
     .replace(/Sat Oct 4/g, w.tourSat)
@@ -2537,7 +2541,9 @@ const PHOTOS = {
         card.setAttribute('role', 'button');
         card.setAttribute('aria-label', `Open ${v.name}`);
         const openCard = () => {
-          if (v.id === 'willow') go('willow-detail');
+          // free exploration — panel only, no agent message ('Tell me more'
+          // is the explicit ask and stays in chat; author round 2026-07-17)
+          if (v.id === 'willow') { lastChipTrigger = card; applyPanel('venue'); }
           else showToast('In this concept, Willow Shore Lodge is the deep-dive.');
         };
         card.addEventListener('click', openCard);
@@ -2563,15 +2569,12 @@ const PHOTOS = {
         insightText.textContent = v.blurb;
         insight.append(icon('sparkle', 'i-pink'), insightText);
         body.appendChild(insight);
-        body.appendChild(makeRatingLine(v));
-        const loc = document.createElement('div');
-        loc.className = 'card-meta';
-        loc.textContent = 'Columbus, OH';
-        body.appendChild(loc);
-        const cap = document.createElement('div');
-        cap.className = 'card-meta';
-        cap.textContent = `${v.capacity} guests max · ${v.priceK}`;
-        body.appendChild(cap);
+        const meta = document.createElement('div');
+        meta.className = 'card-meta';
+        const star = document.createElement('span'); star.className = 'star'; star.textContent = '★';
+        const rv = document.createElement('b'); rv.textContent = String(v.rating);
+        meta.append(star, ' ', rv, ` (${v.reviews}) · ${v.capacity} guests · ${v.priceK}`);
+        body.appendChild(meta);
         card.appendChild(body);
         track.appendChild(card);
       });

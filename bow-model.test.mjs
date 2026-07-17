@@ -189,6 +189,8 @@ test('liveDates swaps every canonical fallback date', () => {
     ['Unavailable on September 20 — next open date: September 19, 2026', `Unavailable on September ${w.day} — next open date: ${w.fridayLong}`],
     ['355 days away', `${w.daysToGo} days away`],
     ['Apr & Aug 2026', w.installments],
+    ['besides the 20th?', `besides the ${w.dayOrd}?`],
+    ['Keep my hold on the 20th', `Keep my hold on the ${w.dayOrd}`],
   ];
   for (const [src, expect] of swaps) assert.equal(liveDates(src, w), expect, src);
   // untouched copy passes through

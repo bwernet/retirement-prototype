@@ -374,10 +374,11 @@
   .carousel-track{display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;padding:4px 44px 8px 2px;scrollbar-width:none}
   .carousel-track::-webkit-scrollbar{display:none}
   .carousel-card{flex:0 0 232px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,box-shadow .15s}
-  /* the agent's per-venue insight — tinted + sparkled so it reads as the
-     agent's note, distinct from standard listing metadata */
-  .card-insight{display:flex;align-items:flex-start;gap:6px;background:#FDEEF7;border-radius:8px;padding:6px 8px;font-size:12px;line-height:1.4;color:var(--ink)}
-  .card-insight .i{width:13px;height:13px;flex-shrink:0;margin-top:1px}
+  /* the agent's per-venue insight — sparkle + ink text, no nested box:
+     the glyph and weight distinguish it from the gray metadata line */
+  .card-insight{display:flex;align-items:flex-start;gap:6px;font-size:12.5px;line-height:1.45;color:var(--ink);font-weight:500}
+  .card-insight .i{width:13px;height:13px;flex-shrink:0;margin-top:2px}
+  .card-meta .star{color:var(--gold)}
   .carousel-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
   .carousel-card .photo-wrap{position:relative}
   .carousel-card .photo-placeholder{width:100%;height:130px;border-radius:0}
@@ -1891,7 +1892,9 @@
         card.setAttribute('role', 'button');
         card.setAttribute('aria-label', `Open ${v.name}`);
         const openCard = () => {
-          if (v.id === 'willow') go('willow-detail');
+          // free exploration — panel only, no agent message ('Tell me more'
+          // is the explicit ask and stays in chat; author round 2026-07-17)
+          if (v.id === 'willow') { lastChipTrigger = card; applyPanel('venue'); }
           else showToast('In this concept, Willow Shore Lodge is the deep-dive.');
         };
         card.addEventListener('click', openCard);
@@ -1917,15 +1920,12 @@
         insightText.textContent = v.blurb;
         insight.append(icon('sparkle', 'i-pink'), insightText);
         body.appendChild(insight);
-        body.appendChild(makeRatingLine(v));
-        const loc = document.createElement('div');
-        loc.className = 'card-meta';
-        loc.textContent = 'Columbus, OH';
-        body.appendChild(loc);
-        const cap = document.createElement('div');
-        cap.className = 'card-meta';
-        cap.textContent = `${v.capacity} guests max · ${v.priceK}`;
-        body.appendChild(cap);
+        const meta = document.createElement('div');
+        meta.className = 'card-meta';
+        const star = document.createElement('span'); star.className = 'star'; star.textContent = '★';
+        const rv = document.createElement('b'); rv.textContent = String(v.rating);
+        meta.append(star, ' ', rv, ` (${v.reviews}) · ${v.capacity} guests · ${v.priceK}`);
+        body.appendChild(meta);
         card.appendChild(body);
         track.appendChild(card);
       });

@@ -182,8 +182,10 @@ export const SCRIPT = {
   'willow-detail': {
     thread: 'Accessible lake-view venues with indoor backup',
     userBubble: 'Tell me more about Willow Shore Lodge',
-    blocks: [{ t: 'text', md: 'Here’s the full picture on Willow Shore Lodge — I’ve opened it alongside so you can dig in.' }],
-    panel: 'venue',
+    // author round 2026-07-17: 'tell me more' is an explicit ask for why this
+    // fits THEM — answered in chat; opening the card is free exploration and
+    // opens the side panel instead. The two never happen at once.
+    blocks: [{ t: 'text', md: 'Here’s why it stood out for you:\n\n• Your must-have indoor backup, solved — the terrace’s glass-walled ballroom keeps the lake in view, rain or shine\n• Seats 150 comfortably, so your whole list fits without rentals\n• **$7,200** quoted — $1,800 under your venue cap\n• BYO bar allowed, which keeps beverage costs in your control\n\nI’m holding **Sat · Sept 20 2026** with a 72-hour courtesy hold. Tap its card whenever you want the full profile.' }],
     chips: [
       { label: 'What Saturdays in September 2026 are still open besides the 20th?', goto: 'willow-saturdays' }, // PIN
       { label: 'I don’t see answers about wheelchair accessibility — ask all 5 venues', goto: 'accessibility-draft' },
@@ -195,7 +197,6 @@ export const SCRIPT = {
     thread: 'Accessible lake-view venues with indoor backup',
     userBubble: 'What Saturdays in September 2026 are still open besides the 20th?', // PIN
     blocks: [{ t: 'text', md: 'Willow Shore’s calendar shows two other open Saturdays that month: **Sept 5** and **Sept 26**. The 12th is booked and the 19th just went to a courtesy hold. Your 72-hour hold on the 20th is still active — want me to keep it?' }],
-    panel: 'venue',
     chips: [
       { label: 'Keep my hold on the 20th', goto: 'accessibility-nudge' },
       { label: 'Ask all five about wheelchair accessibility', goto: 'accessibility-draft' },
@@ -206,7 +207,6 @@ export const SCRIPT = {
   'accessibility-nudge': {
     thread: 'Accessible lake-view venues with indoor backup',
     blocks: [{ t: 'text', md: 'Done — the hold on **Sat · Sept 20 2026** stays active. One thing I noticed: none of the five listings answer your wheelchair-accessibility questions directly. Want me to ask all of them at once?' }],
-    panel: 'venue',
     chips: [{ label: 'Yes — draft a message to all 5', goto: 'accessibility-draft' }],
     match: ['keep', 'hold'],
   },
@@ -577,6 +577,7 @@ export function computeWedding(now = new Date()) {
     fridayLong: `September ${day - 1}, ${year}`,
     altOpen1: `Sept ${day - 14}`, altOpen2: `Sept ${day + 7}`,
     bookedOrd: ordinal(day - 7), holdOrd: ordinal(day - 1),
+    dayOrd: ordinal(day),
     tourFri: slot(fri), tourSat: slot(new Date(fri.getTime() + DAY_MS)), tourSun: slot(new Date(fri.getTime() + 2 * DAY_MS)),
     installments: inst,
   };
@@ -602,6 +603,8 @@ export function liveDates(s, w = WEDDING) {
     .replace(/The 12th is booked and the 19th just went to a courtesy hold/g, `The ${w.bookedOrd} is booked and the ${w.holdOrd} just went to a courtesy hold`)
     .replace(/\*\*Friday, September 19\*\*/g, `**Friday, September ${w.day - 1}**`)
     .replace(/Friday the 19th/g, `Friday the ${w.holdOrd}`)
+    .replace(/besides the 20th/g, `besides the ${w.dayOrd}`)
+    .replace(/hold on the 20th/g, `hold on the ${w.dayOrd}`)
     .replace(/Fri Sept 19/g, `Fri Sept ${w.day - 1}`)
     .replace(/Fri Oct 3/g, w.tourFri)
     .replace(/Sat Oct 4/g, w.tourSat)
