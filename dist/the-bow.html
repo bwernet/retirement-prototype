@@ -1609,6 +1609,14 @@ const PHOTOS = {
       if (e.key === 'Escape') { closePanel(); return; }
       trapTabKey(e, panelEl);
     }
+    // panel policy on navigation (author 2026-07-17): an explicit beat.panel
+    // opens/switches; returning to the home dashboard closes it; a chat beat
+    // with no panel LEAVES an open panel untouched — chat + panel coexist.
+    function applyPanelForBeat(beat) {
+      if (beat.panel) applyPanel(beat.panel);
+      else if (!beat.thread) applyPanel(null);
+      // else: chat beat, no panel — leave whatever's open as-is
+    }
     let lastChipTrigger = null; // which header chip opened the current panel
     function closePanel() {
       applyPanel(null);
@@ -3204,7 +3212,7 @@ const PHOTOS = {
         const node = t.beatNodes.get(id);
         node?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
         // chips are already inline in the transcript node — nothing to redo
-        applyPanel(beat.panel);
+        applyPanelForBeat(beat);
         // if this beat's autoGoto tail was invalidated before its target rendered
         // (e.g. Restart/Back mid-chain), re-follow it so the story can't dead-end
         if (beat.autoGoto && !isRendered(beat.autoGoto)) {
@@ -3256,7 +3264,7 @@ const PHOTOS = {
       // renders, or a first-time visit to a panel beat (budget-added, rebalance,
       // goal-increase) would paint the panel from the pre-effect budget snapshot.
       for (const eff of beat.effects ?? []) applyEffect(eff);
-      applyPanel(beat.panel);
+      applyPanelForBeat(beat);
 
       if (beat.autoGoto) {
         await wait(600);
@@ -3356,6 +3364,7 @@ const PHOTOS = {
       currentGen++; // invalidate any in-flight stream tail; its abort() drops the
                     // partial beat so revisiting re-renders it cleanly
       closeReplyModal(); // no-op when no modal is open
+      applyPanel(null); // returning to the dashboard closes any open panel
       state.beat = state.homeState === 'responded' ? 'home-responded' : 'home';
       showHomeView();
     });
