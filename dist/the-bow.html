@@ -76,8 +76,9 @@
      from 0 to 444px. ONE property on ONE element animates — the content column
      shrinking and the panel appearing are the same motion, so they can never
      desynchronize or bounce (author refinement 2026-07-17). */
-  #canvas{grid-row:2;grid-column:2;position:relative;padding:12px 24px 24px 12px;min-height:0;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) 0px;transition:grid-template-columns .42s ease}
-  #canvas.panel-open{grid-template-columns:minmax(0,1fr) 444px}
+  #canvas{--panel-w:444px;grid-row:2;grid-column:2;position:relative;padding:12px 24px 24px 12px;min-height:0;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) 0px;transition:grid-template-columns .42s ease}
+  #canvas.panel-open{grid-template-columns:minmax(0,1fr) var(--panel-w)}
+  #canvas.panel-resizing{transition:none}
   #home{grid-area:1/1;min-width:0;background:var(--card);border-radius:var(--r-lg);height:100%;overflow-y:auto;padding:48px}
   #home .inner{max-width:1180px;margin:0 auto}
 
@@ -160,7 +161,11 @@
      right side is clipped until the column finishes growing (author
      refinement 2026-07-17: card must ride the moving edge, not sit revealed
      in place, or content reads as lagging the panel) */
-  .panel-inner{position:absolute;inset:0 auto 0 24px;width:420px;background:var(--card);border-radius:var(--r-lg);overflow-y:auto}
+  .panel-inner{position:absolute;inset:0 auto 0 24px;width:calc(var(--panel-w) - 24px);background:var(--card);border-radius:var(--r-lg);overflow-y:auto}
+  /* resize handle riding the seam gutter; affordance bar appears on hover/focus/drag */
+  .panel-resize{position:absolute;top:0;bottom:0;left:0;width:28px;cursor:col-resize;z-index:5;display:flex;align-items:center;justify-content:flex-start;padding-left:8px}
+  .panel-resize::after{content:'';width:4px;height:44px;border-radius:999px;background:#CFC6BA;opacity:0;transition:opacity .15s}
+  .panel-resize:hover::after,.panel-resize:focus-visible::after,.panel-resize.dragging::after{opacity:1}
   #panel[hidden]{display:none}
   #panel .panel-placeholder{padding:24px;color:var(--gray);font-size:14px}
   .panel-close-bar{position:sticky;top:0;display:flex;justify-content:flex-end;padding:12px 12px 0;background:var(--card);z-index:5}
@@ -435,6 +440,7 @@
     #panel{position:fixed;inset:0;width:auto;height:auto;border-radius:0;z-index:70;overflow:visible;transform:translateX(100%);transition:transform .42s ease}
     #panel.panel-visible{transform:translateX(0)}
     .panel-inner{position:absolute;inset:0;width:auto;border-radius:0}
+    .panel-resize{display:none}
 
     /* interstitial text sizes down; sits above the rail bar (z 60) so the
        takeover is truly full-screen — below #panel's 70 */
@@ -1392,6 +1398,56 @@ const PHOTOS = {
       else document.getElementById('chip-budget').focus();
     }
     const PANEL_LABELS = { venue: 'Venue details', composer: 'Compose message to venues', budget: 'Budget overview' };
+    // ---- resizable panel (author request 2026-07-17) ----------------------
+    // One persistent handle element; applyPanel re-appends it after clearing
+    // the panel, so its listeners survive content swaps.
+    const PANEL_MIN = 360, PANEL_MAX = 720, PANEL_DEFAULT = 444;
+    let panelW = PANEL_DEFAULT;
+    const resizeHandle = document.createElement('div');
+    resizeHandle.className = 'panel-resize';
+    resizeHandle.setAttribute('role', 'separator');
+    resizeHandle.setAttribute('aria-orientation', 'vertical');
+    resizeHandle.setAttribute('aria-label', 'Resize panel (arrow keys or drag)');
+    resizeHandle.tabIndex = 0;
+    function setPanelW(w) {
+      panelW = Math.max(PANEL_MIN, Math.min(PANEL_MAX, Math.round(w)));
+      canvasEl.style.setProperty('--panel-w', panelW + 'px');
+      resizeHandle.setAttribute('aria-valuemin', String(PANEL_MIN));
+      resizeHandle.setAttribute('aria-valuemax', String(PANEL_MAX));
+      resizeHandle.setAttribute('aria-valuenow', String(panelW));
+    }
+    setPanelW(PANEL_DEFAULT);
+    let panelDragging = false;
+    resizeHandle.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      panelDragging = true;
+      try { resizeHandle.setPointerCapture(e.pointerId); } catch (err) {}
+      canvasEl.classList.add('panel-resizing');
+      resizeHandle.classList.add('dragging');
+      document.body.style.userSelect = 'none';
+    });
+    resizeHandle.addEventListener('pointermove', e => {
+      if (!panelDragging) return;
+      // the seam follows the cursor: column width = distance from the pointer
+      // to the canvas's right content edge, plus half the gutter
+      const rightEdge = canvasEl.getBoundingClientRect().right - 24;
+      setPanelW(rightEdge - e.clientX + 12);
+    });
+    function endPanelDrag(e) {
+      if (!panelDragging) return;
+      panelDragging = false;
+      try { resizeHandle.releasePointerCapture(e.pointerId); } catch (err) {}
+      canvasEl.classList.remove('panel-resizing');
+      resizeHandle.classList.remove('dragging');
+      document.body.style.userSelect = '';
+    }
+    resizeHandle.addEventListener('pointerup', endPanelDrag);
+    resizeHandle.addEventListener('pointercancel', endPanelDrag);
+    resizeHandle.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft') { setPanelW(panelW + 16); e.preventDefault(); }
+      else if (e.key === 'ArrowRight') { setPanelW(panelW - 16); e.preventDefault(); }
+    });
+
     let panelHideTimer = null;
     function applyPanel(name) {
       // was the panel already on screen? content swaps shouldn't re-run the
@@ -1416,6 +1472,7 @@ const PHOTOS = {
         const inner = document.createElement('div');
         inner.className = 'panel-inner';
         panelEl.appendChild(inner);
+        panelEl.appendChild(resizeHandle);
 
         const closeBar = document.createElement('div');
         closeBar.className = 'panel-close-bar';
@@ -2775,6 +2832,7 @@ const PHOTOS = {
       state = freshState();
       window.__bowRecipients = state.composerRecipients.length;
       prevBudgetAmounts = {};
+      setPanelW(PANEL_DEFAULT);
       homeEl.dataset.state = 'fresh';
       chipSpentEl.dataset.raw = String(state.budget.spent);
       chipSpentEl.textContent = fmtK(state.budget.spent);
