@@ -190,7 +190,7 @@ the spent chip.** This is itself a transparent-autonomy statement.
 | Header spent, post-booking | $23.1k (on budget screen) | **$23,100** reached at B14 booking = 17,500 + deposit **$5,600** | her $23.1k relocates from the budget screen to the booking payoff — and lands exactly |
 | Budget panel meta | Miami · 09/28/2026 · 101–125 | Columbus, OH · 9/20/26 · 125 | filler normalized |
 | Responder list | home card names Evergreen; recommendation compares Blue Horizon | responders = Willow Shore, Harborcrest, Silver Pines, **Blue Horizon**; Evergreen never replies | realistic — one venue just doesn't answer |
-| Rebalance outcome | — | trims planned/booked mix to bring projected to **$39,800** (agent shows each trim) | numbers chosen so it lands just under goal |
+| Rebalance outcome | — | trims total **−$6,900** → projected **$44,400**: catering plated→chef stations at the real 125 headcount 18,000→12,500 (−5,500); fees & tax recomputed 2,100→1,550 (−550); dress 3,000→2,500, stationery 600→350, cake 1,000→900 (−850). Agent is honest that trims alone can't close the gap and offers the fork: raise goal to **$45,000** (→ "$600 under your new target") or restart the search with under-$6k venues (redirects to Silver Pines mention, converges back) | amended 2026-07-16: the original "$39,800 via trims" was unreachable without silently cutting booked vendors — the honest fork is a better empathy+efficiency beat |
 
 All other on-screen copy ships verbatim from the screens and is test-pinned.
 
@@ -236,7 +236,7 @@ as the Silvur artifacts) and record the shipped value in `BRAND`.
 1. **Graph integrity:** every chip/goto target exists; every beat reachable
    from B0; only the final beat may dead-end; fallback defined for all states.
 2. **Budget arithmetic:** every canonical figure above derived, not hardcoded
-   twice — sums asserted (17,500; 27,300; 51,300; 23,100; 39,800).
+   twice — sums asserted (17,500; 27,300; 51,300; 44,400; 45,000; 23,100).
 3. **Copy pins:** author-art-directed lines verbatim (the "While you were
    offline…" message, the composer body checklist, recommendation bullets,
    quote-breakdown lines, budget chat message with canonical numbers).
