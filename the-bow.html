@@ -228,10 +228,14 @@
   .budget-figure .fig-diff.under{color:#1F9D55}
   .budget-bar-wrap{position:relative;margin:26px 0 14px}
   .budget-bar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--line)}
-  .budget-bar .seg-paid{background:var(--pink-deep)}
-  .budget-bar .seg-booked{background:var(--pink)}
-  .budget-bar .seg-quoted{background:#F48FD0}
-  .budget-bar .seg-planned{background:var(--pink-pale)}
+  .budget-bar .bar-seg{flex-shrink:0;outline-offset:-2px}
+  .budget-bar.cat-bar{gap:2px;background:transparent}
+  .budget-bar.cat-bar .bar-seg{border-radius:3px}
+  .budget-bar.cat-bar .bar-seg:first-child{border-radius:999px 3px 3px 999px}
+  .budget-bar.cat-bar .bar-seg:last-child{border-radius:3px 999px 999px 3px}
+  .budget-bar .seg-remainder{background:#E7DFD4}
+  .bar-tip{position:absolute;bottom:calc(100% + 6px);transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;white-space:nowrap;pointer-events:none;z-index:6}
+  .bar-tip[hidden]{display:none}
   .budget-goal-marker{position:absolute;top:-22px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--gray);white-space:nowrap}
   .budget-goal-marker .pig{display:flex;align-items:center}
   .budget-goal-marker .pig .i{width:14px;height:14px}
@@ -1273,6 +1277,131 @@
       });
       return grid;
     }
+    // ---- budget viz: Status/Category bar views (author round 2026-07-17) -----
+    let budgetView = 'status'; // persists across panel re-renders; restart resets
+    // category palette from the author's reference: pinks -> blues -> golds
+    const CAT_PALETTE = ['#FF3EB4', '#F7A9DB', '#FBD9F2', '#9EC7EB', '#C5DBF2', '#E1ECF8', '#F5B700', '#FBE3A0'];
+    const CAT_OTHER_COLOR = '#E7DFD4';
+
+    function setBudgetView(view, container, catBtn, statusBtn) {
+      if (budgetView === view) return;
+      budgetView = view;
+      catBtn.className = view === 'category' ? 'active' : '';
+      statusBtn.className = view === 'status' ? 'active' : '';
+      const old = container.querySelector('.budget-viz');
+      if (old) old.replaceWith(buildBudgetViz(state.budget, view));
+    }
+
+    function buildBudgetViz(b, view) {
+      const bookedAmt = b.items.filter(i => i.status === 'booked').reduce((s, i) => s + i.amount, 0);
+      const plannedAmt = b.items.filter(i => i.status === 'planned').reduce((s, i) => s + i.amount, 0);
+      const quotedAmt = b.quoted.reduce((s, i) => s + i.amount, 0) - b.depositAgainstQuoted;
+      const paidAmt = b.paid;
+      const segTotal = (paidAmt + bookedAmt + quotedAmt + plannedAmt) || 1;
+      const goal = b.goal;
+      // the bar spans max(goal, projected): under budget -> segments + neutral
+      // remainder up to the goal, marker at the end; over budget -> segments
+      // fill the bar, marker sits inside at the goal, overage visible past it
+      const barTotal = Math.max(goal, segTotal);
+      const viz = document.createElement('div');
+      viz.className = 'budget-viz';
+
+      const barWrap = document.createElement('div');
+      barWrap.className = 'budget-bar-wrap';
+      const marker = document.createElement('div');
+      marker.className = 'budget-goal-marker';
+      marker.style.left = (goal / barTotal * 100) + '%';
+      const pig = document.createElement('span'); pig.className = 'pig'; pig.appendChild(icon('piggy', 'i-pink'));
+      const tag = document.createElement('span'); tag.textContent = fmtK(goal);
+      marker.append(pig, tag);
+      barWrap.appendChild(marker);
+
+      const bar = document.createElement('div');
+      bar.className = 'budget-bar' + (view === 'category' ? ' cat-bar' : '');
+
+      const tip = document.createElement('div');
+      tip.className = 'bar-tip';
+      tip.hidden = true;
+
+      let segments;
+      if (view === 'status') {
+        segments = [
+          { label: 'Paid', amount: paidAmt, color: 'var(--pink-deep)' },
+          { label: 'Booked', amount: bookedAmt, color: 'var(--pink)' },
+          { label: 'Quoted', amount: quotedAmt, color: '#F48FD0' },
+          { label: 'Planned', amount: plannedAmt, color: 'var(--pink-pale)' },
+        ];
+      } else {
+        // per-item composition; deposit stays netted against Venue rental so the
+        // category total always equals the same projected figure as Status
+        const items = [
+          ...b.quoted.map(i => ({ label: i.label, amount: i.label === 'Venue rental' ? i.amount - b.depositAgainstQuoted : i.amount })),
+          ...b.items.map(i => ({ label: i.label, amount: i.amount })),
+          { label: 'Deposits paid', amount: paidAmt },
+        ].filter(i => i.amount > 0).sort((a, c) => c.amount - a.amount);
+        const KEEP = 6;
+        segments = items.slice(0, KEEP).map((i, idx) => ({ ...i, color: CAT_PALETTE[idx % CAT_PALETTE.length] }));
+        const rest = items.slice(KEEP);
+        if (rest.length === 1) {
+          segments.push({ ...rest[0], color: CAT_PALETTE[KEEP % CAT_PALETTE.length] });
+        } else if (rest.length > 1) {
+          segments.push({ label: 'Everything else', amount: rest.reduce((s, i) => s + i.amount, 0), color: CAT_OTHER_COLOR });
+        }
+      }
+
+      let acc = 0;
+      segments.forEach(seg => {
+        const el = document.createElement('div');
+        el.className = 'bar-seg';
+        el.style.width = (seg.amount / barTotal * 100) + '%';
+        el.style.background = seg.color;
+        el.tabIndex = 0;
+        el.setAttribute('role', 'img');
+        el.setAttribute('aria-label', `${seg.label} — ${fmtMoney(seg.amount)}`);
+        const centerPct = (acc + seg.amount / 2) / barTotal * 100;
+        const show = () => {
+          tip.textContent = `${seg.label} — ${fmtMoney(seg.amount)}`;
+          tip.style.left = centerPct + '%';
+          tip.hidden = false;
+        };
+        const hide = () => { tip.hidden = true; };
+        el.addEventListener('mouseenter', show);
+        el.addEventListener('mouseleave', hide);
+        el.addEventListener('focus', show);
+        el.addEventListener('blur', hide);
+        bar.appendChild(el);
+        acc += seg.amount;
+      });
+      if (goal > segTotal) {
+        const rem = document.createElement('div');
+        rem.className = 'bar-seg seg-remainder';
+        rem.style.width = ((goal - segTotal) / barTotal * 100) + '%';
+        bar.appendChild(rem);
+      }
+      barWrap.appendChild(bar);
+      barWrap.appendChild(tip);
+      viz.appendChild(barWrap);
+
+      if (view === 'status') {
+        const legend = document.createElement('div');
+        legend.className = 'budget-legend';
+        segments.forEach(seg => {
+          const item = document.createElement('span');
+          item.className = 'leg-item';
+          const dot = document.createElement('span'); dot.className = 'dot'; dot.style.background = seg.color;
+          const text = document.createElement('span');
+          text.appendChild(document.createTextNode(seg.label + ' '));
+          const strong = document.createElement('b');
+          strong.appendChild(animatedAmount('seg-' + seg.label.toLowerCase(), seg.amount));
+          text.appendChild(strong);
+          item.append(dot, text);
+          legend.appendChild(item);
+        });
+        viz.appendChild(legend);
+      }
+      return viz;
+    }
+
     function renderBudgetPanel(container) {
       container.classList.add('budget-panel');
       const b = state.budget;
@@ -1297,19 +1426,14 @@
       const catBtn = document.createElement('button');
       catBtn.type = 'button';
       catBtn.textContent = 'Category';
-      catBtn.disabled = true;
-      catBtn.title = 'Status view only in this concept';
       const statusBtn = document.createElement('button');
       statusBtn.type = 'button';
       statusBtn.textContent = 'Status';
-      statusBtn.className = 'active';
+      (budgetView === 'category' ? catBtn : statusBtn).className = 'active';
+      catBtn.addEventListener('click', () => setBudgetView('category', container, catBtn, statusBtn));
+      statusBtn.addEventListener('click', () => setBudgetView('status', container, catBtn, statusBtn));
       toggle.append(catBtn, statusBtn);
       container.appendChild(toggle);
-
-      const meta = document.createElement('div');
-      meta.className = 'budget-meta-row';
-      meta.append(icon('cal'), ' 9/20/26 · ', icon('people', 'i-blue'), ' 125 guests · ', icon('pin', 'i-red'), ' Columbus, OH');
-      container.appendChild(meta);
 
       const figures = document.createElement('div');
       figures.className = 'budget-figures';
@@ -1342,43 +1466,7 @@
       figures.appendChild(projFig);
       container.appendChild(figures);
 
-      const barWrap = document.createElement('div');
-      barWrap.className = 'budget-bar-wrap';
-      const goalPct = Math.min(goal / segTotal, 1) * 100;
-      const marker = document.createElement('div');
-      marker.className = 'budget-goal-marker';
-      marker.style.left = goalPct + '%';
-      const pig = document.createElement('span'); pig.className = 'pig'; pig.appendChild(icon('piggy', 'i-pink'));
-      const tag = document.createElement('span'); tag.textContent = fmtK(goal);
-      marker.append(pig, tag);
-      barWrap.appendChild(marker);
-
-      const bar = document.createElement('div');
-      bar.className = 'budget-bar';
-      [['seg-paid', paidAmt], ['seg-booked', bookedAmt], ['seg-quoted', quotedAmt], ['seg-planned', plannedAmt]].forEach(([cls, amt]) => {
-        const seg = document.createElement('div');
-        seg.className = cls;
-        seg.style.width = (amt / segTotal * 100) + '%';
-        bar.appendChild(seg);
-      });
-      barWrap.appendChild(bar);
-      container.appendChild(barWrap);
-
-      const legend = document.createElement('div');
-      legend.className = 'budget-legend';
-      [['Paid', 'var(--pink-deep)', paidAmt, 'paid'], ['Booked', 'var(--pink)', bookedAmt, 'booked'], ['Quoted', '#F48FD0', quotedAmt, 'quoted'], ['Planned', 'var(--pink-pale)', plannedAmt, 'planned']].forEach(([label, color, amt, key]) => {
-        const item = document.createElement('span');
-        item.className = 'leg-item';
-        const dot = document.createElement('span'); dot.className = 'dot'; dot.style.background = color;
-        const text = document.createElement('span');
-        text.appendChild(document.createTextNode(label + ' '));
-        const strong = document.createElement('b');
-        strong.appendChild(animatedAmount('seg-' + key, amt));
-        text.appendChild(strong);
-        item.append(dot, text);
-        legend.appendChild(item);
-      });
-      container.appendChild(legend);
+      container.appendChild(buildBudgetViz(b, budgetView));
 
       const itemsH3 = document.createElement('h3');
       itemsH3.append('My budget items ', icon('pencil'));
@@ -2287,6 +2375,7 @@
       window.__bowRecipients = state.composerRecipients.length;
       prevBudgetAmounts = {};
       setPanelW(PANEL_DEFAULT);
+      budgetView = 'status';
       homeEl.dataset.state = 'fresh';
       chipSpentEl.dataset.raw = String(state.budget.spent);
       chipSpentEl.textContent = fmtK(state.budget.spent);
