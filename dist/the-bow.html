@@ -318,9 +318,9 @@
   .chat-badge.pulse{animation:bow-badge-pulse .6s ease}
   @keyframes bow-badge-pulse{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
 
-  /* disclosure caption lives in the top bar's empty middle — always visible,
-     never overlapping the prototype (author note 2026-07-17) */
-  #concept-pill{flex:1;text-align:center;font-size:11px;color:var(--gray);padding:0 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* disclosure caption centered at the bottom, in the cream strip beneath
+     the canvas card — always visible, never overlapping (author 2026-07-17) */
+  #concept-pill{position:fixed;left:50%;bottom:4px;transform:translateX(-50%);font-size:11px;color:var(--gray);white-space:nowrap;z-index:30}
   #concept-pill .pill-short{display:none}
   #concept-pill #restart{text-decoration:underline;text-underline-offset:2px;color:var(--gray)}
   #concept-pill #restart:hover{color:var(--ink)}
@@ -501,7 +501,7 @@
     /* concept pill: short label only, disclaimer text stays in the DOM (pinned by
        the-bow.test.mjs) but is visually hidden; lifted clear of the fixed rail
        bar and above its z-index so Restart stays clickable */
-    #concept-pill{padding:0 8px}
+    #concept-pill{bottom:calc(56px + 2px)}
     #concept-pill .pill-text{display:none}
     #concept-pill .pill-short{display:inline}
   }
@@ -604,7 +604,6 @@
         <path d="M11 10 L8 17 M11 10 L14 17"/>
       </g>
     </svg>
-    <div id="concept-pill"><span class="pill-text">Concept prototype — not affiliated with any marketplace · </span><span class="pill-short" aria-hidden="true">Concept · </span><button id="restart">Restart</button></div>
     <div class="chips">
       <button type="button" class="hchip hchip-btn" id="chip-date" aria-label="Wedding date details"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg> 9/20/26</button><button type="button" class="hchip hchip-btn hchip-guests" id="chip-guests" aria-label="Guest count"><svg class="i i-blue" aria-hidden="true"><use href="#i-people"/></svg> <span id="chip-guests-num">125</span>&nbsp;guests</button>
       <button type="button" class="hchip hchip-btn hchip-location" id="chip-location" aria-label="Location details"><svg class="i i-red" aria-hidden="true"><use href="#i-pin"/></svg> Columbus, OH</button>
@@ -747,6 +746,7 @@
     <aside id="panel" hidden aria-label="Details panel"></aside>
     <div id="interstitial" hidden></div>
   </main>
+  <div id="concept-pill"><span class="pill-text">Concept prototype — not affiliated with any marketplace · </span><span class="pill-short" aria-hidden="true">Concept · </span><button id="restart">Restart</button></div>
   <script type="module">
     // the bow — model layer for the agentic wedding-marketplace concept.
 // Whitelabeled: never reference the real client's brand anywhere in this file.
