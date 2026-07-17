@@ -17,6 +17,13 @@
        checks the two literal hex values never drift apart). Decorative pinks
        (chips, bars, gradients) are unaffected and keep using --pink. */
     --pink-cta:#E1008A;
+    /* --label-pink-fill: darkened --label-pink #E5309B (white text on it was
+       4.02:1 — fails AA) via the same stepwise HSL-lightness rule: L 54.31% →
+       48.31% (-6 pts), hue/sat unchanged. White-on-this contrast = 4.6119:1,
+       passes AA. Used ONLY where --label-pink is a FILL under white text (the
+       "New!" pill); --label-pink itself stays for dark-on-white text/border
+       uses (category labels, highlight card border), which already pass. */
+    --label-pink-fill:#DB1B8D;
   }
   *{box-sizing:border-box;margin:0}
   html,body{height:100%}
@@ -114,7 +121,7 @@
   .card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:24px;display:flex;flex-direction:column;gap:10px;position:relative}
   .card.highlight{border-color:var(--label-pink);box-shadow:0 0 0 1px var(--label-pink)}
   .card .cat{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
-  .card .new-pill{background:var(--label-pink);color:#fff;font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+  .card .new-pill{background:var(--label-pink-fill);color:#fff;font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
   .card .title{font-size:18px;font-weight:800;line-height:1.3}
   .card .body{font-size:15px;color:var(--gray);line-height:1.5;flex:1}
   .card-cta{align-self:flex-start;font-size:15px;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:var(--ink)}
@@ -698,6 +705,22 @@
     // prevents chips/panel/effects from a superseded beat firing later.
     let currentGen = 0;
     const inFlight = new Set(); // beat ids currently streaming (same-beat re-entry no-op)
+
+    // ---- #stream aria-busy: single source of truth -------------------------
+    // Derived from a counter of active streaming chains, never written ad-hoc:
+    // a superseded chain's abort() must not clobber a superseding chain that is
+    // still streaming (e.g. chip click → mid-stream unmatched Enter → fallback
+    // starts streaming → old chain's abort fires). busy stays true until the
+    // LAST active chain finishes or aborts.
+    let activeStreams = 0;
+    function streamStarted() {
+      activeStreams++;
+      streamEl.setAttribute('aria-busy', 'true');
+    }
+    function streamEnded() {
+      activeStreams = Math.max(0, activeStreams - 1); // restart zeroes the counter; a stale chain ending after that must not go negative
+      if (activeStreams === 0) streamEl.setAttribute('aria-busy', 'false');
+    }
 
     // ---- markdown-lite + escaping ---------------------------------------------
     function escapeHtml(s) {
@@ -1994,7 +2017,7 @@
       t.el.appendChild(wrap);
       t.beatNodes.set(id, wrap);
 
-      streamEl.setAttribute('aria-busy', 'true');
+      streamStarted();
       // invalidated before chips rendered → drop the partial beat entirely so a
       // revisit re-renders it cleanly instead of leaving it chipless/duplicated
       const abort = () => {
@@ -2002,7 +2025,7 @@
         t.rendered.delete(id);
         t.beatNodes.delete(id);
         wrap.remove();
-        streamEl.setAttribute('aria-busy', 'false');
+        streamEnded();
       };
 
       const userText = opts.userText ?? beat.userBubble;
@@ -2021,7 +2044,7 @@
       }
 
       inFlight.delete(id);
-      streamEl.setAttribute('aria-busy', 'false');
+      streamEnded();
       renderChips(hasSlotsBlock ? [] : (beat.chips ?? []));
       // effects (e.g. the 'budget' effect) must land in state BEFORE the panel
       // renders, or a first-time visit to a panel beat (budget-added, rebalance,
@@ -2050,11 +2073,11 @@
       t.el.appendChild(wrap);
 
       appendUserBubble(wrap, text);
-      streamEl.setAttribute('aria-busy', 'true');
+      streamStarted();
       await showTyping(wrap);
-      if (stale()) { wrap.remove(); streamEl.setAttribute('aria-busy', 'false'); return; }
+      if (stale()) { wrap.remove(); streamEnded(); return; }
       await renderTextBlock(wrap, SCRIPT.fallback.blocks[0].md, stale);
-      streamEl.setAttribute('aria-busy', 'false');
+      streamEnded();
       if (stale()) { wrap.remove(); return; }
       renderChips(current?.chips ?? []);
       // state.beat intentionally left unchanged — fallback never changes it
@@ -2142,6 +2165,9 @@
       applyPanel(null);
       chipsEl.replaceChildren();
       streamEl.replaceChildren();
+      // zero the counter directly: superseded chains never stream again after
+      // restart, and streamEnded() clamps at 0 when their aborts fire later
+      activeStreams = 0;
       streamEl.setAttribute('aria-busy', 'false');
       showHomeView();
     });
