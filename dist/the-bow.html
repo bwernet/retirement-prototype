@@ -215,12 +215,13 @@
   .composer-send:hover{opacity:.92}
 
   /* ---- panel: budget (Task 9) ---- */
-  .budget-panel h2{font-family:'Figtree';font-weight:800;font-size:22px;margin:0 0 12px}
+  .budget-panel h2{font-family:'Figtree';font-weight:800;font-size:22px;margin:0}
   .budget-panel h3{font-size:15px;font-weight:800;margin:26px 0 12px}
-  .budget-toggle{display:inline-flex;background:#F3EEE6;border-radius:999px;padding:3px;margin-bottom:16px}
-  .budget-toggle button{padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;color:var(--gray)}
-  .budget-toggle button.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
-  .budget-toggle button:disabled{opacity:.5;cursor:not-allowed}
+  /* title + view toggle share one row, like the source mockup */
+  .budget-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .budget-toggle{display:inline-flex;background:#F1F2F4;border-radius:999px;padding:3px}
+  .budget-toggle button{padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;color:var(--gray);border:1px solid transparent}
+  .budget-toggle button.active{background:#fff;color:var(--ink);border:1px solid var(--ink)}
   .budget-meta-row{font-size:13px;color:var(--gray);margin-bottom:20px}
   .budget-figures{display:flex;gap:32px;margin-bottom:22px;flex-wrap:wrap}
   .budget-figure{display:flex;flex-direction:column;gap:4px}
@@ -1915,8 +1916,14 @@ const PHOTOS = {
         const centerPct = (acc + seg.amount / 2) / barTotal * 100;
         const show = () => {
           tip.textContent = `${seg.label} — ${fmtMoney(seg.amount)}`;
-          tip.style.left = centerPct + '%';
           tip.hidden = false;
+          // clamp inside the bar's box so the tooltip never clips at the
+          // panel edges (the panel is an overflow-clipping container)
+          const wrapW = barWrap.clientWidth;
+          const tw = tip.offsetWidth;
+          const x = Math.max(0, Math.min(centerPct / 100 * wrapW - tw / 2, wrapW - tw));
+          tip.style.left = x + 'px';
+          tip.style.transform = 'none';
         };
         const hide = () => { tip.hidden = true; };
         el.addEventListener('mouseenter', show);
@@ -1971,9 +1978,11 @@ const PHOTOS = {
       const goal = b.goal;
       const diff = projected - goal;
 
+      const head = document.createElement('div');
+      head.className = 'budget-head';
       const h2 = document.createElement('h2');
       h2.textContent = 'Budget Overview';
-      container.appendChild(h2);
+      head.appendChild(h2);
 
       const toggle = document.createElement('div');
       toggle.className = 'budget-toggle';
@@ -1987,7 +1996,8 @@ const PHOTOS = {
       catBtn.addEventListener('click', () => setBudgetView('category', container, catBtn, statusBtn));
       statusBtn.addEventListener('click', () => setBudgetView('status', container, catBtn, statusBtn));
       toggle.append(catBtn, statusBtn);
-      container.appendChild(toggle);
+      head.appendChild(toggle);
+      container.appendChild(head);
 
       const figures = document.createElement('div');
       figures.className = 'budget-figures';
