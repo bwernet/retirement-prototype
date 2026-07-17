@@ -308,16 +308,16 @@ export const SCRIPT = {
   'hold-willow': {
     thread: 'Vendor reply summary and accessibility comparison',
     userBubble: 'Hold Willow Shore Lodge',
-    blocks: [{ t: 'text', md: 'Done — your **72-hour courtesy hold** on Willow Shore Lodge for **Sat · Sept 20 2026** is confirmed with Maya, their events coordinator. It expires Thursday at 5 pm, nothing is charged, and you can release it anytime. While it’s active, want to look at what their $7,200 quote actually covers?' }],
-    chips: [{ label: 'Break down what’s included in the quote', goto: 'quote-breakdown' }], // PIN
+    blocks: [{ t: 'text', md: 'Done — your **72-hour courtesy hold** on Willow Shore Lodge for **Sat · Sept 20 2026** is confirmed with Maya, their events coordinator. It expires Thursday at 5 pm, nothing is charged, and you can release it anytime. While it’s active, want me to break down the full cost — their $7,200 venue quote plus catering and fees?' }],
+    chips: [{ label: 'Break down the full cost', goto: 'quote-breakdown' }], // author-revised 2026-07-17 (quote is venue-only; catering is added, not "included")
     match: ['hold willow', 'hold the date', 'willow shore'],
   },
 
   'quote-breakdown': {
     thread: 'Vendor reply summary and accessibility comparison',
-    userBubble: 'Break down what’s included in the quote', // PIN
+    userBubble: 'Break down the full cost', // author-revised 2026-07-17
     blocks: [
-      { t: 'text', md: 'Here’s what Willow Shore Lodge included in their estimate:\n\n• **Venue rental ($7,200)** – covers full-day use of ceremony lawn, pavilion, and reception hall, plus setup and teardown staff.\n• **Catering ($18,000)** – includes appetizers, entrée options for 150 guests, non-alcoholic beverages, linens, flatware, and serving staff. Alcohol packages are separate.\n• **Service fees & tax ($2,100)** – standard 10% service fee plus local tax on food and beverage.\n\nThe total of **$27,300** represents the core event cost, but add-ons like bar service, décor, or coordination would be additional as soon as they confirm.\n\nWould you like me to:\n\n• Add these details to your budget now,\n• Ask the venue for a more itemized quote, or\n• Estimate add-ons (like bar or rentals) to see the full picture?' }, // PIN
+      { t: 'text', md: 'Their **$7,200 quote covers the venue itself**. Here’s the full picture once I add catering and fees:\n\n• **Venue rental ($7,200)** – their quote: full-day use of ceremony lawn, pavilion, and reception hall, plus setup and teardown staff.\n• **Catering (est. $18,000)** – appetizers, entrée options for 150 guests, non-alcoholic beverages, linens, flatware, and serving staff. Alcohol packages are separate.\n• **Service fees & tax (est. $2,100)** – standard 10% service fee plus local tax on food and beverage.\n\nAltogether that’s about **$27,300** for the core event — add-ons like bar service, décor, or coordination would be extra.\n\nWould you like me to:\n\n• Add these details to your budget now,\n• Ask the venue for a more itemized quote, or\n• Estimate add-ons (like bar or rentals) to see the full picture?' }, // author-revised 2026-07-17: quote is venue-only, catering/fees added
     ],
     chips: [
       { label: 'Add to my budget', goto: 'budget-added' }, // PIN
