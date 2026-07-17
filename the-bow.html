@@ -392,6 +392,15 @@
     }
     let state = freshState();
 
+    // ---- generation guard ---------------------------------------------------
+    // Every navigation (go(), typed fallback) bumps currentGen and captures its
+    // own gen; #back/#restart bump it too. After EVERY await in an async chain,
+    // the chain bails if its gen went stale — this cancels in-flight autoGoto
+    // tails on restart, stale stream tails when a newer navigation starts, and
+    // prevents chips/panel/effects from a superseded beat firing later.
+    let currentGen = 0;
+    const inFlight = new Set(); // beat ids currently streaming (same-beat re-entry no-op)
+
     // ---- markdown-lite + escaping ---------------------------------------------
     function escapeHtml(s) {
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -506,7 +515,7 @@
       el.remove();
     }
 
-    async function renderTextBlock(container, md) {
+    async function renderTextBlock(container, md, stale = () => false) {
       const el = document.createElement('div');
       el.className = 'msg msg-agent';
       container.appendChild(el);
@@ -521,7 +530,7 @@
       const tokens = md.match(/\S+|\s+/g) || [];
       let acc = '';
       for (const tok of tokens) {
-        if (done) return;
+        if (done || stale()) return;
         acc += tok;
         if (/\S/.test(tok)) {
           el.innerHTML = mdToHtml(acc);
@@ -576,8 +585,8 @@
       await fadeInWhole(el);
     }
 
-    async function renderBlock(container, block) {
-      if (block.t === 'text') return renderTextBlock(container, block.md);
+    async function renderBlock(container, block, stale) {
+      if (block.t === 'text') return renderTextBlock(container, block.md, stale);
       if (block.t === 'venueList') return renderVenueList(container);
       return renderPlaceholder(container, block.t);
     }
@@ -589,10 +598,13 @@
     // converges on the correct final value.
     function animateNumber(el, from, to, format) {
       el.dataset.raw = to;
+      // per-element token: a newer animation on the same element cancels this one
+      const token = el.__animToken = (el.__animToken ?? 0) + 1;
       if (reducedMotion || from === to) { el.textContent = format(to); return; }
       const start = Date.now();
       const duration = 700;
       const tick = () => {
+        if (el.__animToken !== token) return;
         const p = Math.min(1, (Date.now() - start) / duration);
         el.textContent = format(Math.round(from + (to - from) * p));
         if (p < 1) setTimeout(tick, 16);
@@ -604,7 +616,9 @@
       sent: ['Messages sent.', '3 days later…'],
       toured: ['Tour booked — Fri Oct 3, 3:00 pm.', 'Two weeks later…'],
     };
+    let interstitialToken = 0; // restart bumps this so a pending overlay-hide can't fire on a new run
     async function showInterstitial(variant) {
+      const tok = ++interstitialToken;
       const [line1, line2] = INTERSTITIAL_TEXT[variant] ?? ['', ''];
       interstitialEl.innerHTML = '';
       const l1 = document.createElement('div'); l1.className = 'line1'; l1.textContent = line1;
@@ -612,10 +626,13 @@
       interstitialEl.append(l1, l2);
       interstitialEl.hidden = false;
       await wait(0);
+      if (tok !== interstitialToken) return;
       interstitialEl.classList.add('show');
       await wait(2200);
+      if (tok !== interstitialToken) return;
       interstitialEl.classList.remove('show');
       await wait(200);
+      if (tok !== interstitialToken) return;
       interstitialEl.hidden = true;
     }
 
@@ -651,9 +668,19 @@
     }
 
     // ---- go() — the single entry point --------------------------------------
+    function isRendered(id) {
+      const b = SCRIPT[id];
+      if (!b?.thread) return true;
+      return state.transcripts.get(b.thread)?.rendered.has(id) ?? false;
+    }
+
     async function go(id, opts = {}) {
       const beat = SCRIPT[id];
       if (!beat) return;
+      if (inFlight.has(id)) return; // same beat already streaming — re-entry is a no-op
+
+      const gen = ++currentGen; // this navigation supersedes any in-flight chain
+      const stale = () => gen !== currentGen;
 
       if (!beat.thread) {
         // home-type beat (home, home-responded): no chat thread to render
@@ -673,9 +700,17 @@
         node?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
         renderChips(beat.chips ?? []);
         applyPanel(beat.panel);
+        // if this beat's autoGoto tail was invalidated before its target rendered
+        // (e.g. Restart/Back mid-chain), re-follow it so the story can't dead-end
+        if (beat.autoGoto && !isRendered(beat.autoGoto)) {
+          await wait(600);
+          if (stale()) return;
+          await go(beat.autoGoto);
+        }
         return;
       }
 
+      inFlight.add(id);
       t.rendered.add(id);
       const wrap = document.createElement('div');
       wrap.className = 'beat';
@@ -683,27 +718,42 @@
       t.el.appendChild(wrap);
       t.beatNodes.set(id, wrap);
 
+      // invalidated before chips rendered → drop the partial beat entirely so a
+      // revisit re-renders it cleanly instead of leaving it chipless/duplicated
+      const abort = () => {
+        inFlight.delete(id);
+        t.rendered.delete(id);
+        t.beatNodes.delete(id);
+        wrap.remove();
+      };
+
       const userText = opts.userText ?? beat.userBubble;
       if (userText) appendUserBubble(wrap, userText);
 
       await showTyping(wrap);
+      if (stale()) return abort();
 
       for (const block of beat.blocks ?? []) {
-        await renderBlock(wrap, block);
+        await renderBlock(wrap, block, stale);
+        if (stale()) return abort();
       }
 
+      inFlight.delete(id);
       renderChips(beat.chips ?? []);
       applyPanel(beat.panel);
       for (const eff of beat.effects ?? []) applyEffect(eff);
 
       if (beat.autoGoto) {
         await wait(600);
+        if (stale()) return;
         await go(beat.autoGoto);
       }
     }
 
     // ---- fallback (typed input, no match) ------------------------------------
     async function renderFallback(text) {
+      const gen = ++currentGen; // supersedes any in-flight stream (Enter mid-stream)
+      const stale = () => gen !== currentGen;
       const current = SCRIPT[state.beat];
       const threadName = current?.thread ?? '__fallback__';
       showThreadView();
@@ -715,7 +765,9 @@
 
       appendUserBubble(wrap, text);
       await showTyping(wrap);
-      await renderTextBlock(wrap, SCRIPT.fallback.blocks[0].md);
+      if (stale()) { wrap.remove(); return; }
+      await renderTextBlock(wrap, SCRIPT.fallback.blocks[0].md, stale);
+      if (stale()) { wrap.remove(); return; }
       renderChips(current?.chips ?? []);
       // state.beat intentionally left unchanged — fallback never changes it
     }
@@ -752,10 +804,17 @@
 
     // ---- back / restart ---------------------------------------------------
     backBtn.addEventListener('click', () => {
+      currentGen++; // invalidate any in-flight stream tail; its abort() drops the
+                    // partial beat so revisiting re-renders it cleanly
       state.beat = state.homeState === 'responded' ? 'home-responded' : 'home';
       showHomeView();
     });
     restartBtn.addEventListener('click', () => {
+      currentGen++; // cancel every pending chain (stream tails, autoGoto waits)
+      inFlight.clear();
+      interstitialToken++;
+      interstitialEl.classList.remove('show');
+      interstitialEl.hidden = true;
       state = freshState();
       homeEl.dataset.state = 'fresh';
       chipSpentEl.dataset.raw = String(state.budget.spent);
