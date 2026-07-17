@@ -146,7 +146,6 @@
   #thread-title{font-size:16px;font-weight:700;margin:0}
   /* conversation column capped for readability (author note 2026-07-17) */
   #stream{flex:1;min-height:0;overflow-y:auto;padding:24px 32px;width:100%;max-width:1024px;margin:0 auto}
-  #chips{display:flex;flex-wrap:wrap;gap:10px;padding:0 32px 16px;width:100%;max-width:1024px;margin:0 auto}
   .thread-ask{margin:0 auto 24px;width:calc(100% - 64px);max-width:960px}
 
   /* the panel enters fully from off-canvas on the SAME curve as the surface
@@ -319,8 +318,12 @@
   .chat-badge.pulse{animation:bow-badge-pulse .6s ease}
   @keyframes bow-badge-pulse{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
 
-  #concept-pill{position:fixed;right:20px;bottom:20px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:12px;color:var(--gray);display:flex;align-items:center;gap:4px;box-shadow:0 2px 10px rgba(0,0,0,.06);z-index:50}
+  /* disclosure caption lives in the top bar's empty middle — always visible,
+     never overlapping the prototype (author note 2026-07-17) */
+  #concept-pill{flex:1;text-align:center;font-size:11px;color:var(--gray);padding:0 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #concept-pill .pill-short{display:none}
+  #concept-pill #restart{text-decoration:underline;text-underline-offset:2px;color:var(--gray)}
+  #concept-pill #restart:hover{color:var(--ink)}
   #restart{text-decoration:underline;text-underline-offset:2px;color:var(--gray);font-size:12px}
   #restart:hover{color:var(--ink)}
 
@@ -346,18 +349,17 @@
   /* plain numbered lines flowing into the carousel — one combined answer (author note 2026-07-17) */
   .venue-list ol{padding-left:0;display:flex;flex-direction:column;gap:12px}
   .venue-row{list-style:none;font-size:16px;line-height:1.5;display:flex;align-items:center;flex-wrap:wrap;gap:10px}
-  .chip{display:inline-flex;align-items:center;background:var(--chip-pink);color:var(--ink);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:600;opacity:1;transition:opacity .2s,transform .15s}
+  /* ONE grammar for “say this to the agent”: gradient bubble, no icon
+     (author decision 2026-07-17); functional actions stay buttons/links */
+  .chip{display:inline-flex;align-items:center;background:linear-gradient(90deg, var(--chip-pink) 0%, var(--chip-blue) 100%);color:var(--ink);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:600;opacity:1;transition:opacity .2s,transform .15s}
   .chip:hover{transform:translateY(-1px)}
-  #chips .chip{background:var(--chip-blue)}
+  .chips-inline{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 4px}
   .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
   /* ---- block renderers (Task 8) ---- */
   .action-chip{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(90deg, var(--chip-pink) 0%, var(--chip-blue) 100%);color:var(--ink);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;flex-shrink:0;transition:transform .15s}
   .action-chip:hover{transform:translateY(-1px)}
-  /* tertiary inline action: no bubble — quiet text link, underline on hover */
-  .action-chip.quiet{background:transparent;color:var(--pink-deep);padding:4px 6px;text-decoration:none}
-  .action-chip.quiet:hover{transform:none;text-decoration:underline;text-underline-offset:3px}
   .btn-outline{background:#fff;border:1px solid var(--ink);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600}
   .btn-outline:hover{background:rgba(0,0,0,.04)}
   .btn-text{text-decoration:underline;text-underline-offset:2px;font-size:13px;font-weight:600;color:var(--ink)}
@@ -378,7 +380,8 @@
   .carousel-wrap{position:relative;margin-bottom:14px}
   .carousel-track{display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;padding:4px 44px 8px 2px;scrollbar-width:none}
   .carousel-track::-webkit-scrollbar{display:none}
-  .carousel-card{flex:0 0 200px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column}
+  .carousel-card{flex:0 0 200px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .carousel-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
   .carousel-card .photo-wrap{position:relative}
   .carousel-card .photo-placeholder{width:100%;height:130px;border-radius:0}
   .featured-tag{position:absolute;top:8px;left:8px;background:var(--ink);color:#fff;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:4px 8px;border-radius:999px}
@@ -498,7 +501,7 @@
     /* concept pill: short label only, disclaimer text stays in the DOM (pinned by
        the-bow.test.mjs) but is visually hidden; lifted clear of the fixed rail
        bar and above its z-index so Restart stays clickable */
-    #concept-pill{padding:8px 12px;gap:2px;bottom:calc(56px + 12px);z-index:65}
+    #concept-pill{padding:0 8px}
     #concept-pill .pill-text{display:none}
     #concept-pill .pill-short{display:inline}
   }
@@ -601,6 +604,7 @@
         <path d="M11 10 L8 17 M11 10 L14 17"/>
       </g>
     </svg>
+    <div id="concept-pill"><span class="pill-text">Concept prototype — not affiliated with any marketplace · </span><span class="pill-short" aria-hidden="true">Concept · </span><button id="restart">Restart</button></div>
     <div class="chips">
       <button type="button" class="hchip hchip-btn" id="chip-date" aria-label="Wedding date details"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg> 9/20/26</button><button type="button" class="hchip hchip-btn hchip-guests" id="chip-guests" aria-label="Guest count"><svg class="i i-blue" aria-hidden="true"><use href="#i-people"/></svg> <span id="chip-guests-num">125</span>&nbsp;guests</button>
       <button type="button" class="hchip hchip-btn hchip-location" id="chip-location" aria-label="Location details"><svg class="i i-red" aria-hidden="true"><use href="#i-pin"/></svg> Columbus, OH</button>
@@ -734,7 +738,6 @@
         <h2 id="thread-title"></h2>
       </header>
       <div id="stream" aria-live="polite" aria-busy="false"></div>
-      <div id="chips" role="group" aria-label="Suggested replies"></div>
       <div class="askwrap thread-ask">
         <div class="askbox">
           <textarea id="ask-thread" rows="1" placeholder="Ask anything" aria-label="Ask anything"></textarea>
@@ -744,7 +747,6 @@
     <aside id="panel" hidden aria-label="Details panel"></aside>
     <div id="interstitial" hidden></div>
   </main>
-  <div id="concept-pill"><span class="pill-text">Concept prototype — not affiliated with any marketplace · </span><span class="pill-short" aria-hidden="true">Concept · </span><button id="restart">Restart</button></div>
   <script type="module">
     // the bow — model layer for the agentic wedding-marketplace concept.
 // Whitelabeled: never reference the real client's brand anywhere in this file.
@@ -1397,7 +1399,6 @@ const PHOTOS = {
     const threadEl = document.getElementById('thread');
     const threadTitleEl = document.getElementById('thread-title');
     const streamEl = document.getElementById('stream');
-    const chipsEl = document.getElementById('chips');
     const askEl = document.getElementById('ask');
     const askThreadEl = document.getElementById('ask-thread');
     const panelEl = document.getElementById('panel');
@@ -1509,19 +1510,28 @@ const PHOTOS = {
     }
 
     // ---- chips / panel / toast ----------------------------------------------
-    function renderChips(chips) {
-      chipsEl.replaceChildren();
-      (chips ?? []).forEach((c, i) => {
+    // chips render INTO the beat's wrap so they flow after the answer and
+    // scroll with the conversation (author note 2026-07-17); earlier beats'
+    // chips stay live in the scrollback — clicking one re-navigates.
+    function renderChips(chips, host) {
+      if (!chips?.length || !host) return;
+      const group = document.createElement('div');
+      group.className = 'chips-inline';
+      group.setAttribute('role', 'group');
+      group.setAttribute('aria-label', 'Suggested replies');
+      chips.forEach((c, i) => {
         const btn = document.createElement('button');
         btn.className = 'chip';
         btn.type = 'button';
         btn.textContent = liveText(c.label);
         btn.addEventListener('click', () => go(c.goto));
-        chipsEl.appendChild(btn);
+        group.appendChild(btn);
         if (reducedMotion) return;
         btn.style.opacity = '0';
         setTimeout(() => { btn.style.opacity = '1'; }, i * 40);
       });
+      host.appendChild(group);
+      scrollStreamToBottom();
     }
     // ---- shared focus-trap helper (panel + reply modal) ------------------
     function getFocusable(container) {
@@ -2282,7 +2292,7 @@ const PHOTOS = {
       const cta = document.createElement('button');
       cta.type = 'button';
       cta.className = 'action-chip';
-      cta.append(icon('pin', 'i-red'), ' Explore other locations');
+      cta.append('Explore other locations');
       cta.addEventListener('click', () => panelNoteAfter(cta,
         '(Your location stays flexible until you book a venue — in this concept, the story stays in Columbus.)'));
       container.appendChild(cta);
@@ -2355,7 +2365,7 @@ const PHOTOS = {
       const cta = document.createElement('button');
       cta.type = 'button';
       cta.className = 'action-chip';
-      cta.append(icon('cal'), ' Explore other dates');
+      cta.append('Explore other dates');
       cta.addEventListener('click', () => panelNoteAfter(cta,
         '(Friday dates in your area trend 20–30% cheaper — your date stays flexible until the venue is booked.)'));
       container.appendChild(cta);
@@ -2402,7 +2412,7 @@ const PHOTOS = {
       const cta = document.createElement('button');
       cta.type = 'button';
       cta.className = 'action-chip';
-      cta.append(icon('people', 'i-blue'), ' Start your guest list');
+      cta.append('Start your guest list');
       cta.addEventListener('click', () => panelNoteAfter(cta,
         '(In the full product this opens guest management — in this concept, planning continues around your estimate.)'));
       container.appendChild(cta);
@@ -2531,8 +2541,8 @@ const PHOTOS = {
         li.appendChild(text);
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'action-chip quiet';
-        btn.append(icon('sparkle', 'i-pink'), ' Tell me more');
+        btn.className = 'action-chip';
+        btn.append('Tell me more');
         if (v.id === 'willow') {
           btn.addEventListener('click', () => go('willow-detail'));
         } else {
@@ -2556,6 +2566,15 @@ const PHOTOS = {
       VENUES.forEach(v => {
         const card = document.createElement('div');
         card.className = 'carousel-card';
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `Open ${v.name}`);
+        const openCard = () => {
+          if (v.id === 'willow') go('willow-detail');
+          else showToast('In this concept, Willow Shore Lodge is the deep-dive.');
+        };
+        card.addEventListener('click', openCard);
+        card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCard(); } });
         const photoWrap = document.createElement('div');
         photoWrap.className = 'photo-wrap';
         photoWrap.appendChild(makePhotoImg(v));
@@ -3136,7 +3155,7 @@ const PHOTOS = {
       if (already) {
         const node = t.beatNodes.get(id);
         node?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
-        renderChips(hasSlotsBlock ? [] : (beat.chips ?? []));
+        // chips are already inline in the transcript node — nothing to redo
         applyPanel(beat.panel);
         // if this beat's autoGoto tail was invalidated before its target rendered
         // (e.g. Restart/Back mid-chain), re-follow it so the story can't dead-end
@@ -3184,7 +3203,7 @@ const PHOTOS = {
 
       inFlight.delete(id);
       streamEnded();
-      renderChips(hasSlotsBlock ? [] : (beat.chips ?? []));
+      renderChips(hasSlotsBlock ? [] : (beat.chips ?? []), wrap);
       // effects (e.g. the 'budget' effect) must land in state BEFORE the panel
       // renders, or a first-time visit to a panel beat (budget-added, rebalance,
       // goal-increase) would paint the panel from the pre-effect budget snapshot.
@@ -3218,7 +3237,7 @@ const PHOTOS = {
       await renderTextBlock(wrap, SCRIPT.fallback.blocks[0].md, stale);
       streamEnded();
       if (stale()) { wrap.remove(); return; }
-      renderChips(current?.chips ?? []);
+      renderChips(current?.chips ?? [], wrap);
       // state.beat intentionally left unchanged — fallback never changes it
     }
 
@@ -3322,7 +3341,6 @@ const PHOTOS = {
       statVendorsEl.dataset.raw = '12';
       statVendorsEl.textContent = '12';
       applyPanel(null);
-      chipsEl.replaceChildren();
       streamEl.replaceChildren();
       // do NOT zero activeStreams here: every started chain decrements exactly
       // once on its own (abort or finish), so the counter self-balances — a
