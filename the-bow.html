@@ -891,12 +891,17 @@
         else if (name === 'budget') renderBudgetPanel(body);
 
         // move focus to the panel's heading (tabindex="-1" — not part of the
-        // normal tab order, just a programmatic landing point)
+        // normal tab order, just a programmatic landing point). preventScroll
+        // is load-bearing: a plain focus() scrolls #panel's overflow-hidden
+        // clip box sideways to reveal the heading, teleporting the card into
+        // view over the content before the column animation has grown.
         const heading = body.querySelector('h2');
         if (heading) {
           heading.setAttribute('tabindex', '-1');
-          heading.focus();
+          heading.focus({ preventScroll: true });
         }
+        panelEl.scrollLeft = 0; // clip box must never carry a scroll offset
+        panelEl.scrollTop = 0;
 
         if (wasOpen || reducedMotion) {
           // already on screen (content swap) or instant mode: no re-slide
