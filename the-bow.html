@@ -923,7 +923,7 @@
       el.className = 'comparison-table';
       const thead = document.createElement('thead');
       const headRow = document.createElement('tr');
-      ['', 'Willow Shore Lodge', 'Blue Horizon Club'].forEach(h => {
+      ['', willow.name, blue.name].forEach(h => {
         const th = document.createElement('th');
         th.textContent = h;
         headRow.appendChild(th);
@@ -1333,11 +1333,13 @@
     backBtn.addEventListener('click', () => {
       currentGen++; // invalidate any in-flight stream tail; its abort() drops the
                     // partial beat so revisiting re-renders it cleanly
+      closeReplyModal(); // no-op when no modal is open
       state.beat = state.homeState === 'responded' ? 'home-responded' : 'home';
       showHomeView();
     });
     restartBtn.addEventListener('click', () => {
       currentGen++; // cancel every pending chain (stream tails, autoGoto waits)
+      closeReplyModal(); // no-op when no modal is open
       inFlight.clear();
       interstitialToken++;
       interstitialEl.classList.remove('show');
