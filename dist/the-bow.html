@@ -161,7 +161,7 @@
      right side is clipped until the column finishes growing (author
      refinement 2026-07-17: card must ride the moving edge, not sit revealed
      in place, or content reads as lagging the panel) */
-  .panel-inner{position:absolute;inset:0 auto 0 24px;width:calc(var(--panel-w) - 24px);background:var(--card);border-radius:var(--r-lg);overflow-y:auto}
+  .panel-inner{position:absolute;inset:0 auto 0 24px;width:calc(var(--panel-w) - 24px);background:var(--card);border-radius:var(--r-lg);overflow-y:auto;container-type:inline-size}
   /* resize handle riding the seam gutter; affordance bar appears on hover/focus/drag */
   .panel-resize{position:absolute;top:0;bottom:0;left:0;width:28px;cursor:col-resize;z-index:5;display:flex;align-items:center;justify-content:flex-start;padding-left:8px}
   .panel-resize::after{content:'';width:4px;height:44px;border-radius:999px;background:#CFC6BA;opacity:0;transition:opacity .15s}
@@ -251,7 +251,12 @@
   .budget-section-head.remaining-head{display:flex;align-items:baseline;justify-content:space-between}
   .budget-section-head .remaining-amt{font-size:13px;font-weight:400;color:var(--gray)}
   .budget-section-head .remaining-amt strong{color:var(--ink);font-weight:800}
-  .budget-items-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-bottom:8px}
+  /* item cards: one column in a narrow panel, two when the panel is dragged
+     wider — queried against the panel itself, not the viewport */
+  .budget-items-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-bottom:8px}
+  @container (min-width: 500px){
+    .budget-items-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  }
   .budget-item-card{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;min-width:0}
   .budget-item-card .bi-icon{font-size:18px}
   .budget-item-card .bi-label{flex:1;font-size:13px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
