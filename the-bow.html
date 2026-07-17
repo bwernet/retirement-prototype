@@ -373,19 +373,29 @@
   .carousel-wrap{position:relative;margin-bottom:14px}
   .carousel-track{display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;padding:4px 44px 8px 2px;scrollbar-width:none}
   .carousel-track::-webkit-scrollbar{display:none}
-  .carousel-card{flex:0 0 232px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .carousel-card{flex:0 0 300px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,box-shadow .15s}
   /* the agent's per-venue insight — sparkle + ink text, no nested box:
-     the glyph and weight distinguish it from the gray metadata line */
-  .card-insight{display:flex;align-items:flex-start;gap:6px;font-size:12.5px;line-height:1.45;color:var(--ink);font-weight:500}
-  .card-insight .i{width:13px;height:13px;flex-shrink:0;margin-top:2px}
-  .card-meta .star{color:var(--gold)}
   .carousel-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
   .carousel-card .photo-wrap{position:relative}
   .carousel-card .photo-placeholder{width:100%;height:130px;border-radius:0}
-  .featured-tag{position:absolute;top:8px;left:8px;background:var(--ink);color:#fff;font-size:11px;font-weight:700;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%}
-  .carousel-card .card-body{padding:12px;display:flex;flex-direction:column;gap:4px}
-  .carousel-card .card-name{font-weight:700;font-size:14px}
-  .carousel-card .card-meta{font-size:12px;color:var(--gray)}
+  /* comparison-first card anatomy (author round 2026-07-17): photo+pill /
+     name / structured stats columns / labeled why-it-fits-you block */
+  .match-pill{position:absolute;top:10px;left:10px;background:#fff;color:var(--ink);font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  .match-pill.top{background:var(--label-pink-fill);color:#fff}
+  .save-btn{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.12);color:var(--ink)}
+  .save-btn .i{width:16px;height:16px;vertical-align:0}
+  .save-btn.saved{color:var(--label-pink-fill)}
+  .card-stats{display:grid;grid-template-columns:1fr 1fr 1fr;margin:2px 0 2px}
+  .stat-cell{display:flex;flex-direction:column;align-items:center;gap:1px;padding:2px 6px}
+  .stat-cell + .stat-cell{border-left:1px solid var(--line)}
+  .stat-cell .val{font-size:14px;font-weight:700}
+  .stat-cell .lbl{font-size:11px;color:var(--gray)}
+  .fit-block{background:#FDF2F8;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+  .fit-label{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--label-pink)}
+  .fit-label .i{width:13px;height:13px}
+  .fit-text{font-size:12.5px;line-height:1.45;color:var(--ink)}
+  .carousel-card .card-body{padding:12px 12px 14px;display:flex;flex-direction:column;gap:8px}
+  .carousel-card .card-name{font-weight:800;font-size:16px;letter-spacing:-.01em}
   .carousel-arrow{position:absolute;right:0;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-size:18px;z-index:2}
   .carousel-arrow:hover{background:#F6F1E9}
   .carousel-arrow.left{left:0;right:auto}
@@ -529,6 +539,7 @@
       <symbol id="i-cake" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20.5v-6h14v6"/><path d="M3.5 20.5h17"/><path d="M7.5 14.5v-4h9v4"/><path d="M12 10.5V8"/><path d="M12 5.5v.01"/></g></symbol>
       <symbol id="i-brush" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.8" y="11" width="6.4" height="9.5" rx="1"/><path d="M10.4 11V6c0-1.4 1-2.4 1.6-2.9.6.5 1.6 1.5 1.6 2.9v5"/></g></symbol>
       <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M4 7.5l8 5.7 8-5.7"/></g></symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 20s-7.5-4.7-7.5-10.2A4.3 4.3 0 0 1 12 6.6a4.3 4.3 0 0 1 7.5 3.2C19.5 15.3 12 20 12 20z"/></g></symbol>
       <symbol id="i-send" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3.5 11.7 20.5 4l-3.7 15.5-5.6-5.6-7.7-2.2z"/><path d="M11.2 13.9 20.5 4"/></g></symbol>
       <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.1 5.1l1.9 1.9M17 17l1.9 1.9M18.9 5.1 17 7M7 17l-1.9 1.9"/></g></symbol>
       <symbol id="i-moon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M20 13.8A8.2 8.2 0 0 1 10.2 4 8.2 8.2 0 1 0 20 13.8z"/></g></symbol>
@@ -1899,14 +1910,28 @@
         };
         card.addEventListener('click', openCard);
         card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCard(); } });
+        const rank = VENUES.indexOf(v) + 1;
         const photoWrap = document.createElement('div');
         photoWrap.className = 'photo-wrap';
         photoWrap.appendChild(makePhotoImg(v));
+        // soft match pill (comparison-first anatomy, author round 2026-07-17):
+        // #1 gets the accent, the rest stay quiet white
         const tag = document.createElement('span');
-        tag.className = 'featured-tag';
-        tag.textContent = String(VENUES.indexOf(v) + 1);
-        tag.setAttribute('aria-label', `Ranked ${VENUES.indexOf(v) + 1} of ${VENUES.length}`);
+        tag.className = 'match-pill' + (rank === 1 ? ' top' : '');
+        tag.textContent = `#${rank} match`;
         photoWrap.appendChild(tag);
+        const save = document.createElement('button');
+        save.type = 'button';
+        save.className = 'save-btn';
+        save.setAttribute('aria-label', `Save ${v.name}`);
+        save.setAttribute('aria-pressed', 'false');
+        save.appendChild(icon('heart'));
+        save.addEventListener('click', e => {
+          e.stopPropagation();
+          const on = save.classList.toggle('saved');
+          save.setAttribute('aria-pressed', String(on));
+        });
+        photoWrap.appendChild(save);
         card.appendChild(photoWrap);
         const body = document.createElement('div');
         body.className = 'card-body';
@@ -1914,18 +1939,29 @@
         name.className = 'card-name';
         name.textContent = v.name;
         body.appendChild(name);
-        const insight = document.createElement('div');
-        insight.className = 'card-insight';
-        const insightText = document.createElement('span');
-        insightText.textContent = v.blurb;
-        insight.append(icon('sparkle', 'i-pink'), insightText);
-        body.appendChild(insight);
-        const meta = document.createElement('div');
-        meta.className = 'card-meta';
-        const star = document.createElement('span'); star.className = 'star'; star.textContent = '★';
-        const rv = document.createElement('b'); rv.textContent = String(v.rating);
-        meta.append(star, ' ', rv, ` (${v.reviews}) · ${v.capacity} guests · ${v.priceK}`);
-        body.appendChild(meta);
+        // structured comparison attributes: three labeled columns
+        const stats = document.createElement('div');
+        stats.className = 'card-stats';
+        [[`★ ${v.rating}`, `${v.reviews} reviews`, 'stat-star'], [String(v.capacity), 'guests', ''], [`From ${v.priceK.replace(' ', '')}`, 'est. price', '']].forEach(([val, lbl, cls]) => {
+          const cell = document.createElement('div');
+          cell.className = 'stat-cell';
+          const vEl = document.createElement('span'); vEl.className = 'val' + (cls ? ' ' + cls : ''); vEl.textContent = val;
+          const lEl = document.createElement('span'); lEl.className = 'lbl'; lEl.textContent = lbl;
+          cell.append(vEl, lEl);
+          stats.appendChild(cell);
+        });
+        body.appendChild(stats);
+        // the agent's rationale, clearly labeled and visually separate
+        const fit = document.createElement('div');
+        fit.className = 'fit-block';
+        const fitHead = document.createElement('div');
+        fitHead.className = 'fit-label';
+        fitHead.append(icon('sparkle', 'i-pink'), ' Why it fits you');
+        const fitText = document.createElement('div');
+        fitText.className = 'fit-text';
+        fitText.textContent = v.fit;
+        fit.append(fitHead, fitText);
+        body.appendChild(fit);
         card.appendChild(body);
         track.appendChild(card);
       });
