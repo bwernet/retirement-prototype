@@ -470,6 +470,27 @@ export const SCRIPT = {
   },
 };
 
+export function matchInput(text, currentBeatId) {
+  const words = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').split(/\s+/).filter(w => w.length > 2);
+  if (!words.length) return null;
+  // Direct chip targets only: the whole graph is reachable from home, so a
+  // wider net would let "book willow shore lodge" skip the entire story.
+  const candidates = [...new Set((SCRIPT[currentBeatId]?.chips ?? []).map(c => c.goto))]
+    .filter(id => id !== currentBeatId && id !== 'fallback');
+  let best = null, bestScore = 0;
+  for (const id of candidates) {
+    const keys = (SCRIPT[id].match ?? []).join(' ').toLowerCase();
+    let score = 0;
+    for (const w of words) if (keys.includes(w)) score++;
+    // phrase bonus: multi-word match keys that appear whole in the input
+    for (const k of SCRIPT[id].match ?? []) {
+      if (k.includes(' ') && text.toLowerCase().includes(k)) score += 2;
+    }
+    if (score > bestScore) { bestScore = score; best = id; }
+  }
+  return bestScore >= 1 ? best : null;
+}
+
 export function reachableBeats(fromId) {
   const seen = new Set([fromId]);
   const queue = [fromId];

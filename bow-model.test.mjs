@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   BRAND, VENUES, initialBudget, applyVenuePackage, applyRebalance,
   applyGoalIncrease, applyBooking, fmtMoney, fmtK, SCRIPT, reachableBeats,
+  matchInput,
 } from './bow-model.js';
 
 test('brand layer', () => {
@@ -133,4 +134,13 @@ test('permission-first negotiation', () => {
   const labels = SCRIPT['contract-flag'].chips.map(c => c.label);
   assert.ok(labels.some(l => l.includes('negotiate')), 'agent asks before negotiating');
   assert.ok(labels.some(l => l.toLowerCase().includes('proceed')));
+});
+
+test('matcher', () => {
+  assert.equal(matchInput('what about wheelchair accessibility?', 'willow-detail'), 'accessibility-draft');
+  assert.equal(matchInput('tell me about the venues you found', 'home'), 'venue-results');
+  assert.equal(matchInput('hold willow shore', 'recommendation'), 'hold-willow');
+  assert.equal(matchInput('xyzzy plugh', 'home'), null);
+  // never returns an unreachable beat: booking flow not reachable from home
+  assert.equal(matchInput('book willow shore lodge', 'home'), null);
 });
