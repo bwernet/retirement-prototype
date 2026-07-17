@@ -1,11 +1,12 @@
-// Fetches Figtree 400/500/600/800 + 400i (latin)
+// Fetches Figtree 300/400/500/600/800 + 400i (latin)
 // from Google Fonts and writes bow-fonts.css with base64-embedded woff2
 // so the artifact is fully self-contained. Mirrors build-fonts.mjs.
 //
-// Google serves Figtree's normal weights (400/500/600/800) as one
+// Google serves Figtree's normal weights (300/400/500/600/800) as one
 // variable-font woff2 file. Picks that resolve to the same URL are grouped
 // into a single @font-face with a font-weight range instead of duplicating
-// the same payload per weight.
+// the same payload per weight — so adding 300 (for the interstitial's light
+// line 2, Task 10) widens the declared range to "300 800" at zero extra bytes.
 import fs from 'node:fs';
 
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
@@ -14,6 +15,7 @@ const css = await (await fetch(cssUrl, { headers: { 'User-Agent': UA } })).text(
 const blocks = css.split('@font-face').slice(1);
 
 const WANT = [
+  { fam: 'Figtree', style: 'normal', weight: 300 },
   { fam: 'Figtree', style: 'normal', weight: 400 },
   { fam: 'Figtree', style: 'normal', weight: 500 },
   { fam: 'Figtree', style: 'normal', weight: 600 },
