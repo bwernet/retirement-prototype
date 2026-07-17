@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
 const html = fs.readFileSync('the-bow.html', 'utf8');
+const modelJs = fs.readFileSync('bow-model.js', 'utf8');
 const t = (name, fn) => { try { fn(); console.log('ok -', name); } catch (e) { console.error('FAIL -', name); throw e; } };
 
 t('whitelabel: client name absent', () => {
@@ -30,5 +31,13 @@ t('proactive cards (fresh state)', () => {
 t('responded-state card', () => {
   assert.ok(html.includes('4 venues responded to accessibility enquiry'));
   assert.ok(html.includes('Willow Shore Lodge, Harborcrest Pavilion, Silver Pines Retreat, and Blue Horizon Club have sent over their accommodations and floor plans'));
+});
+t('pinkCTA: :root custom property matches bow-model.js BRAND.pinkCTA (Task 12)', () => {
+  const cssMatch = html.match(/--pink-cta:\s*(#[0-9A-Fa-f]{6})/);
+  const jsMatch = modelJs.match(/pinkCTA:\s*'(#[0-9A-Fa-f]{6})'/);
+  assert.ok(cssMatch, 'the-bow.html :root is missing --pink-cta');
+  assert.ok(jsMatch, 'bow-model.js BRAND is missing pinkCTA');
+  assert.equal(cssMatch[1].toUpperCase(), jsMatch[1].toUpperCase(),
+    `CSS --pink-cta (${cssMatch[1]}) must equal BRAND.pinkCTA (${jsMatch[1]}) — they can't drift`);
 });
 console.log('the-bow.html content OK');

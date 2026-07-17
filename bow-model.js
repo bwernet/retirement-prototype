@@ -5,7 +5,14 @@ export const BRAND = {
   name: 'the bow',
   disclaimer: 'Concept prototype — not affiliated with any marketplace',
   cream: '#FBF1E6', ink: '#171719', card: '#FFFFFF',
-  pink: '#FF3EB4',        // CTA fill; Task 12 verifies AA for its text size, darkens if needed
+  pink: '#FF3EB4',        // decorative pink — chips/segments/gradients only, NOT for white text fills
+  // pinkCTA: #FF3EB4 darkened (HSL lightness 62.16% → 44.16%, -18 pts in 1-pt
+  // steps, hue/sat unchanged) until contrast(white, color) >= 4.5 (Task 12).
+  // White-on-pinkCTA contrast = 4.5967:1 — passes WCAG AA for normal text.
+  // Used ONLY for filled buttons/badges carrying white text (composer send
+  // button, chat badge, avatar initials) — pale-pink chips keep dark ink
+  // text and decorative pinks (bars, gradients) are unaffected.
+  pinkCTA: '#E1008A',
   pinkDeep: '#A50064', pinkPale: '#FBD9F2', bubble: '#FBD9F2',
   chipPink: '#FDD5F0', chipBlue: '#D9E7FD',
   labelPink: '#E5309B', labelOrange: '#E88A00', labelBlue: '#2F80ED', labelGreen: '#1F9D55',

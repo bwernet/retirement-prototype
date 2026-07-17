@@ -136,6 +136,12 @@ test('permission-first negotiation', () => {
   assert.ok(labels.some(l => l.toLowerCase().includes('proceed')));
 });
 
+test('CTA pink passes AA for white text', () => {
+  const lum = h => { const [r,g,b] = [1,3,5].map(i => parseInt(h.slice(i,i+2),16)/255).map(v => v <= .04045 ? v/12.92 : ((v+.055)/1.055)**2.4); return .2126*r+.7152*g+.0722*b; };
+  const contrast = (a,b) => { const [x,y] = [lum(a),lum(b)].sort((p,q)=>q-p); return (x+.05)/(y+.05); };
+  assert.ok(contrast('#FFFFFF', BRAND.pinkCTA) >= 4.5, `got ${contrast('#FFFFFF', BRAND.pinkCTA)}`);
+});
+
 test('matcher', () => {
   assert.equal(matchInput('what about wheelchair accessibility?', 'willow-detail'), 'accessibility-draft');
   assert.equal(matchInput('tell me about the venues you found', 'home'), 'venue-results');

@@ -11,6 +11,12 @@
     --pink-pale:#FBD9F2; --chip-pink:#FDD5F0; --chip-blue:#D9E7FD; --gray:#6B6B74;
     --line:#E8E0D6; --gold:#F5A623; --r-lg:24px; --r-md:16px; --r-sm:10px;
     --label-pink:#E5309B; --label-orange:#E88A00; --label-blue:#2F80ED; --label-green:#1F9D55;
+    /* --pink-cta: darkened #FF3EB4 for white-text fills only (composer send
+       button, chat badge, avatar initials) — white-on-this contrast ~4.60:1,
+       passes WCAG AA. Must equal BRAND.pinkCTA in bow-model.js (the-bow.test.mjs
+       checks the two literal hex values never drift apart). Decorative pinks
+       (chips, bars, gradients) are unaffected and keep using --pink. */
+    --pink-cta:#E1008A;
   }
   *{box-sizing:border-box;margin:0}
   html,body{height:100%}
@@ -19,6 +25,11 @@
   textarea{font:inherit;color:inherit}
   ul{list-style:none;padding:0}
   svg{display:block}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  /* ---- focus-visible (Task 12) ---- */
+  :focus-visible{outline:2px solid var(--label-blue);outline-offset:2px;border-radius:4px}
+  #ask:focus-visible,#ask-thread:focus-visible{outline:2px solid var(--label-blue);outline-offset:2px}
 
   /* ---- rail ---- */
   #rail{grid-row:1/3;grid-column:1;display:flex;flex-direction:column;align-items:center;padding:20px 0 16px;gap:4px}
@@ -36,8 +47,8 @@
   #rail .rail-bottom{display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:auto}
   .chat-btn{position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%}
   .chat-btn:hover{background:rgba(0,0,0,.04)}
-  .chat-badge{position:absolute;top:-2px;right:-2px;background:var(--pink);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid var(--cream)}
-  .avatar{width:36px;height:36px;border-radius:50%;background:var(--pink);border:0;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;letter-spacing:.02em}
+  .chat-badge{position:absolute;top:-2px;right:-2px;background:var(--pink-cta);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid var(--cream)}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--pink-cta);border:0;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;letter-spacing:.02em}
 
   /* ---- topbar ---- */
   #topbar{grid-row:1;grid-column:2;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 8px;background:var(--cream)}
@@ -166,7 +177,7 @@
   .composer-panel .recipient-chip{display:inline-flex;align-items:center;gap:6px;background:var(--chip-pink);border-radius:999px;padding:6px 8px 6px 12px;font-size:13px;font-weight:600}
   .composer-panel .recipient-chip button{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--ink)}
   .composer-panel .recipient-chip button:hover{background:rgba(0,0,0,.1)}
-  .composer-send{display:flex;align-items:center;gap:8px;background:var(--pink);color:#fff;font-weight:600;border-radius:999px;padding:14px 24px;font-size:15px;margin-top:20px;width:100%;justify-content:center}
+  .composer-send{display:flex;align-items:center;gap:8px;background:var(--pink-cta);color:#fff;font-weight:600;border-radius:999px;padding:14px 24px;font-size:15px;margin-top:20px;width:100%;justify-content:center}
   .composer-send:hover{opacity:.92}
 
   /* ---- panel: budget (Task 9) ---- */
@@ -489,7 +500,7 @@
       <button class="avatar" aria-label="Account"><span aria-hidden="true">T&amp;C</span></button>
     </div>
   </nav>
-  <header id="topbar">
+  <header id="topbar" aria-label="Wedding summary">
     <svg id="wordmark" viewBox="0 0 120 36" role="img" aria-label="the bow">
       <text x="0" y="25" font-family="Figtree" font-weight="800" font-size="21" fill="var(--ink)">the bow</text>
       <g transform="translate(90,7)" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -504,7 +515,7 @@
       <span class="hchip"><svg class="i i-pink" aria-hidden="true"><use href="#i-piggy"/></svg> <b id="chip-spent">$17.5k</b> <small>spent</small> | <b id="chip-goal">$40k</b> <small>budget</small></span>
     </div>
   </header>
-  <main id="canvas">
+  <main id="canvas" aria-label="Conversation and planning tools">
     <section id="home" data-state="fresh">
       <div class="inner">
         <p class="days">355 DAYS TO GO!</p>
@@ -630,7 +641,7 @@
         <button id="back" aria-label="Back to home">←</button>
         <h2 id="thread-title"></h2>
       </header>
-      <div id="stream" aria-live="polite"></div>
+      <div id="stream" aria-live="polite" aria-busy="false"></div>
       <div id="chips" role="group" aria-label="Suggested replies"></div>
       <div class="askwrap thread-ask">
         <div class="askbox">
@@ -638,7 +649,7 @@
         </div>
       </div>
     </section>
-    <aside id="panel" hidden></aside>
+    <aside id="panel" hidden aria-label="Details panel"></aside>
     <div id="interstitial" hidden></div>
   </main>
   <div id="concept-pill"><span class="pill-text">Concept prototype — not affiliated with any marketplace · </span><span class="pill-short" aria-hidden="true">Concept · </span><button id="restart">Restart</button></div>
@@ -753,23 +764,43 @@
         setTimeout(() => { btn.style.opacity = '1'; }, i * 40);
       });
     }
+    // ---- shared focus-trap helper (panel + reply modal) ------------------
+    function getFocusable(container) {
+      return [...container.querySelectorAll(
+        'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )].filter(el => el.getClientRects().length > 0);
+    }
+    function trapTabKey(e, container) {
+      if (e.key !== 'Tab') return;
+      const focusable = getFocusable(container);
+      if (!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    }
+
     function onPanelKeydown(e) {
-      if (e.key !== 'Escape') return;
-      // reply modal takes precedence: its own Escape handler closes it,
+      // reply modal takes precedence: its own Escape/Tab handler runs instead,
       // and the panel stays open underneath
       if (document.getElementById('bow-reply-modal')) return;
-      closePanel();
+      if (e.key === 'Escape') { closePanel(); return; }
+      trapTabKey(e, panelEl);
     }
     function closePanel() {
       applyPanel(null);
       askThreadEl.focus();
     }
+    const PANEL_LABELS = { venue: 'Venue details', composer: 'Compose message to venues', budget: 'Budget overview' };
     function applyPanel(name) {
       panelEl.innerHTML = '';
       panelEl.classList.remove('panel-visible');
       document.removeEventListener('keydown', onPanelKeydown); // never stacks — remove is a no-op when absent
       if (name) {
         panelEl.hidden = false;
+        panelEl.setAttribute('aria-label', PANEL_LABELS[name] ?? 'Details panel');
         threadEl.classList.add('panel-open');
         document.addEventListener('keydown', onPanelKeydown);
 
@@ -792,6 +823,14 @@
         else if (name === 'composer') renderComposerPanel(body);
         else if (name === 'budget') renderBudgetPanel(body);
 
+        // move focus to the panel's heading (tabindex="-1" — not part of the
+        // normal tab order, just a programmatic landing point)
+        const heading = body.querySelector('h2');
+        if (heading) {
+          heading.setAttribute('tabindex', '-1');
+          heading.focus();
+        }
+
         if (reducedMotion) {
           panelEl.classList.add('panel-visible');
         } else {
@@ -799,6 +838,7 @@
         }
       } else {
         panelEl.hidden = true;
+        panelEl.removeAttribute('aria-label');
         threadEl.classList.remove('panel-open');
       }
     }
@@ -845,15 +885,15 @@
       const hero = document.createElement('img');
       hero.className = 'hero-photo';
       hero.src = PHOTOS.willowHero;
-      hero.alt = `${v.name} — ${v.setting}`;
+      hero.alt = `${v.name} — ${v.setting}, main view`;
       hero.loading = 'lazy';
       grid.appendChild(hero);
       const thumbGrid = document.createElement('div');
       thumbGrid.className = 'thumb-grid';
-      ['willowThumb1', 'willowThumb2', 'willowThumb3', 'willowThumb4'].forEach(key => {
+      ['willowThumb1', 'willowThumb2', 'willowThumb3', 'willowThumb4'].forEach((key, i) => {
         const img = document.createElement('img');
         img.src = PHOTOS[key];
-        img.alt = `${v.name} — ${v.setting}`;
+        img.alt = `${v.name} — lakeside view, photo ${i + 1}`;
         img.loading = 'lazy';
         thumbGrid.appendChild(img);
       });
@@ -960,6 +1000,11 @@
     // ---- panel: composer (Task 9) ----------------------------------------------
     function renderComposerPanel(container) {
       container.classList.add('composer-panel');
+
+      const heading = document.createElement('h2');
+      heading.className = 'sr-only';
+      heading.textContent = 'Compose message to venues';
+      container.appendChild(heading);
 
       const subjectEl = document.createElement('div');
       subjectEl.className = 'subject-line';
@@ -1413,7 +1458,9 @@
       if (lastModalTrigger) lastModalTrigger.focus();
     }
     function onModalKeydown(e) {
-      if (e.key === 'Escape') closeReplyModal();
+      if (e.key === 'Escape') { closeReplyModal(); return; }
+      const overlay = document.getElementById('bow-reply-modal');
+      if (overlay) trapTabKey(e, overlay);
     }
     function buildFloorplanSvg() {
       const NS = 'http://www.w3.org/2000/svg';
@@ -1947,6 +1994,7 @@
       t.el.appendChild(wrap);
       t.beatNodes.set(id, wrap);
 
+      streamEl.setAttribute('aria-busy', 'true');
       // invalidated before chips rendered → drop the partial beat entirely so a
       // revisit re-renders it cleanly instead of leaving it chipless/duplicated
       const abort = () => {
@@ -1954,6 +2002,7 @@
         t.rendered.delete(id);
         t.beatNodes.delete(id);
         wrap.remove();
+        streamEl.setAttribute('aria-busy', 'false');
       };
 
       const userText = opts.userText ?? beat.userBubble;
@@ -1972,6 +2021,7 @@
       }
 
       inFlight.delete(id);
+      streamEl.setAttribute('aria-busy', 'false');
       renderChips(hasSlotsBlock ? [] : (beat.chips ?? []));
       // effects (e.g. the 'budget' effect) must land in state BEFORE the panel
       // renders, or a first-time visit to a panel beat (budget-added, rebalance,
@@ -2000,9 +2050,11 @@
       t.el.appendChild(wrap);
 
       appendUserBubble(wrap, text);
+      streamEl.setAttribute('aria-busy', 'true');
       await showTyping(wrap);
-      if (stale()) { wrap.remove(); return; }
+      if (stale()) { wrap.remove(); streamEl.setAttribute('aria-busy', 'false'); return; }
       await renderTextBlock(wrap, SCRIPT.fallback.blocks[0].md, stale);
+      streamEl.setAttribute('aria-busy', 'false');
       if (stale()) { wrap.remove(); return; }
       renderChips(current?.chips ?? []);
       // state.beat intentionally left unchanged — fallback never changes it
@@ -2090,6 +2142,7 @@
       applyPanel(null);
       chipsEl.replaceChildren();
       streamEl.replaceChildren();
+      streamEl.setAttribute('aria-busy', 'false');
       showHomeView();
     });
 
