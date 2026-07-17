@@ -190,8 +190,11 @@
   .venue-panel .quote-row .quote-note{color:var(--gray);font-size:13px}
   .venue-panel h3{font-size:16px;font-weight:800;margin:0 0 10px}
   .venue-panel .about-copy{font-size:14px;line-height:1.6;color:var(--ink);margin-bottom:24px}
-  .venue-panel .perfect-card{border:1px solid var(--label-pink);background:rgba(255,62,180,.04);border-radius:var(--r-md);padding:18px;margin-bottom:24px}
-  .venue-panel .perfect-card .title{font-weight:700;font-size:14px;margin-bottom:10px;display:block}
+  /* 'Why it's perfect' — same treatment in card + panel: pink sparkle
+     label, no pink border/box (author round 2026-07-17) */
+  .venue-panel .perfect-card{padding:2px 0 0;margin-bottom:24px}
+  .venue-panel .perfect-card .title{color:var(--label-pink);font-weight:700;font-size:13px;letter-spacing:.02em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+  .venue-panel .perfect-card li::marker{color:transparent}
   .venue-panel .perfect-card ul{display:flex;flex-direction:column;gap:8px}
   .venue-panel .perfect-card li{font-size:14px;line-height:1.5;padding-left:16px;position:relative}
   .venue-panel .perfect-card li::before{content:'•';position:absolute;left:2px;color:var(--label-pink)}
@@ -377,10 +380,10 @@
   .carousel-track{display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;padding:4px 44px 8px 2px;scrollbar-width:none}
   .carousel-track::-webkit-scrollbar{display:none}
   .carousel-card{flex:0 0 300px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,box-shadow .15s}
-  /* the agent's per-venue insight — sparkle + ink text, no nested box:
   .carousel-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
   .carousel-card .photo-wrap{position:relative}
-  .carousel-card .photo-placeholder{width:100%;height:130px;border-radius:0}
+  /* full-bleed photo: fills the card width, flush top corners */
+  .carousel-card .photo-placeholder{width:100%;height:150px;border-radius:0;display:block}
   /* comparison-first card anatomy (author round 2026-07-17): photo+pill /
      name / structured stats columns / labeled why-it-fits-you block */
   .match-pill{position:absolute;top:10px;left:10px;background:#fff;color:var(--ink);font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;box-shadow:0 1px 4px rgba(0,0,0,.12)}
@@ -393,10 +396,10 @@
   .stat-cell + .stat-cell{border-left:1px solid var(--line)}
   .stat-cell .val{font-size:14px;font-weight:700}
   .stat-cell .lbl{font-size:11px;color:var(--gray)}
-  .fit-block{background:#FDF2F8;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
-  .fit-label{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--label-pink)}
+  .fit-block{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:4px}
+  .fit-label{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--label-pink);letter-spacing:.02em}
   .fit-label .i{width:13px;height:13px}
-  .fit-text{font-size:12.5px;line-height:1.45;color:var(--ink)}
+  .fit-text{font-size:12.5px;line-height:1.45;color:var(--gray)}
   .carousel-card .card-body{padding:12px 12px 14px;display:flex;flex-direction:column;gap:8px}
   .carousel-card .card-name{font-weight:800;font-size:16px;letter-spacing:-.01em}
   .carousel-arrow{position:absolute;right:0;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-size:18px;z-index:2}
@@ -1485,8 +1488,21 @@ const PHOTOS = {
     // every rendered string passes through here: {N} recipient count + the
     // evergreen date substitution (source copy keeps the canonical fallback
     // dates so the verbatim pins hold; the live dates appear at render time)
+    // the couple's estimated head-count is dynamic (guests panel stepper).
+    // Only the couple's-guest references swap; venue capacities (v.capacity,
+    // the "101-150" pricing bracket) stay fixed. Source copy keeps "150" so
+    // the verbatim pins hold; this substitutes at render time.
+    function withGuestCount(s) {
+      const g = state?.guestCount ?? 125;
+      return s
+        .replace(/150-guest head-count/g, `${g}-guest head-count`)
+        .replace(/150-guest capacity/g, `${g}-guest capacity`)
+        .replace(/about 150 guests/g, `about ${g} guests`)
+        .replace(/Seats 150 comfortably/g, `Seats ${g} comfortably`)
+        .replace(/entrée options for 150 guests/g, `entrée options for ${g} guests`);
+    }
     function liveText(s) {
-      return liveDates(withRecipientCount(s));
+      return withGuestCount(liveDates(withRecipientCount(s)));
     }
     function mdToHtml(md) {
       let s = escapeHtml(liveText(md));
@@ -1836,7 +1852,7 @@ const PHOTOS = {
       perfectCard.className = 'perfect-card';
       const perfectTitle = document.createElement('span');
       perfectTitle.className = 'title';
-      perfectTitle.append(icon('sparkle', 'i-pink'), " Why it's perfect:");
+      perfectTitle.append(icon('sparkle', 'i-pink'), " Why it's perfect");
       perfectCard.appendChild(perfectTitle);
       const ul = document.createElement('ul');
       const bullets = [
@@ -1847,7 +1863,7 @@ const PHOTOS = {
       ];
       bullets.forEach(text => {
         const li = document.createElement('li');
-        li.textContent = text;
+        li.textContent = liveText(text);
         ul.appendChild(li);
       });
       const holdLi = document.createElement('li');
@@ -1913,14 +1929,14 @@ const PHOTOS = {
       const ol = document.createElement('ol');
       COMPOSER.body.slice(1, 6).forEach(line => {
         const li = document.createElement('li');
-        li.textContent = line.replace(/^\d+\.\s*/, '');
+        li.textContent = liveText(line.replace(/^\d+\.\s*/, ''));
         ol.appendChild(li);
       });
       container.appendChild(ol);
 
       [6, 7].forEach(i => {
         const p = document.createElement('p');
-        p.textContent = COMPOSER.body[i];
+        p.textContent = liveText(COMPOSER.body[i]);
         container.appendChild(p);
       });
 
@@ -2610,7 +2626,7 @@ const PHOTOS = {
         fit.className = 'fit-block';
         const fitHead = document.createElement('div');
         fitHead.className = 'fit-label';
-        fitHead.append(icon('sparkle', 'i-pink'), ' Why it fits you');
+        fitHead.append(icon('sparkle', 'i-pink'), " Why it's perfect");
         const fitText = document.createElement('div');
         fitText.className = 'fit-text';
         fitText.textContent = v.fit;
@@ -3282,8 +3298,8 @@ const PHOTOS = {
     // evergreen dates in the static markup (countdown, header chip, card
     // titles) — the source keeps the canonical fallback dates; this one-time
     // sweep swaps text nodes only, leaving icons and spans intact
-    document.querySelectorAll('.days, #chip-date, .card .title').forEach(el => {
-      el.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = liveDates(n.textContent); });
+    document.querySelectorAll('.days, #chip-date, .card .title, .card .body').forEach(el => {
+      el.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = withGuestCount(liveDates(n.textContent)); });
     });
 
     // ---- home entry points (suggestions + cards) ------------------------------
