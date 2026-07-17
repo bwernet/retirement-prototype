@@ -138,17 +138,105 @@
   .block-placeholder.show{opacity:1}
   .venue-list{margin-bottom:14px;opacity:0;transition:opacity .15s}
   .venue-list.show{opacity:1}
-  .venue-list ol{padding-left:0}
-  .venue-row{list-style:none;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
-  .venue-row:last-child{border-bottom:0}
+  .venue-list ol{padding-left:0;display:flex;flex-direction:column;gap:10px}
+  .venue-row{list-style:none;font-size:14px;display:flex;align-items:center;flex-wrap:wrap;gap:10px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px}
   .chip{display:inline-flex;align-items:center;background:var(--chip-pink);color:var(--ink);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:600;opacity:1;transition:opacity .2s,transform .15s}
   .chip:hover{transform:translateY(-1px)}
   #chips .chip{background:var(--chip-blue)}
   .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ---- block renderers (Task 8) ---- */
+  .action-chip{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(90deg, var(--chip-pink) 0%, var(--chip-blue) 100%);color:var(--ink);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;flex-shrink:0;transition:transform .15s}
+  .action-chip:hover{transform:translateY(-1px)}
+  .btn-outline{background:#fff;border:1px solid var(--ink);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600}
+  .btn-outline:hover{background:rgba(0,0,0,.04)}
+  .btn-text{text-decoration:underline;text-underline-offset:2px;font-size:13px;font-weight:600;color:var(--ink)}
+  .btn-text:hover{color:var(--pink-deep)}
+  .inline-note{color:var(--gray)}
+  .inline-note em{font-style:italic}
+
+  .photo-placeholder{width:200px;height:150px;flex-shrink:0;border-radius:var(--r-sm);background:linear-gradient(135deg,#F3E9DC 0%,#DDDBD6 100%);display:flex;align-items:center;justify-content:center;font-size:28px}
+
+  .rating-line{font-size:13px;color:var(--gray);display:flex;align-items:center;gap:4px}
+  .rating-line .star{color:var(--gold)}
+  .rating-line .rating-val{color:var(--ink);font-weight:600}
+
+  .access-row{display:flex;align-items:center;gap:6px;font-size:14px}
+  .access-quote{font-size:14px;color:var(--gray);font-style:italic;margin:2px 0}
+
+  /* carousel */
+  .carousel-wrap{position:relative;margin-bottom:14px}
+  .carousel-track{display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;padding:4px 44px 8px 2px;scrollbar-width:none}
+  .carousel-track::-webkit-scrollbar{display:none}
+  .carousel-card{flex:0 0 200px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column}
+  .carousel-card .photo-wrap{position:relative}
+  .carousel-card .photo-placeholder{width:100%;height:130px;border-radius:0}
+  .featured-tag{position:absolute;top:8px;left:8px;background:var(--ink);color:#fff;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:4px 8px;border-radius:999px}
+  .carousel-card .card-body{padding:12px;display:flex;flex-direction:column;gap:4px}
+  .carousel-card .card-name{font-weight:700;font-size:14px}
+  .carousel-card .card-meta{font-size:12px;color:var(--gray)}
+  .carousel-arrow{position:absolute;right:0;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-size:18px}
+  .carousel-arrow:hover{background:rgba(0,0,0,.04)}
+
+  /* reply cards */
+  .reply-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:18px;margin-bottom:14px;display:grid;grid-template-columns:200px 1fr;gap:18px}
+  .reply-meta-col{display:flex;flex-direction:column;gap:6px}
+  .reply-meta-col .meta-line{font-size:13px;color:var(--gray)}
+  .reply-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+  .reply-name{font-weight:700;font-size:20px}
+  .quote-pill{background:var(--chip-blue);color:var(--ink);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;white-space:nowrap}
+  .reply-line{font-size:14px;margin-bottom:6px}
+  .reply-actions{display:flex;align-items:center;gap:16px;margin-top:12px}
+
+  /* modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(23,23,25,.6);display:flex;align-items:center;justify-content:center;z-index:200;padding:24px}
+  .modal-card{background:#fff;border-radius:var(--r-lg);padding:28px;max-width:520px;width:100%;max-height:82vh;overflow-y:auto}
+  .modal-card h3{font-size:20px;font-weight:800;margin-bottom:14px}
+  .modal-card .modal-quote{font-size:15px;line-height:1.6;color:var(--ink);margin-bottom:20px}
+  .floorplan{margin-bottom:20px}
+  .floorplan text{font-size:9px;fill:var(--gray);font-family:'Figtree',system-ui,sans-serif}
+  .floorplan rect{fill:#F8F4EE;stroke:var(--line)}
+
+  /* comparison */
+  .comparison-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;font-size:14px;margin-bottom:14px}
+  .comparison-table th,.comparison-table td{text-align:left;padding:10px 16px;border-bottom:1px solid var(--line)}
+  .comparison-table tr:last-child td{border-bottom:0}
+  .comparison-table th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--gray);font-weight:600;background:#FAF6F0}
+  .comparison-table .row-label{font-weight:600;color:var(--gray);width:110px}
+
+  /* draft preview */
+  .draft-preview-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:18px;margin-bottom:14px}
+  .draft-subject{font-size:14px;margin-bottom:10px}
+  .token-pill{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:600}
+  .draft-greeting{font-size:14px;color:var(--gray);margin-bottom:8px}
+  .draft-body-clip{position:relative;max-height:4.65em;overflow:hidden;font-size:14px;line-height:1.55}
+  .draft-body-clip::after{content:'';position:absolute;left:0;right:0;bottom:0;height:28px;background:linear-gradient(to bottom, rgba(255,255,255,0), #fff)}
+
+  /* slots */
+  .slots-row{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .slot-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:16px 20px;text-align:center;flex:1 1 140px}
+  .slot-card:hover{border-color:var(--pink);transform:translateY(-1px)}
+  .slot-card .slot-day{font-weight:700;font-size:15px}
+  .slot-card .slot-date{font-size:13px;color:var(--gray);margin:2px 0}
+  .slot-card .slot-time{font-size:13px;color:var(--gray)}
+
+  /* exchange */
+  .exchange{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:16px 18px;margin-bottom:14px}
+  .exchange summary{cursor:pointer;font-weight:600;font-size:14px}
+  .exchange-body{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+  .exchange-msg{background:#FAF6F0;border-radius:var(--r-sm);padding:12px 14px;font-size:14px;line-height:1.5}
+  .exchange-msg .who{font-weight:700;display:block;margin-bottom:2px}
+
+  /* contract */
+  .contract-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin-bottom:14px}
+  .contract-row{display:flex;justify-content:space-between;font-size:14px;padding:7px 0;border-bottom:1px solid var(--line)}
+  .contract-row.total{font-weight:700;font-size:15px;border-bottom:none;padding-top:10px}
+  .contract-row.plain{border-bottom:none;color:var(--gray);font-size:13px;padding-top:4px}
+
   @media (prefers-reduced-motion: reduce){
     .msg.typing span{animation:none}
-    .block-placeholder,.venue-list,.chip,.toast,#interstitial{transition:none}
+    .block-placeholder,.venue-list,.chip,.toast,#interstitial,.carousel-track,.action-chip{transition:none}
   }
 </style>
 </head>
@@ -548,6 +636,45 @@
       await wait(150);
     }
 
+    // ---- block renderer shared helpers ----------------------------------------
+    function appendInlineNote(container, text) {
+      const el = document.createElement('div');
+      el.className = 'msg msg-agent inline-note';
+      const em = document.createElement('em');
+      em.textContent = text;
+      el.appendChild(em);
+      container.appendChild(el);
+      scrollStreamToBottom();
+    }
+    const NON_WILLOW_NOTE = 'In this concept, Willow Shore Lodge is the deep-dive — the others summarize in the reply comparison later.';
+    const NON_WILLOW_HOLD_NOTE = 'In this concept, Willow Shore Lodge is the booking path — holds on other venues aren’t scripted.';
+
+    function makePhotoPlaceholder() {
+      const div = document.createElement('div');
+      div.className = 'photo-placeholder';
+      div.setAttribute('aria-hidden', 'true');
+      div.textContent = '🏞️';
+      return div;
+    }
+
+    function makeRatingLine(v) {
+      const span = document.createElement('span');
+      span.className = 'rating-line';
+      const star = document.createElement('span');
+      star.className = 'star';
+      star.textContent = '★';
+      const val = document.createElement('span');
+      val.className = 'rating-val';
+      val.textContent = String(v.rating);
+      const count = document.createElement('span');
+      count.textContent = `(${v.reviews})`;
+      span.append(star, val, count);
+      return span;
+    }
+
+    const ACCESS_ICON = { full: '✅', none: '🚫', partial: '⚠️' };
+
+    // ---- venueList --------------------------------------------------------
     async function renderVenueList(container) {
       const el = document.createElement('div');
       el.className = 'venue-list';
@@ -555,24 +682,411 @@
       VENUES.forEach((v, i) => {
         const li = document.createElement('li');
         li.className = 'venue-row';
+        const text = document.createElement('span');
         const strong = document.createElement('strong');
         strong.textContent = `${i + 1}. ${v.name}`;
-        li.appendChild(strong);
-        li.appendChild(document.createTextNode(` – ${v.priceK} • ${v.blurb}`));
+        text.appendChild(strong);
+        text.appendChild(document.createTextNode(` – ${v.priceK} • ${v.blurb}`));
+        li.appendChild(text);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'action-chip';
+        btn.textContent = '✨ Tell me more';
         if (v.id === 'willow') {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'chip';
-          btn.textContent = 'Tell me more';
           btn.addEventListener('click', () => go('willow-detail'));
-          li.appendChild(btn);
+        } else {
+          btn.addEventListener('click', () => appendInlineNote(container, NON_WILLOW_NOTE));
         }
+        li.appendChild(btn);
         ol.appendChild(li);
       });
       el.appendChild(ol);
       container.appendChild(el);
       scrollStreamToBottom();
       await fadeInWhole(el);
+    }
+
+    // ---- carousel -----------------------------------------------------------
+    async function renderCarousel(container) {
+      const el = document.createElement('div');
+      el.className = 'carousel-wrap';
+      const track = document.createElement('div');
+      track.className = 'carousel-track';
+      VENUES.forEach(v => {
+        const card = document.createElement('div');
+        card.className = 'carousel-card';
+        const photoWrap = document.createElement('div');
+        photoWrap.className = 'photo-wrap';
+        photoWrap.appendChild(makePhotoPlaceholder());
+        const tag = document.createElement('span');
+        tag.className = 'featured-tag';
+        tag.textContent = 'Featured';
+        photoWrap.appendChild(tag);
+        card.appendChild(photoWrap);
+        const body = document.createElement('div');
+        body.className = 'card-body';
+        const name = document.createElement('div');
+        name.className = 'card-name';
+        name.textContent = v.name;
+        body.appendChild(name);
+        body.appendChild(makeRatingLine(v));
+        const loc = document.createElement('div');
+        loc.className = 'card-meta';
+        loc.textContent = 'Columbus, OH';
+        body.appendChild(loc);
+        const cap = document.createElement('div');
+        cap.className = 'card-meta';
+        cap.textContent = `${v.capacity} guests max · ${v.priceK}`;
+        body.appendChild(cap);
+        card.appendChild(body);
+        track.appendChild(card);
+      });
+      el.appendChild(track);
+      const arrow = document.createElement('button');
+      arrow.type = 'button';
+      arrow.className = 'carousel-arrow';
+      arrow.setAttribute('aria-label', 'Scroll venues');
+      arrow.textContent = '›';
+      arrow.addEventListener('click', () => {
+        const card = track.querySelector('.carousel-card');
+        const step = card ? card.getBoundingClientRect().width + 14 : 214;
+        track.scrollBy({ left: step, behavior: reducedMotion ? 'auto' : 'smooth' });
+      });
+      el.appendChild(arrow);
+      container.appendChild(el);
+      scrollStreamToBottom();
+      await fadeInWhole(el);
+    }
+
+    // ---- replyCards + modal ----------------------------------------------
+    let lastModalTrigger = null;
+    function closeReplyModal() {
+      const overlay = document.getElementById('bow-reply-modal');
+      if (!overlay) return;
+      overlay.remove();
+      document.removeEventListener('keydown', onModalKeydown);
+      if (lastModalTrigger) lastModalTrigger.focus();
+    }
+    function onModalKeydown(e) {
+      if (e.key === 'Escape') closeReplyModal();
+    }
+    function buildFloorplanSvg() {
+      const NS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 260 140');
+      svg.setAttribute('class', 'floorplan');
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('height', '140');
+      svg.setAttribute('role', 'img');
+      svg.setAttribute('aria-label', 'Simplified floor plan schematic');
+      const rects = [
+        { x: 8, y: 8, w: 150, h: 60, label: 'Ceremony' },
+        { x: 8, y: 76, w: 150, h: 56, label: 'Reception' },
+        { x: 166, y: 8, w: 86, h: 124, label: 'Restrooms' },
+      ];
+      rects.forEach(r => {
+        const rect = document.createElementNS(NS, 'rect');
+        rect.setAttribute('x', r.x); rect.setAttribute('y', r.y);
+        rect.setAttribute('width', r.w); rect.setAttribute('height', r.h);
+        rect.setAttribute('rx', 6);
+        svg.appendChild(rect);
+        const text = document.createElementNS(NS, 'text');
+        text.setAttribute('x', r.x + r.w / 2);
+        text.setAttribute('y', r.y + r.h / 2);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.textContent = r.label;
+        svg.appendChild(text);
+      });
+      return svg;
+    }
+    function openReplyModal(v, trigger) {
+      lastModalTrigger = trigger;
+      const overlay = document.createElement('div');
+      overlay.id = 'bow-reply-modal';
+      overlay.className = 'modal-overlay';
+      overlay.addEventListener('click', e => { if (e.target === overlay) closeReplyModal(); });
+      const card = document.createElement('div');
+      card.className = 'modal-card';
+      card.setAttribute('role', 'dialog');
+      card.setAttribute('aria-modal', 'true');
+      const h3 = document.createElement('h3');
+      h3.textContent = v.name;
+      card.appendChild(h3);
+      const q = document.createElement('p');
+      q.className = 'modal-quote';
+      q.textContent = v.accessQuote;
+      card.appendChild(q);
+      card.appendChild(buildFloorplanSvg());
+      const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'btn-outline';
+      closeBtn.textContent = 'Close';
+      closeBtn.addEventListener('click', closeReplyModal);
+      card.appendChild(closeBtn);
+      overlay.appendChild(card);
+      document.body.appendChild(overlay);
+      document.addEventListener('keydown', onModalKeydown);
+      closeBtn.focus();
+    }
+
+    async function renderReplyCards(container) {
+      const replied = VENUES.filter(v => v.replied);
+      for (const v of replied) {
+        const card = document.createElement('div');
+        card.className = 'reply-card';
+        // left: photo + meta
+        const left = document.createElement('div');
+        left.className = 'reply-meta-col';
+        left.appendChild(makePhotoPlaceholder());
+        left.appendChild(makeRatingLine(v));
+        const cap = document.createElement('div'); cap.className = 'meta-line'; cap.textContent = `Capacity: ${v.capacity} guests`;
+        const setting = document.createElement('div'); setting.className = 'meta-line'; setting.textContent = `Setting: ${v.setting}`;
+        const rain = document.createElement('div'); rain.className = 'meta-line'; rain.textContent = `Rain plan: ${v.rainPlan}`;
+        left.append(cap, setting, rain);
+        card.appendChild(left);
+        // right: name/quote, access, availability, actions
+        const right = document.createElement('div');
+        const header = document.createElement('div');
+        header.className = 'reply-header';
+        const name = document.createElement('div');
+        name.className = 'reply-name';
+        name.textContent = v.name;
+        const pill = document.createElement('span');
+        pill.className = 'quote-pill';
+        pill.textContent = `Quote: ${fmtMoney(v.quote)}`;
+        header.append(name, pill);
+        right.appendChild(header);
+
+        const accessRow = document.createElement('div');
+        accessRow.className = 'access-row reply-line';
+        const accessLabel = document.createElement('strong');
+        accessLabel.textContent = 'Accessibility Overview: ';
+        accessRow.appendChild(accessLabel);
+        accessRow.appendChild(document.createTextNode(`${ACCESS_ICON[v.access] ?? ''} ${v.accessLabel}`));
+        right.appendChild(accessRow);
+
+        const quoteLine = document.createElement('p');
+        quoteLine.className = 'access-quote';
+        quoteLine.textContent = `“${v.accessQuote}”`;
+        right.appendChild(quoteLine);
+
+        const availLine = document.createElement('div');
+        availLine.className = 'reply-line';
+        const availLabel = document.createElement('strong');
+        availLabel.textContent = 'Availability: ';
+        availLine.appendChild(availLabel);
+        availLine.appendChild(document.createTextNode(v.availability));
+        right.appendChild(availLine);
+
+        const actions = document.createElement('div');
+        actions.className = 'reply-actions';
+        const viewBtn = document.createElement('button');
+        viewBtn.type = 'button';
+        viewBtn.className = 'btn-outline';
+        viewBtn.textContent = 'View full reply';
+        viewBtn.addEventListener('click', () => openReplyModal(v, viewBtn));
+        actions.appendChild(viewBtn);
+
+        const holdBtn = document.createElement('button');
+        holdBtn.type = 'button';
+        holdBtn.className = 'btn-text';
+        holdBtn.textContent = 'Hold date';
+        if (v.id === 'willow') {
+          holdBtn.addEventListener('click', () => go('hold-willow'));
+        } else {
+          holdBtn.addEventListener('click', () => appendInlineNote(container, NON_WILLOW_HOLD_NOTE));
+        }
+        actions.appendChild(holdBtn);
+        right.appendChild(actions);
+
+        card.appendChild(right);
+        container.appendChild(card);
+      }
+      scrollStreamToBottom();
+      await wait(0);
+    }
+
+    // ---- recommendationHeading ---------------------------------------------
+    async function renderRecommendationHeading(container) {
+      const el = document.createElement('div');
+      el.className = 'recommendation-anchor';
+      el.setAttribute('aria-hidden', 'true');
+      container.appendChild(el);
+    }
+
+    // ---- comparison ---------------------------------------------------------
+    async function renderComparison(container) {
+      const willow = VENUES.find(v => v.id === 'willow');
+      const blue = VENUES.find(v => v.id === 'bluehorizon');
+      const el = document.createElement('table');
+      el.className = 'comparison-table';
+      const thead = document.createElement('thead');
+      const headRow = document.createElement('tr');
+      ['', 'Willow Shore Lodge', 'Blue Horizon Club'].forEach(h => {
+        const th = document.createElement('th');
+        th.textContent = h;
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      el.appendChild(thead);
+      const tbody = document.createElement('tbody');
+      const rows = [
+        ['Date', 'Sat Sept 20 ✅', 'Fri Sept 19'],
+        ['Access', '✅ Full', '✅ Full'],
+        ['Setting', willow.setting, blue.setting],
+        ['Capacity', `${willow.capacity} guests`, `${blue.capacity} guests`],
+        ['Rain plan', willow.rainPlan, blue.rainPlan],
+        ['Quote', fmtMoney(willow.quote), fmtMoney(blue.quote)],
+      ];
+      rows.forEach(([label, a, b]) => {
+        const tr = document.createElement('tr');
+        const th = document.createElement('td');
+        th.className = 'row-label';
+        th.textContent = label;
+        const tdA = document.createElement('td');
+        tdA.textContent = a;
+        const tdB = document.createElement('td');
+        tdB.textContent = b;
+        tr.append(th, tdA, tdB);
+        tbody.appendChild(tr);
+      });
+      el.appendChild(tbody);
+      container.appendChild(el);
+      scrollStreamToBottom();
+      await wait(0);
+    }
+
+    // ---- draftPreview ---------------------------------------------------------
+    async function renderDraftPreview(container) {
+      const card = document.createElement('div');
+      card.className = 'draft-preview-card';
+
+      const subject = document.createElement('div');
+      subject.className = 'draft-subject';
+      const label = document.createElement('strong');
+      label.textContent = 'Subject: ';
+      subject.appendChild(label);
+      const [before, after] = COMPOSER.subject.split('[Venue Name]');
+      subject.appendChild(document.createTextNode(before));
+      const pill = document.createElement('span');
+      pill.className = 'token-pill';
+      pill.textContent = '🏛️ Venue Name';
+      subject.appendChild(pill);
+      if (after) subject.appendChild(document.createTextNode(after));
+      card.appendChild(subject);
+
+      const greeting = document.createElement('div');
+      greeting.className = 'draft-greeting';
+      greeting.textContent = COMPOSER.greeting;
+      card.appendChild(greeting);
+
+      const bodyClip = document.createElement('div');
+      bodyClip.className = 'draft-body-clip';
+      bodyClip.textContent = COMPOSER.body[0];
+      card.appendChild(bodyClip);
+
+      container.appendChild(card);
+      scrollStreamToBottom();
+      await wait(0);
+    }
+
+    // ---- slots ----------------------------------------------------------------
+    async function renderSlots(container, beat) {
+      const row = document.createElement('div');
+      row.className = 'slots-row';
+      (beat?.chips ?? []).forEach(chip => {
+        const [dayDate, time] = chip.label.split(' · ');
+        const spaceIdx = (dayDate ?? '').indexOf(' ');
+        const day = spaceIdx === -1 ? (dayDate ?? '') : dayDate.slice(0, spaceIdx);
+        const date = spaceIdx === -1 ? '' : dayDate.slice(spaceIdx + 1);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'slot-card';
+        const d1 = document.createElement('div'); d1.className = 'slot-day'; d1.textContent = day;
+        const d2 = document.createElement('div'); d2.className = 'slot-date'; d2.textContent = date;
+        const d3 = document.createElement('div'); d3.className = 'slot-time'; d3.textContent = time ?? '';
+        btn.append(d1, d2, d3);
+        btn.addEventListener('click', () => go(chip.goto));
+        row.appendChild(btn);
+      });
+      container.appendChild(row);
+      scrollStreamToBottom();
+      await wait(0);
+    }
+
+    // ---- exchange ---------------------------------------------------------
+    async function renderExchange(container) {
+      const details = document.createElement('details');
+      details.className = 'exchange';
+      const summary = document.createElement('summary');
+      summary.textContent = 'View the exchange';
+      details.appendChild(summary);
+      const body = document.createElement('div');
+      body.className = 'exchange-body';
+      const msgs = [
+        { who: 'You (via the bow):', text: 'We’d love to move forward at the quoted $7,200 for Sept 20 — can you confirm the peak-Saturday fee will be waived per the original quote?' },
+        { who: 'Maya · Willow Shore Lodge:', text: 'Confirmed — we’ll honor $7,200. I’ve also added a complimentary rehearsal hour on Friday evening. Updated contract attached.' },
+      ];
+      msgs.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'exchange-msg';
+        const who = document.createElement('span');
+        who.className = 'who';
+        who.textContent = m.who;
+        div.appendChild(who);
+        div.appendChild(document.createTextNode(m.text));
+        body.appendChild(div);
+      });
+      details.appendChild(body);
+      container.appendChild(details);
+      scrollStreamToBottom();
+      await wait(0);
+    }
+
+    // ---- contract ---------------------------------------------------------
+    async function renderContract(container, beat) {
+      const negotiatedEff = (beat?.effects ?? []).find(e => e.e === 'negotiated');
+      const venueRental = negotiatedEff ? negotiatedEff.venueRental : (state.venueRental ?? 7450);
+      const catering = state.budget.quoted.find(i => i.label === 'Catering')?.amount ?? 0;
+      const fees = state.budget.quoted.find(i => i.label === 'Service fees & tax')?.amount ?? 0;
+      const total = venueRental + catering + fees;
+
+      const card = document.createElement('div');
+      card.className = 'contract-card';
+      const rows = [
+        ['Venue rental', fmtMoney(venueRental)],
+        ['Catering', fmtMoney(catering)],
+        ['Service fees & tax', fmtMoney(fees)],
+      ];
+      rows.forEach(([label, val]) => {
+        const row = document.createElement('div');
+        row.className = 'contract-row';
+        const l = document.createElement('span'); l.textContent = label;
+        const v = document.createElement('span'); v.textContent = val;
+        row.append(l, v);
+        card.appendChild(row);
+      });
+      const totalRow = document.createElement('div');
+      totalRow.className = 'contract-row total';
+      const tl = document.createElement('span'); tl.textContent = 'Total';
+      const tv = document.createElement('span'); tv.textContent = fmtMoney(total);
+      totalRow.append(tl, tv);
+      card.appendChild(totalRow);
+
+      const deposit = document.createElement('div');
+      deposit.className = 'contract-row plain';
+      deposit.textContent = 'Deposit due at signing: $5,600';
+      card.appendChild(deposit);
+
+      const balance = document.createElement('div');
+      balance.className = 'contract-row plain';
+      balance.textContent = 'Balance: two installments (Apr & Aug 2026)';
+      card.appendChild(balance);
+
+      container.appendChild(card);
+      scrollStreamToBottom();
+      await wait(0);
     }
 
     async function renderPlaceholder(container, type) {
@@ -585,9 +1099,17 @@
       await fadeInWhole(el);
     }
 
-    async function renderBlock(container, block, stale) {
+    async function renderBlock(container, block, stale, beat) {
       if (block.t === 'text') return renderTextBlock(container, block.md, stale);
       if (block.t === 'venueList') return renderVenueList(container);
+      if (block.t === 'carousel') return renderCarousel(container);
+      if (block.t === 'replyCards') return renderReplyCards(container);
+      if (block.t === 'recommendationHeading') return renderRecommendationHeading(container);
+      if (block.t === 'comparison') return renderComparison(container);
+      if (block.t === 'draftPreview') return renderDraftPreview(container);
+      if (block.t === 'slots') return renderSlots(container, beat);
+      if (block.t === 'exchange') return renderExchange(container);
+      if (block.t === 'contract') return renderContract(container, beat);
       return renderPlaceholder(container, block.t);
     }
 
@@ -689,6 +1211,11 @@
         return;
       }
 
+      // beats whose blocks include a `slots` renderer show the slots as
+      // clickable cards themselves — the #chips row would just duplicate
+      // those same goto targets, so it's suppressed for this beat only.
+      const hasSlotsBlock = (beat.blocks ?? []).some(b => b.t === 'slots');
+
       const already = getThread(beat.thread).rendered.has(id);
       state.beat = id;
       showThreadView();
@@ -698,7 +1225,7 @@
       if (already) {
         const node = t.beatNodes.get(id);
         node?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
-        renderChips(beat.chips ?? []);
+        renderChips(hasSlotsBlock ? [] : (beat.chips ?? []));
         applyPanel(beat.panel);
         // if this beat's autoGoto tail was invalidated before its target rendered
         // (e.g. Restart/Back mid-chain), re-follow it so the story can't dead-end
@@ -734,12 +1261,12 @@
       if (stale()) return abort();
 
       for (const block of beat.blocks ?? []) {
-        await renderBlock(wrap, block, stale);
+        await renderBlock(wrap, block, stale, beat);
         if (stale()) return abort();
       }
 
       inFlight.delete(id);
-      renderChips(beat.chips ?? []);
+      renderChips(hasSlotsBlock ? [] : (beat.chips ?? []));
       applyPanel(beat.panel);
       for (const eff of beat.effects ?? []) applyEffect(eff);
 
