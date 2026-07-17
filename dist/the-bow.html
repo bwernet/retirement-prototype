@@ -344,22 +344,21 @@
   @keyframes bow-typing{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
   .block-placeholder{border:1px dashed var(--line);border-radius:12px;padding:14px 16px;color:var(--gray);font-size:13px;margin-bottom:14px;opacity:0;transition:opacity .15s}
   .block-placeholder.show{opacity:1}
-  .venue-list{margin-bottom:14px;opacity:0;transition:opacity .15s}
-  .venue-list.show{opacity:1}
   /* plain numbered lines flowing into the carousel — one combined answer (author note 2026-07-17) */
-  .venue-list ol{padding-left:0;display:flex;flex-direction:column;gap:12px}
-  .venue-row{list-style:none;font-size:16px;line-height:1.5;display:flex;align-items:center;flex-wrap:wrap;gap:10px}
-  /* ONE grammar for “say this to the agent”: gradient bubble, no icon
-     (author decision 2026-07-17); functional actions stay buttons/links */
-  .chip{display:inline-flex;align-items:center;background:linear-gradient(90deg, var(--chip-pink) 0%, var(--chip-blue) 100%);color:var(--ink);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:600;opacity:1;transition:opacity .2s,transform .15s}
-  .chip:hover{transform:translateY(-1px)}
+  /* chip hierarchy (author round 2026-07-17, option C): suggestions are
+     quiet outline pills; the ONE recommended next move gets the gradient —
+     the gradient means “recommended”, not merely “clickable” */
+  .chip{display:inline-flex;align-items:center;background:#fff;border:1px solid #D8CFC2;color:var(--ink);border-radius:999px;padding:8px 15px;font-size:14px;font-weight:600;opacity:1;transition:opacity .2s,transform .15s,border-color .15s}
+  .chip:hover{transform:translateY(-1px);border-color:var(--gray)}
+  .chip.primary{background:linear-gradient(90deg, var(--chip-pink) 0%, var(--chip-blue) 100%);border:0;padding:9px 16px}
   .chips-inline{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 4px}
   .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
   /* ---- block renderers (Task 8) ---- */
-  .action-chip{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(90deg, var(--chip-pink) 0%, var(--chip-blue) 100%);color:var(--ink);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;flex-shrink:0;transition:transform .15s}
-  .action-chip:hover{transform:translateY(-1px)}
+  .action-chip{display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #D8CFC2;color:var(--ink);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;flex-shrink:0;transition:transform .15s,border-color .15s}
+  .action-chip:hover{transform:translateY(-1px);border-color:var(--gray)}
+  .action-chip.primary{background:linear-gradient(90deg, var(--chip-pink) 0%, var(--chip-blue) 100%);border:0}
   .btn-outline{background:#fff;border:1px solid var(--ink);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600}
   .btn-outline:hover{background:rgba(0,0,0,.04)}
   .btn-text{text-decoration:underline;text-underline-offset:2px;font-size:13px;font-weight:600;color:var(--ink)}
@@ -380,11 +379,12 @@
   .carousel-wrap{position:relative;margin-bottom:14px}
   .carousel-track{display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;padding:4px 44px 8px 2px;scrollbar-width:none}
   .carousel-track::-webkit-scrollbar{display:none}
-  .carousel-card{flex:0 0 200px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .carousel-card{flex:0 0 232px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .card-blurb{font-size:12px;color:var(--gray);line-height:1.45}
   .carousel-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
   .carousel-card .photo-wrap{position:relative}
   .carousel-card .photo-placeholder{width:100%;height:130px;border-radius:0}
-  .featured-tag{position:absolute;top:8px;left:8px;background:var(--ink);color:#fff;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:4px 8px;border-radius:999px}
+  .featured-tag{position:absolute;top:8px;left:8px;background:var(--ink);color:#fff;font-size:11px;font-weight:700;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%}
   .carousel-card .card-body{padding:12px;display:flex;flex-direction:column;gap:4px}
   .carousel-card .card-name{font-weight:700;font-size:14px}
   .carousel-card .card-meta{font-size:12px;color:var(--gray)}
@@ -450,7 +450,7 @@
 
   @media (prefers-reduced-motion: reduce){
     .msg.typing span{animation:none}
-    .block-placeholder,.venue-list,.chip,.toast,#interstitial,.carousel-track,.action-chip{transition:none}
+    .block-placeholder,.chip,.toast,#interstitial,.carousel-track,.action-chip{transition:none}
     .interstitial-shimmer-sweep.play{animation:none}
     .chat-badge.pulse{animation:none}
   }
@@ -917,8 +917,8 @@ const SCRIPT = {
     userBubble: 'Tell me about the venues you found!', // PIN
     blocks: [
       { t: 'text', md: 'While you were offline, I cross-checked your 150-guest head-count, your $9 k venue cap, and your “must-have indoor backup” rule against every lake-view property within 30 mi. Then I pinged each venue’s live calendar to confirm they still hold **Saturday • Sept 20 2026**.\n\nHere are the five that cleared every filter — no last-minute surprises:' }, // PIN
-      { t: 'venueList' }, // renders VENUES rows with per-venue "Tell me more" chips
-      { t: 'text', md: '**Take a closer look:**' }, // PIN
+      // author round 2026-07-17 (option D): the ranked card carousel IS the
+      // list — rank badges + blurbs live on the cards, no separate text rows
       { t: 'carousel' },
       { t: 'text', md: '**Next moves (pick one or just tell me):**\n*(I’ll keep monitoring in case one books out — if availability changes you’ll get an alert.)*' }, // PIN
     ],
@@ -936,7 +936,7 @@ const SCRIPT = {
     panel: 'venue',
     chips: [
       { label: 'What Saturdays in September 2026 are still open besides the 20th?', goto: 'willow-saturdays' }, // PIN
-      { label: 'I don’t see answers about wheelchair accessibility — ask all 5 venues', goto: 'accessibility-draft' },
+      { label: 'I don’t see answers about wheelchair accessibility — ask all 5 venues', goto: 'accessibility-draft', primary: true },
     ],
     match: ['willow', 'tell me more', 'detail'],
   },
@@ -1016,7 +1016,7 @@ const SCRIPT = {
     ],
     chips: [
       { label: 'Compare Willow Shore Lodge and Blue Horizon Club Side by side', goto: 'compare-side' }, // PIN
-      { label: 'Hold Willow Shore Lodge', goto: 'hold-willow' }, // PIN
+      { label: 'Hold Willow Shore Lodge', goto: 'hold-willow', primary: true }, // PIN
       { label: 'Hold Blue Horizon Club', goto: 'hold-blue' }, // PIN
     ],
     match: ['recommend', 'which one', 'best'],
@@ -1519,9 +1519,10 @@ const PHOTOS = {
       group.className = 'chips-inline';
       group.setAttribute('role', 'group');
       group.setAttribute('aria-label', 'Suggested replies');
+      const primaryIdx = Math.max(0, chips.findIndex(c => c.primary));
       chips.forEach((c, i) => {
         const btn = document.createElement('button');
-        btn.className = 'chip';
+        btn.className = i === primaryIdx ? 'chip primary' : 'chip';
         btn.type = 'button';
         btn.textContent = liveText(c.label);
         btn.addEventListener('click', () => go(c.goto));
@@ -2291,7 +2292,7 @@ const PHOTOS = {
 
       const cta = document.createElement('button');
       cta.type = 'button';
-      cta.className = 'action-chip';
+      cta.className = 'action-chip primary';
       cta.append('Explore other locations');
       cta.addEventListener('click', () => panelNoteAfter(cta,
         '(Your location stays flexible until you book a venue — in this concept, the story stays in Columbus.)'));
@@ -2364,7 +2365,7 @@ const PHOTOS = {
 
       const cta = document.createElement('button');
       cta.type = 'button';
-      cta.className = 'action-chip';
+      cta.className = 'action-chip primary';
       cta.append('Explore other dates');
       cta.addEventListener('click', () => panelNoteAfter(cta,
         '(Friday dates in your area trend 20–30% cheaper — your date stays flexible until the venue is booked.)'));
@@ -2411,7 +2412,7 @@ const PHOTOS = {
 
       const cta = document.createElement('button');
       cta.type = 'button';
-      cta.className = 'action-chip';
+      cta.className = 'action-chip primary';
       cta.append('Start your guest list');
       cta.addEventListener('click', () => panelNoteAfter(cta,
         '(In the full product this opens guest management — in this concept, planning continues around your estimate.)'));
@@ -2496,7 +2497,6 @@ const PHOTOS = {
       container.appendChild(el);
       scrollStreamToBottom();
     }
-    const NON_WILLOW_NOTE = 'In this concept, Willow Shore Lodge is the deep-dive — the others summarize in the reply comparison later.';
     const NON_WILLOW_HOLD_NOTE = 'In this concept, Willow Shore Lodge is the booking path — holds on other venues aren’t scripted.';
 
     function makePhotoImg(v) {
@@ -2525,38 +2525,6 @@ const PHOTOS = {
 
     const ACCESS_ICON = { full: '✅', none: '🚫', partial: '⚠️' };
 
-    // ---- venueList --------------------------------------------------------
-    async function renderVenueList(container) {
-      const el = document.createElement('div');
-      el.className = 'venue-list';
-      const ol = document.createElement('ol');
-      VENUES.forEach((v, i) => {
-        const li = document.createElement('li');
-        li.className = 'venue-row';
-        const text = document.createElement('span');
-        const strong = document.createElement('strong');
-        strong.textContent = `${i + 1}. ${v.name}`;
-        text.appendChild(strong);
-        text.appendChild(document.createTextNode(` – ${v.priceK} • ${v.blurb}`));
-        li.appendChild(text);
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'action-chip';
-        btn.append('Tell me more');
-        if (v.id === 'willow') {
-          btn.addEventListener('click', () => go('willow-detail'));
-        } else {
-          btn.addEventListener('click', () => appendInlineNote(container, NON_WILLOW_NOTE));
-        }
-        li.appendChild(btn);
-        ol.appendChild(li);
-      });
-      el.appendChild(ol);
-      container.appendChild(el);
-      scrollStreamToBottom();
-      await fadeInWhole(el);
-    }
-
     // ---- carousel -----------------------------------------------------------
     async function renderCarousel(container) {
       const el = document.createElement('div');
@@ -2580,7 +2548,8 @@ const PHOTOS = {
         photoWrap.appendChild(makePhotoImg(v));
         const tag = document.createElement('span');
         tag.className = 'featured-tag';
-        tag.textContent = 'Featured';
+        tag.textContent = String(VENUES.indexOf(v) + 1);
+        tag.setAttribute('aria-label', `Ranked ${VENUES.indexOf(v) + 1} of ${VENUES.length}`);
         photoWrap.appendChild(tag);
         card.appendChild(photoWrap);
         const body = document.createElement('div');
@@ -2589,6 +2558,10 @@ const PHOTOS = {
         name.className = 'card-name';
         name.textContent = v.name;
         body.appendChild(name);
+        const blurb = document.createElement('div');
+        blurb.className = 'card-blurb';
+        blurb.textContent = v.blurb;
+        body.appendChild(blurb);
         body.appendChild(makeRatingLine(v));
         const loc = document.createElement('div');
         loc.className = 'card-meta';
@@ -2974,7 +2947,6 @@ const PHOTOS = {
 
     async function renderBlock(container, block, stale, beat) {
       if (block.t === 'text') return renderTextBlock(container, block.md, stale);
-      if (block.t === 'venueList') return renderVenueList(container);
       if (block.t === 'carousel') return renderCarousel(container);
       if (block.t === 'replyCards') return renderReplyCards(container);
       if (block.t === 'recommendationHeading') return renderRecommendationHeading(container);

@@ -167,8 +167,8 @@ export const SCRIPT = {
     userBubble: 'Tell me about the venues you found!', // PIN
     blocks: [
       { t: 'text', md: 'While you were offline, I cross-checked your 150-guest head-count, your $9 k venue cap, and your “must-have indoor backup” rule against every lake-view property within 30 mi. Then I pinged each venue’s live calendar to confirm they still hold **Saturday • Sept 20 2026**.\n\nHere are the five that cleared every filter — no last-minute surprises:' }, // PIN
-      { t: 'venueList' }, // renders VENUES rows with per-venue "Tell me more" chips
-      { t: 'text', md: '**Take a closer look:**' }, // PIN
+      // author round 2026-07-17 (option D): the ranked card carousel IS the
+      // list — rank badges + blurbs live on the cards, no separate text rows
       { t: 'carousel' },
       { t: 'text', md: '**Next moves (pick one or just tell me):**\n*(I’ll keep monitoring in case one books out — if availability changes you’ll get an alert.)*' }, // PIN
     ],
@@ -186,7 +186,7 @@ export const SCRIPT = {
     panel: 'venue',
     chips: [
       { label: 'What Saturdays in September 2026 are still open besides the 20th?', goto: 'willow-saturdays' }, // PIN
-      { label: 'I don’t see answers about wheelchair accessibility — ask all 5 venues', goto: 'accessibility-draft' },
+      { label: 'I don’t see answers about wheelchair accessibility — ask all 5 venues', goto: 'accessibility-draft', primary: true },
     ],
     match: ['willow', 'tell me more', 'detail'],
   },
@@ -266,7 +266,7 @@ export const SCRIPT = {
     ],
     chips: [
       { label: 'Compare Willow Shore Lodge and Blue Horizon Club Side by side', goto: 'compare-side' }, // PIN
-      { label: 'Hold Willow Shore Lodge', goto: 'hold-willow' }, // PIN
+      { label: 'Hold Willow Shore Lodge', goto: 'hold-willow', primary: true }, // PIN
       { label: 'Hold Blue Horizon Club', goto: 'hold-blue' }, // PIN
     ],
     match: ['recommend', 'which one', 'best'],
