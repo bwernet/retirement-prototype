@@ -186,7 +186,7 @@ export const SCRIPT = {
     panel: 'venue',
     chips: [
       { label: 'What Saturdays in September 2026 are still open besides the 20th?', goto: 'willow-saturdays' }, // PIN
-      { label: 'I don’t see answers about wheelchair accessibility — ask all 5 venues', goto: 'accessibility-draft', primary: true },
+      { label: 'I don’t see answers about wheelchair accessibility — ask all 5 venues', goto: 'accessibility-draft' },
     ],
     match: ['willow', 'tell me more', 'detail'],
   },
@@ -266,7 +266,7 @@ export const SCRIPT = {
     ],
     chips: [
       { label: 'Compare Willow Shore Lodge and Blue Horizon Club Side by side', goto: 'compare-side' }, // PIN
-      { label: 'Hold Willow Shore Lodge', goto: 'hold-willow', primary: true }, // PIN
+      { label: 'Hold Willow Shore Lodge', goto: 'hold-willow' }, // PIN
       { label: 'Hold Blue Horizon Club', goto: 'hold-blue' }, // PIN
     ],
     match: ['recommend', 'which one', 'best'],

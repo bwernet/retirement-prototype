@@ -345,20 +345,17 @@
   .block-placeholder{border:1px dashed var(--line);border-radius:12px;padding:14px 16px;color:var(--gray);font-size:13px;margin-bottom:14px;opacity:0;transition:opacity .15s}
   .block-placeholder.show{opacity:1}
   /* plain numbered lines flowing into the carousel — one combined answer (author note 2026-07-17) */
-  /* chip hierarchy (author round 2026-07-17, option C): suggestions are
-     quiet outline pills; the ONE recommended next move gets the gradient —
-     the gradient means “recommended”, not merely “clickable” */
-  .chip{display:inline-flex;align-items:center;background:#fff;border:1px solid #D8CFC2;color:var(--ink);border-radius:999px;padding:8px 15px;font-size:14px;font-weight:600;opacity:1;transition:opacity .2s,transform .15s,border-color .15s}
-  .chip:hover{transform:translateY(-1px);border-color:var(--gray)}
-  .chip.primary{background:linear-gradient(90deg, var(--chip-pink) 0%, var(--chip-blue) 100%);border:0;padding:9px 16px}
+  /* one uniform treatment for every say-this-to-the-agent chip (author
+     round 2026-07-17: mixed outline/gradient read as inconsistency) */
+  .chip{display:inline-flex;align-items:center;background:linear-gradient(90deg, var(--chip-pink) 0%, var(--chip-blue) 100%);color:var(--ink);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:600;opacity:1;transition:opacity .2s,transform .15s}
+  .chip:hover{transform:translateY(-1px)}
   .chips-inline{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 4px}
   .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
   /* ---- block renderers (Task 8) ---- */
-  .action-chip{display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #D8CFC2;color:var(--ink);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;flex-shrink:0;transition:transform .15s,border-color .15s}
-  .action-chip:hover{transform:translateY(-1px);border-color:var(--gray)}
-  .action-chip.primary{background:linear-gradient(90deg, var(--chip-pink) 0%, var(--chip-blue) 100%);border:0}
+  .action-chip{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(90deg, var(--chip-pink) 0%, var(--chip-blue) 100%);color:var(--ink);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;flex-shrink:0;transition:transform .15s}
+  .action-chip:hover{transform:translateY(-1px)}
   .btn-outline{background:#fff;border:1px solid var(--ink);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600}
   .btn-outline:hover{background:rgba(0,0,0,.04)}
   .btn-text{text-decoration:underline;text-underline-offset:2px;font-size:13px;font-weight:600;color:var(--ink)}
@@ -380,7 +377,10 @@
   .carousel-track{display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;padding:4px 44px 8px 2px;scrollbar-width:none}
   .carousel-track::-webkit-scrollbar{display:none}
   .carousel-card{flex:0 0 232px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,box-shadow .15s}
-  .card-blurb{font-size:12px;color:var(--gray);line-height:1.45}
+  /* the agent's per-venue insight — tinted + sparkled so it reads as the
+     agent's note, distinct from standard listing metadata */
+  .card-insight{display:flex;align-items:flex-start;gap:6px;background:#FDEEF7;border-radius:8px;padding:6px 8px;font-size:12px;line-height:1.4;color:var(--ink)}
+  .card-insight .i{width:13px;height:13px;flex-shrink:0;margin-top:1px}
   .carousel-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
   .carousel-card .photo-wrap{position:relative}
   .carousel-card .photo-placeholder{width:100%;height:130px;border-radius:0}
@@ -936,7 +936,7 @@ const SCRIPT = {
     panel: 'venue',
     chips: [
       { label: 'What Saturdays in September 2026 are still open besides the 20th?', goto: 'willow-saturdays' }, // PIN
-      { label: 'I don’t see answers about wheelchair accessibility — ask all 5 venues', goto: 'accessibility-draft', primary: true },
+      { label: 'I don’t see answers about wheelchair accessibility — ask all 5 venues', goto: 'accessibility-draft' },
     ],
     match: ['willow', 'tell me more', 'detail'],
   },
@@ -1016,7 +1016,7 @@ const SCRIPT = {
     ],
     chips: [
       { label: 'Compare Willow Shore Lodge and Blue Horizon Club Side by side', goto: 'compare-side' }, // PIN
-      { label: 'Hold Willow Shore Lodge', goto: 'hold-willow', primary: true }, // PIN
+      { label: 'Hold Willow Shore Lodge', goto: 'hold-willow' }, // PIN
       { label: 'Hold Blue Horizon Club', goto: 'hold-blue' }, // PIN
     ],
     match: ['recommend', 'which one', 'best'],
@@ -1519,10 +1519,9 @@ const PHOTOS = {
       group.className = 'chips-inline';
       group.setAttribute('role', 'group');
       group.setAttribute('aria-label', 'Suggested replies');
-      const primaryIdx = Math.max(0, chips.findIndex(c => c.primary));
       chips.forEach((c, i) => {
         const btn = document.createElement('button');
-        btn.className = i === primaryIdx ? 'chip primary' : 'chip';
+        btn.className = 'chip';
         btn.type = 'button';
         btn.textContent = liveText(c.label);
         btn.addEventListener('click', () => go(c.goto));
@@ -2292,7 +2291,7 @@ const PHOTOS = {
 
       const cta = document.createElement('button');
       cta.type = 'button';
-      cta.className = 'action-chip primary';
+      cta.className = 'action-chip';
       cta.append('Explore other locations');
       cta.addEventListener('click', () => panelNoteAfter(cta,
         '(Your location stays flexible until you book a venue — in this concept, the story stays in Columbus.)'));
@@ -2365,7 +2364,7 @@ const PHOTOS = {
 
       const cta = document.createElement('button');
       cta.type = 'button';
-      cta.className = 'action-chip primary';
+      cta.className = 'action-chip';
       cta.append('Explore other dates');
       cta.addEventListener('click', () => panelNoteAfter(cta,
         '(Friday dates in your area trend 20–30% cheaper — your date stays flexible until the venue is booked.)'));
@@ -2412,7 +2411,7 @@ const PHOTOS = {
 
       const cta = document.createElement('button');
       cta.type = 'button';
-      cta.className = 'action-chip primary';
+      cta.className = 'action-chip';
       cta.append('Start your guest list');
       cta.addEventListener('click', () => panelNoteAfter(cta,
         '(In the full product this opens guest management — in this concept, planning continues around your estimate.)'));
@@ -2558,10 +2557,12 @@ const PHOTOS = {
         name.className = 'card-name';
         name.textContent = v.name;
         body.appendChild(name);
-        const blurb = document.createElement('div');
-        blurb.className = 'card-blurb';
-        blurb.textContent = v.blurb;
-        body.appendChild(blurb);
+        const insight = document.createElement('div');
+        insight.className = 'card-insight';
+        const insightText = document.createElement('span');
+        insightText.textContent = v.blurb;
+        insight.append(icon('sparkle', 'i-pink'), insightText);
+        body.appendChild(insight);
         body.appendChild(makeRatingLine(v));
         const loc = document.createElement('div');
         loc.className = 'card-meta';
