@@ -390,12 +390,15 @@
     #thread.panel-open{margin-right:0}
     #panel{position:fixed;inset:0;width:auto;height:auto;border-radius:0;z-index:70}
 
-    /* interstitial text sizes down */
+    /* interstitial text sizes down; sits above the rail bar (z 60) so the
+       takeover is truly full-screen — below #panel's 70 */
     #interstitial .line2{font-size:28px}
+    #interstitial{z-index:65}
 
     /* concept pill: short label only, disclaimer text stays in the DOM (pinned by
-       the-bow.test.mjs) but is visually hidden */
-    #concept-pill{padding:8px 12px;gap:2px}
+       the-bow.test.mjs) but is visually hidden; lifted clear of the fixed rail
+       bar and above its z-index so Restart stays clickable */
+    #concept-pill{padding:8px 12px;gap:2px;bottom:calc(56px + 12px);z-index:65}
     #concept-pill .pill-text{display:none}
     #concept-pill .pill-short{display:inline}
   }
