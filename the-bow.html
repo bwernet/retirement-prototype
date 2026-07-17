@@ -37,7 +37,7 @@
   .chat-btn{position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%}
   .chat-btn:hover{background:rgba(0,0,0,.04)}
   .chat-badge{position:absolute;top:-2px;right:-2px;background:var(--pink);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid var(--cream)}
-  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg, var(--pink) 0%, var(--label-blue) 100%);border:0;flex-shrink:0}
+  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg, var(--pink) 0%, var(--label-blue) 100%);border:0;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;letter-spacing:.02em}
 
   /* ---- topbar ---- */
   #topbar{grid-row:1;grid-column:2;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 8px;background:var(--cream)}
@@ -106,10 +106,99 @@
   #chips{display:flex;flex-wrap:wrap;gap:10px;padding:0 32px 16px}
   .thread-ask{margin:0 32px 24px}
 
-  #panel{position:absolute;top:12px;right:24px;bottom:24px;width:420px;background:var(--card);border-radius:var(--r-lg);overflow-y:auto}
+  #panel{position:absolute;top:12px;right:24px;bottom:24px;width:420px;background:var(--card);border-radius:var(--r-lg);overflow-y:auto;transform:translateX(16px);opacity:0;transition:transform .42s ease,opacity .42s ease}
+  #panel.panel-visible{transform:translateX(0);opacity:1}
   #panel[hidden]{display:none}
   #panel .panel-placeholder{padding:24px;color:var(--gray);font-size:14px}
   #thread.panel-open{margin-right:440px}
+  .panel-close-bar{position:sticky;top:0;display:flex;justify-content:flex-end;padding:12px 12px 0;background:var(--card);z-index:5}
+  .panel-close{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gray)}
+  .panel-close:hover{background:rgba(0,0,0,.05);color:var(--ink)}
+  .panel-body{padding:0 24px 28px}
+  .panel-note{color:var(--gray);font-size:13px;margin-top:10px;font-style:italic}
+
+  /* ---- panel: venue (Task 9) ---- */
+  .venue-panel .photo-grid{display:flex;gap:8px;margin-bottom:16px}
+  .venue-panel .hero-photo{width:60%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;flex-shrink:0}
+  .venue-panel .thumb-grid{width:40%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px}
+  .venue-panel .thumb-grid img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+  .venue-panel .pill-blue{display:inline-flex;align-items:center;background:var(--chip-blue);color:var(--ink);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;margin-bottom:14px}
+  .venue-panel h2{font-family:'Figtree';font-weight:800;font-size:32px;margin:0 0 8px;line-height:1.15}
+  .venue-panel .rating-row{font-size:14px;color:var(--gray);display:flex;align-items:center;gap:6px;margin-bottom:20px}
+  .venue-panel .rating-row .star{color:var(--gold)}
+  .venue-panel .rating-row .rv{color:var(--ink);font-weight:600}
+  .venue-panel .rating-row u{text-decoration-color:currentColor}
+  .venue-panel .quote-caps{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--label-pink);margin-bottom:8px}
+  .venue-panel .quote-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:14px;margin-bottom:24px}
+  .venue-panel .quote-row .amt{font-weight:800;font-size:16px}
+  .venue-panel .quote-row .quote-note{color:var(--gray);font-size:13px}
+  .venue-panel h3{font-size:16px;font-weight:800;margin:0 0 10px}
+  .venue-panel .about-copy{font-size:14px;line-height:1.6;color:var(--ink);margin-bottom:24px}
+  .venue-panel .perfect-card{border:1px solid var(--label-pink);background:rgba(255,62,180,.04);border-radius:var(--r-md);padding:18px;margin-bottom:24px}
+  .venue-panel .perfect-card .title{font-weight:700;font-size:14px;margin-bottom:10px;display:block}
+  .venue-panel .perfect-card ul{display:flex;flex-direction:column;gap:8px}
+  .venue-panel .perfect-card li{font-size:14px;line-height:1.5;padding-left:16px;position:relative}
+  .venue-panel .perfect-card li::before{content:'•';position:absolute;left:2px;color:var(--label-pink)}
+  .venue-panel .other-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+
+  /* ---- panel: composer (Task 9) ---- */
+  .composer-panel .subject-line,.composer-panel .greeting-line{font-size:14px;margin-bottom:14px}
+  .composer-panel p{font-size:14px;line-height:1.6;margin-bottom:12px}
+  .composer-panel ol{margin:0 0 14px;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+  .composer-panel ol li{font-size:14px;line-height:1.5}
+  .composer-panel .sig-line{font-size:14px;line-height:1.6}
+  .composer-panel .sig-gray{color:var(--gray)}
+  .composer-panel .recipients-row{margin:20px 0 4px}
+  .composer-panel .recipients-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray);margin-bottom:8px;display:block}
+  .composer-panel .recipient-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .composer-panel .recipient-chip{display:inline-flex;align-items:center;gap:6px;background:var(--chip-pink);border-radius:999px;padding:6px 8px 6px 12px;font-size:13px;font-weight:600}
+  .composer-panel .recipient-chip button{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--ink)}
+  .composer-panel .recipient-chip button:hover{background:rgba(0,0,0,.1)}
+  .composer-send{display:flex;align-items:center;gap:8px;background:var(--pink);color:#fff;font-weight:600;border-radius:999px;padding:14px 24px;font-size:15px;margin-top:20px;width:100%;justify-content:center}
+  .composer-send:hover{opacity:.92}
+
+  /* ---- panel: budget (Task 9) ---- */
+  .budget-panel h2{font-family:'Figtree';font-weight:800;font-size:22px;margin:0 0 12px}
+  .budget-panel h3{font-size:15px;font-weight:800;margin:26px 0 12px}
+  .budget-toggle{display:inline-flex;background:#F3EEE6;border-radius:999px;padding:3px;margin-bottom:16px}
+  .budget-toggle button{padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;color:var(--gray)}
+  .budget-toggle button.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .budget-toggle button:disabled{opacity:.5;cursor:not-allowed}
+  .budget-meta-row{font-size:13px;color:var(--gray);margin-bottom:20px}
+  .budget-figures{display:flex;gap:32px;margin-bottom:22px;flex-wrap:wrap}
+  .budget-figure{display:flex;flex-direction:column;gap:4px}
+  .budget-figure .fig-amt{font-size:24px;font-weight:800}
+  .budget-figure .fig-label{font-size:13px;color:var(--gray);display:flex;align-items:center;gap:6px}
+  .budget-figure .fig-diff{font-weight:700}
+  .budget-figure .fig-diff.over{color:#D64545}
+  .budget-figure .fig-diff.under{color:#1F9D55}
+  .budget-bar-wrap{position:relative;margin:26px 0 14px}
+  .budget-bar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--line)}
+  .budget-bar .seg-paid{background:var(--pink-deep)}
+  .budget-bar .seg-booked{background:var(--pink)}
+  .budget-bar .seg-quoted{background:#F48FD0}
+  .budget-bar .seg-planned{background:var(--pink-pale)}
+  .budget-goal-marker{position:absolute;top:-22px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--gray);white-space:nowrap}
+  .budget-goal-marker .pig{font-size:14px}
+  .budget-goal-marker::after{content:'';position:absolute;bottom:-14px;width:2px;height:14px;background:var(--ink)}
+  .budget-legend{display:flex;flex-wrap:wrap;gap:12px 18px;font-size:12px;color:var(--gray);margin-bottom:8px}
+  .budget-legend .leg-item{display:flex;align-items:center;gap:6px}
+  .budget-legend .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .budget-legend b{color:var(--ink)}
+  .budget-section-head{font-size:14px;font-weight:700;margin:16px 0 10px}
+  .budget-section-head.remaining-head{display:flex;align-items:baseline;justify-content:space-between}
+  .budget-section-head .remaining-amt{font-size:13px;font-weight:400;color:var(--gray)}
+  .budget-section-head .remaining-amt strong{color:var(--ink);font-weight:800}
+  .budget-items-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+  .budget-item-card{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px}
+  .budget-item-card .bi-icon{font-size:18px}
+  .budget-item-card .bi-label{flex:1;font-size:13px;font-weight:600}
+  .budget-item-card .bi-amt{font-size:13px;font-weight:700}
+  .budget-item-card .bi-chevron{color:var(--gray);font-size:14px}
+
+  @media (prefers-reduced-motion: reduce){
+    #panel{transition:none}
+  }
   #interstitial[hidden]{display:none}
   #interstitial{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(23,23,25,.85);color:#fff;border-radius:var(--r-lg);opacity:0;transition:opacity .2s;z-index:40;text-align:center}
   #interstitial.show{opacity:1}
@@ -156,7 +245,7 @@
   .inline-note{color:var(--gray)}
   .inline-note em{font-style:italic}
 
-  .photo-placeholder{width:200px;height:150px;flex-shrink:0;border-radius:var(--r-sm);background:linear-gradient(135deg,#F3E9DC 0%,#DDDBD6 100%);display:flex;align-items:center;justify-content:center;font-size:28px}
+  .photo-placeholder{width:200px;height:150px;flex-shrink:0;border-radius:var(--r-sm);background:linear-gradient(135deg,#F3E9DC 0%,#DDDBD6 100%);display:flex;align-items:center;justify-content:center;font-size:28px;object-fit:cover}
 
   .rating-line{font-size:13px;color:var(--gray);display:flex;align-items:center;gap:4px}
   .rating-line .star{color:var(--gold)}
@@ -296,11 +385,18 @@
         <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3h11A2.5 2.5 0 0 1 19 5.5v7A2.5 2.5 0 0 1 16.5 15H9l-4 3v-3H5.5A2.5 2.5 0 0 1 3 12.5v-7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
         <span class="chat-badge">4</span>
       </button>
-      <button class="avatar" aria-label="Account"></button>
+      <button class="avatar" aria-label="Account"><span aria-hidden="true">T&amp;C</span></button>
     </div>
   </nav>
   <header id="topbar">
-    <svg id="wordmark" viewBox="0 0 120 40" role="img" aria-label="the bow"><text x="0" y="27" font-family="Figtree" font-weight="800" font-size="24" fill="var(--ink)">the bow</text></svg>
+    <svg id="wordmark" viewBox="0 0 120 36" role="img" aria-label="the bow">
+      <text x="0" y="25" font-family="Figtree" font-weight="800" font-size="21" fill="var(--ink)">the bow</text>
+      <g transform="translate(90,7)" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 10 C11 10 4 2 2 6 C0 10 6 15 11 10 Z"/>
+        <path d="M11 10 C11 10 18 2 20 6 C22 10 16 15 11 10 Z"/>
+        <path d="M11 10 L8 17 M11 10 L14 17"/>
+      </g>
+    </svg>
     <div class="chips">
       <span class="hchip">📅 9/20/26</span><span class="hchip">👥 125 guests</span>
       <span class="hchip">📍 Columbus, OH</span>
@@ -447,6 +543,7 @@
   <div id="concept-pill">Concept prototype — not affiliated with any marketplace · <button id="restart">Restart</button></div>
   <script type="module">
     import { BRAND, VENUES, SCRIPT, COMPOSER, matchInput, initialBudget, applyVenuePackage, applyRebalance, applyGoalIncrease, applyBooking, fmtMoney, fmtK } from './bow-model.js';
+    import { PHOTOS } from './bow-photos.js';
 
     // ---- dom refs ----------------------------------------------------------
     const homeEl = document.getElementById('home');
@@ -476,6 +573,7 @@
         venueRental: undefined,
         homeState: 'fresh',
         transcripts: new Map(),
+        composerRecipients: VENUES.map(v => v.id), // Task 9: composer panel recipient list
       };
     }
     let state = freshState();
@@ -556,17 +654,429 @@
     }
     function applyPanel(name) {
       panelEl.innerHTML = '';
+      panelEl.classList.remove('panel-visible');
       if (name) {
-        const div = document.createElement('div');
-        div.className = 'panel-placeholder';
-        div.textContent = `[panel: ${name}]`;
-        panelEl.appendChild(div);
         panelEl.hidden = false;
         threadEl.classList.add('panel-open');
+
+        const closeBar = document.createElement('div');
+        closeBar.className = 'panel-close-bar';
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'panel-close';
+        closeBtn.setAttribute('aria-label', 'Close panel');
+        closeBtn.textContent = '✕';
+        closeBtn.addEventListener('click', () => {
+          applyPanel(null);
+          askThreadEl.focus();
+        });
+        closeBar.appendChild(closeBtn);
+        panelEl.appendChild(closeBar);
+
+        const body = document.createElement('div');
+        body.className = 'panel-body';
+        panelEl.appendChild(body);
+
+        if (name === 'venue') renderVenuePanel(body);
+        else if (name === 'composer') renderComposerPanel(body);
+        else if (name === 'budget') renderBudgetPanel(body);
+
+        if (reducedMotion) {
+          panelEl.classList.add('panel-visible');
+        } else {
+          setTimeout(() => panelEl.classList.add('panel-visible'), 0);
+        }
       } else {
         panelEl.hidden = true;
         threadEl.classList.remove('panel-open');
       }
+    }
+
+    // ---- panel content helper: [Token] substitution as pills -----------------
+    function appendTextWithPill(parent, text, token, icon, pillLabel) {
+      const parts = text.split(token);
+      parts.forEach((part, i) => {
+        if (part) parent.appendChild(document.createTextNode(part));
+        if (i < parts.length - 1) {
+          const pill = document.createElement('span');
+          pill.className = 'token-pill';
+          pill.textContent = `${icon} ${pillLabel}`;
+          parent.appendChild(pill);
+        }
+      });
+    }
+
+    // ---- panel: venue (Task 9) -------------------------------------------------
+    function renderVenuePanel(container) {
+      container.classList.add('venue-panel');
+      const v = VENUES.find(x => x.id === 'willow');
+
+      const grid = document.createElement('div');
+      grid.className = 'photo-grid';
+      const hero = document.createElement('img');
+      hero.className = 'hero-photo';
+      hero.src = PHOTOS.willowHero;
+      hero.alt = `${v.name} — ${v.setting}`;
+      hero.loading = 'lazy';
+      grid.appendChild(hero);
+      const thumbGrid = document.createElement('div');
+      thumbGrid.className = 'thumb-grid';
+      ['willowThumb1', 'willowThumb2', 'willowThumb3', 'willowThumb4'].forEach(key => {
+        const img = document.createElement('img');
+        img.src = PHOTOS[key];
+        img.alt = `${v.name} — ${v.setting}`;
+        img.loading = 'lazy';
+        thumbGrid.appendChild(img);
+      });
+      grid.appendChild(thumbGrid);
+      container.appendChild(grid);
+
+      const pill = document.createElement('span');
+      pill.className = 'pill-blue';
+      pill.textContent = 'Free on 9/20/26';
+      container.appendChild(pill);
+
+      const h2 = document.createElement('h2');
+      h2.textContent = v.name;
+      container.appendChild(h2);
+
+      const ratingRow = document.createElement('div');
+      ratingRow.className = 'rating-row';
+      const star = document.createElement('span'); star.className = 'star'; star.textContent = '★';
+      const rv = document.createElement('span'); rv.className = 'rv'; rv.textContent = String(v.rating);
+      const u = document.createElement('u'); u.textContent = `${v.reviews} reviews`;
+      ratingRow.append(star, rv, document.createTextNode(' '), u, document.createTextNode(' · 📍 Columbus, OH'));
+      container.appendChild(ratingRow);
+
+      const caps = document.createElement('div');
+      caps.className = 'quote-caps';
+      caps.textContent = '✨ PERSONALIZED QUOTE';
+      container.appendChild(caps);
+
+      const quoteRow = document.createElement('div');
+      quoteRow.className = 'quote-row';
+      const priceSpan = document.createElement('span');
+      const amtStrong = document.createElement('strong');
+      amtStrong.className = 'amt';
+      amtStrong.textContent = fmtMoney(v.quote);
+      priceSpan.append('💲 ', amtStrong, ' Quoted Price');
+      const note = document.createElement('span');
+      note.className = 'quote-note';
+      note.textContent = '(Quote details unlock after the venues reply.)';
+      const guests = document.createElement('span');
+      guests.textContent = '👥 101-150 guests';
+      quoteRow.append(priceSpan, note, guests);
+      container.appendChild(quoteRow);
+
+      const aboutH3 = document.createElement('h3');
+      aboutH3.textContent = 'About this venue';
+      container.appendChild(aboutH3);
+      const about = document.createElement('p');
+      about.className = 'about-copy';
+      about.textContent = 'Tucked beside a quiet, tree-lined lake, Willow Shore Lodge pairs sweeping waterfront views with the peace of an all-weather plan. Couples can exchange vows on the open terrace at sunset, then step straight into a glass-walled ballroom that keeps the scenery in sight — rain or shine. The venue seats up to 160 for dinner, includes two private suites for getting ready, and a dedicated events team that handles setup and teardown.';
+      container.appendChild(about);
+
+      const perfectCard = document.createElement('div');
+      perfectCard.className = 'perfect-card';
+      const perfectTitle = document.createElement('span');
+      perfectTitle.className = 'title';
+      perfectTitle.textContent = "✨ Why it's perfect:";
+      perfectCard.appendChild(perfectTitle);
+      const ul = document.createElement('ul');
+      const bullets = [
+        'Lakeside terrace ceremony with glass-wall ballroom as rain backup',
+        'Seats 150 comfortably — no extra rentals needed',
+        '22-minute shuttle from your saved downtown hotels',
+        'BYO bar allowed — gives you full control over beverage costs',
+      ];
+      bullets.forEach(text => {
+        const li = document.createElement('li');
+        li.textContent = text;
+        ul.appendChild(li);
+      });
+      const holdLi = document.createElement('li');
+      holdLi.append('72-hour courtesy hold active on ');
+      const holdStrong = document.createElement('strong');
+      holdStrong.textContent = 'Sat · Sept 20 2026';
+      holdLi.appendChild(holdStrong);
+      ul.appendChild(holdLi);
+      perfectCard.appendChild(ul);
+      container.appendChild(perfectCard);
+
+      const otherH3 = document.createElement('h3');
+      otherH3.textContent = 'Some other things I can tell you:';
+      container.appendChild(otherH3);
+      const otherChips = document.createElement('div');
+      otherChips.className = 'other-chips';
+      const chip1 = document.createElement('button');
+      chip1.type = 'button';
+      chip1.className = 'action-chip';
+      chip1.textContent = 'What Saturdays in September 2026 are still open besides the 20th?';
+      chip1.addEventListener('click', () => go('willow-saturdays'));
+      const chip2 = document.createElement('button');
+      chip2.type = 'button';
+      chip2.className = 'action-chip';
+      chip2.textContent = 'Show me photos of ceremonies on the terrace';
+      chip2.addEventListener('click', () => {
+        const noteEl = document.createElement('div');
+        noteEl.className = 'panel-note';
+        noteEl.textContent = "(Photo galleries aren't part of this concept — the venues' replies later include floor plans.)";
+        otherChips.insertAdjacentElement('afterend', noteEl);
+      });
+      otherChips.append(chip1, chip2);
+      container.appendChild(otherChips);
+    }
+
+    // ---- panel: composer (Task 9) ----------------------------------------------
+    function renderComposerPanel(container) {
+      container.classList.add('composer-panel');
+
+      const subjectEl = document.createElement('div');
+      subjectEl.className = 'subject-line';
+      const subjLabel = document.createElement('strong');
+      subjLabel.textContent = 'Subject: ';
+      subjectEl.appendChild(subjLabel);
+      appendTextWithPill(subjectEl, COMPOSER.subject, '[Venue Name]', '🏛️', 'Venue Name');
+      container.appendChild(subjectEl);
+
+      const greetEl = document.createElement('div');
+      greetEl.className = 'greeting-line';
+      appendTextWithPill(greetEl, COMPOSER.greeting, '[Coordinator First Name]', '👤', 'Coordinator First Name');
+      container.appendChild(greetEl);
+
+      const p0 = document.createElement('p');
+      appendTextWithPill(p0, COMPOSER.body[0], '[Venue Name]', '🏛️', 'Venue Name');
+      container.appendChild(p0);
+
+      const ol = document.createElement('ol');
+      COMPOSER.body.slice(1, 6).forEach(line => {
+        const li = document.createElement('li');
+        li.textContent = line.replace(/^\d+\.\s*/, '');
+        ol.appendChild(li);
+      });
+      container.appendChild(ol);
+
+      [6, 7].forEach(i => {
+        const p = document.createElement('p');
+        p.textContent = COMPOSER.body[i];
+        container.appendChild(p);
+      });
+
+      const sig = document.createElement('p');
+      sig.className = 'sig-line';
+      COMPOSER.body[8].split('\n').forEach((line, i) => {
+        if (i > 0) sig.appendChild(document.createElement('br'));
+        if (line.includes('[Phone • Email]')) {
+          const span = document.createElement('span');
+          span.className = 'sig-gray';
+          span.textContent = line;
+          sig.appendChild(span);
+        } else {
+          sig.appendChild(document.createTextNode(line));
+        }
+      });
+      container.appendChild(sig);
+
+      const row = document.createElement('div');
+      row.className = 'recipients-row';
+      const label = document.createElement('span');
+      label.className = 'recipients-label';
+      label.textContent = 'To:';
+      row.appendChild(label);
+      const chipsWrap = document.createElement('div');
+      chipsWrap.className = 'recipient-chips';
+      row.appendChild(chipsWrap);
+      container.appendChild(row);
+
+      const sendBtn = document.createElement('button');
+      sendBtn.type = 'button';
+      sendBtn.className = 'composer-send';
+      container.appendChild(sendBtn);
+
+      function renderRecipients() {
+        chipsWrap.replaceChildren();
+        state.composerRecipients.forEach(id => {
+          const v = VENUES.find(x => x.id === id);
+          const chip = document.createElement('span');
+          chip.className = 'recipient-chip';
+          chip.appendChild(document.createTextNode(v.name));
+          if (state.composerRecipients.length > 1) {
+            const rm = document.createElement('button');
+            rm.type = 'button';
+            rm.setAttribute('aria-label', `Remove ${v.name}`);
+            rm.textContent = '✕';
+            rm.addEventListener('click', () => {
+              state.composerRecipients = state.composerRecipients.filter(x => x !== id);
+              window.__bowRecipients = state.composerRecipients.length;
+              renderRecipients();
+            });
+            chip.appendChild(rm);
+          }
+          chipsWrap.appendChild(chip);
+        });
+        sendBtn.textContent = `➤ Message (${state.composerRecipients.length}) venues`;
+      }
+      renderRecipients();
+      window.__bowRecipients = state.composerRecipients.length;
+
+      sendBtn.addEventListener('click', () => go('messages-sent'));
+    }
+
+    // ---- panel: budget (Task 9) ------------------------------------------------
+    // prior render's amounts, keyed by field — lets amounts animate from the last
+    // shown value instead of popping in flat on every panel rebuild; reset on restart.
+    let prevBudgetAmounts = {};
+    function animatedAmount(key, value, tag, cls) {
+      const el = document.createElement(tag ?? 'span');
+      if (cls) el.className = cls;
+      const from = prevBudgetAmounts[key] ?? value;
+      animateNumber(el, from, value, fmtMoney);
+      prevBudgetAmounts[key] = value;
+      return el;
+    }
+    function buildBudgetItemsGrid(items) {
+      const grid = document.createElement('div');
+      grid.className = 'budget-items-grid';
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'budget-item-card';
+        const icon = document.createElement('span'); icon.className = 'bi-icon'; icon.textContent = item.icon;
+        const label = document.createElement('span'); label.className = 'bi-label'; label.textContent = item.label;
+        const amt = animatedAmount('item-' + item.label, item.amount, 'span', 'bi-amt');
+        const chev = document.createElement('span'); chev.className = 'bi-chevron'; chev.textContent = '›';
+        card.append(icon, label, amt, chev);
+        grid.appendChild(card);
+      });
+      return grid;
+    }
+    function renderBudgetPanel(container) {
+      container.classList.add('budget-panel');
+      const b = state.budget;
+      const bookedAmt = b.items.filter(i => i.status === 'booked').reduce((s, i) => s + i.amount, 0);
+      const plannedAmt = b.items.filter(i => i.status === 'planned').reduce((s, i) => s + i.amount, 0);
+      const quotedAmt = b.quoted.reduce((s, i) => s + i.amount, 0);
+      const paidAmt = b.paid; // segmented bar uses paid as-is, not the depositAgainstQuoted-adjusted figure
+      const segTotal = (paidAmt + bookedAmt + quotedAmt + plannedAmt) || 1;
+      const projected = b.projected;
+      const goal = b.goal;
+      const diff = projected - goal;
+
+      const h2 = document.createElement('h2');
+      h2.textContent = 'Budget Overview';
+      container.appendChild(h2);
+
+      const toggle = document.createElement('div');
+      toggle.className = 'budget-toggle';
+      const catBtn = document.createElement('button');
+      catBtn.type = 'button';
+      catBtn.textContent = 'Category';
+      catBtn.disabled = true;
+      catBtn.title = 'Status view only in this concept';
+      const statusBtn = document.createElement('button');
+      statusBtn.type = 'button';
+      statusBtn.textContent = 'Status';
+      statusBtn.className = 'active';
+      toggle.append(catBtn, statusBtn);
+      container.appendChild(toggle);
+
+      const meta = document.createElement('div');
+      meta.className = 'budget-meta-row';
+      meta.textContent = '📅 9/20/26 · 👥 125 guests · 📍 Columbus, OH';
+      container.appendChild(meta);
+
+      const figures = document.createElement('div');
+      figures.className = 'budget-figures';
+
+      const goalFig = document.createElement('div');
+      goalFig.className = 'budget-figure';
+      goalFig.appendChild(animatedAmount('goal', goal, 'span', 'fig-amt'));
+      const goalLbl = document.createElement('span');
+      goalLbl.className = 'fig-label';
+      goalLbl.textContent = '🐷 Goal budget ✏️';
+      goalFig.appendChild(goalLbl);
+      figures.appendChild(goalFig);
+
+      const projFig = document.createElement('div');
+      projFig.className = 'budget-figure';
+      projFig.appendChild(animatedAmount('projected', projected, 'span', 'fig-amt'));
+      const projLbl = document.createElement('span');
+      projLbl.className = 'fig-label';
+      projLbl.appendChild(document.createTextNode('Projected costs'));
+      const diffSpan = document.createElement('span');
+      if (diff > 0) {
+        diffSpan.className = 'fig-diff over';
+        diffSpan.textContent = `↑ ${fmtMoney(diff)}`;
+      } else {
+        diffSpan.className = 'fig-diff under';
+        diffSpan.textContent = `✓ ${fmtMoney(-diff)} under`;
+      }
+      projLbl.appendChild(diffSpan);
+      projFig.appendChild(projLbl);
+      figures.appendChild(projFig);
+      container.appendChild(figures);
+
+      const barWrap = document.createElement('div');
+      barWrap.className = 'budget-bar-wrap';
+      const goalPct = Math.min(goal / segTotal, 1) * 100;
+      const marker = document.createElement('div');
+      marker.className = 'budget-goal-marker';
+      marker.style.left = goalPct + '%';
+      const pig = document.createElement('span'); pig.className = 'pig'; pig.textContent = '🐷';
+      const tag = document.createElement('span'); tag.textContent = fmtK(goal);
+      marker.append(pig, tag);
+      barWrap.appendChild(marker);
+
+      const bar = document.createElement('div');
+      bar.className = 'budget-bar';
+      [['seg-paid', paidAmt], ['seg-booked', bookedAmt], ['seg-quoted', quotedAmt], ['seg-planned', plannedAmt]].forEach(([cls, amt]) => {
+        const seg = document.createElement('div');
+        seg.className = cls;
+        seg.style.width = (amt / segTotal * 100) + '%';
+        bar.appendChild(seg);
+      });
+      barWrap.appendChild(bar);
+      container.appendChild(barWrap);
+
+      const legend = document.createElement('div');
+      legend.className = 'budget-legend';
+      [['Paid', 'var(--pink-deep)', paidAmt, 'paid'], ['Booked', 'var(--pink)', bookedAmt, 'booked'], ['Quoted', '#F48FD0', quotedAmt, 'quoted'], ['Planned', 'var(--pink-pale)', plannedAmt, 'planned']].forEach(([label, color, amt, key]) => {
+        const item = document.createElement('span');
+        item.className = 'leg-item';
+        const dot = document.createElement('span'); dot.className = 'dot'; dot.style.background = color;
+        const text = document.createElement('span');
+        text.appendChild(document.createTextNode(label + ' '));
+        const strong = document.createElement('b');
+        strong.appendChild(animatedAmount('seg-' + key, amt));
+        text.appendChild(strong);
+        item.append(dot, text);
+        legend.appendChild(item);
+      });
+      container.appendChild(legend);
+
+      const itemsH3 = document.createElement('h3');
+      itemsH3.textContent = 'My budget items ✏️';
+      container.appendChild(itemsH3);
+
+      const booked = b.items.filter(i => i.status === 'booked');
+      const planned = b.items.filter(i => i.status === 'planned');
+
+      const bookedHead = document.createElement('div');
+      bookedHead.className = 'budget-section-head';
+      bookedHead.textContent = `Booked (${booked.length})`;
+      container.appendChild(bookedHead);
+      container.appendChild(buildBudgetItemsGrid(booked));
+
+      const remHead = document.createElement('div');
+      remHead.className = 'budget-section-head remaining-head';
+      const remTitle = document.createElement('span');
+      remTitle.textContent = `Remaining (${planned.length})`;
+      const remAmtWrap = document.createElement('span');
+      remAmtWrap.className = 'remaining-amt';
+      remAmtWrap.appendChild(animatedAmount('remaining-total', plannedAmt, 'strong'));
+      remAmtWrap.appendChild(document.createTextNode(' Estimated remaining'));
+      remHead.append(remTitle, remAmtWrap);
+      container.appendChild(remHead);
+      container.appendChild(buildBudgetItemsGrid(planned));
     }
     let toastTimer = null;
     function showToast(msg) {
@@ -649,12 +1159,13 @@
     const NON_WILLOW_NOTE = 'In this concept, Willow Shore Lodge is the deep-dive — the others summarize in the reply comparison later.';
     const NON_WILLOW_HOLD_NOTE = 'In this concept, Willow Shore Lodge is the booking path — holds on other venues aren’t scripted.';
 
-    function makePhotoPlaceholder() {
-      const div = document.createElement('div');
-      div.className = 'photo-placeholder';
-      div.setAttribute('aria-hidden', 'true');
-      div.textContent = '🏞️';
-      return div;
+    function makePhotoImg(v) {
+      const img = document.createElement('img');
+      img.className = 'photo-placeholder';
+      img.src = PHOTOS[v.photo];
+      img.alt = `${v.name} — ${v.setting}`;
+      img.loading = 'lazy';
+      return img;
     }
 
     function makeRatingLine(v) {
@@ -717,7 +1228,7 @@
         card.className = 'carousel-card';
         const photoWrap = document.createElement('div');
         photoWrap.className = 'photo-wrap';
-        photoWrap.appendChild(makePhotoPlaceholder());
+        photoWrap.appendChild(makePhotoImg(v));
         const tag = document.createElement('span');
         tag.className = 'featured-tag';
         tag.textContent = 'Featured';
@@ -838,7 +1349,7 @@
         // left: photo + meta
         const left = document.createElement('div');
         left.className = 'reply-meta-col';
-        left.appendChild(makePhotoPlaceholder());
+        left.appendChild(makePhotoImg(v));
         left.appendChild(makeRatingLine(v));
         const cap = document.createElement('div'); cap.className = 'meta-line'; cap.textContent = `Capacity: ${v.capacity} guests`;
         const setting = document.createElement('div'); setting.className = 'meta-line'; setting.textContent = `Setting: ${v.setting}`;
@@ -1267,8 +1778,11 @@
 
       inFlight.delete(id);
       renderChips(hasSlotsBlock ? [] : (beat.chips ?? []));
-      applyPanel(beat.panel);
+      // effects (e.g. the 'budget' effect) must land in state BEFORE the panel
+      // renders, or a first-time visit to a panel beat (budget-added, rebalance,
+      // goal-increase) would paint the panel from the pre-effect budget snapshot.
       for (const eff of beat.effects ?? []) applyEffect(eff);
+      applyPanel(beat.panel);
 
       if (beat.autoGoto) {
         await wait(600);
@@ -1345,6 +1859,8 @@
       interstitialEl.classList.remove('show');
       interstitialEl.hidden = true;
       state = freshState();
+      window.__bowRecipients = state.composerRecipients.length;
+      prevBudgetAmounts = {};
       homeEl.dataset.state = 'fresh';
       chipSpentEl.dataset.raw = String(state.budget.spent);
       chipSpentEl.textContent = fmtK(state.budget.spent);
@@ -1359,6 +1875,7 @@
     });
 
     // ---- init -----------------------------------------------------------------
+    window.__bowRecipients = state.composerRecipients.length;
     chipSpentEl.dataset.raw = String(state.budget.spent);
     chipGoalEl.dataset.raw = String(state.budget.goal);
     statVendorsEl.dataset.raw = '0';
