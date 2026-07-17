@@ -475,6 +475,18 @@
 
   /* contract */
   .contract-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin-bottom:14px}
+  .contract-expand{margin-top:14px;display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--ink);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600}
+  .contract-expand:hover{background:rgba(0,0,0,.04)}
+  .contract-expand .i{width:15px;height:15px}
+  .contract-panel h2{font-family:'Figtree';font-weight:800;font-size:26px;margin:0 0 4px;line-height:1.15}
+  .contract-panel h3{font-size:14px;font-weight:800;margin:22px 0 8px}
+  .contract-panel-sub{font-size:13px;color:var(--gray);margin-bottom:6px}
+  .contract-panel-table{display:flex;flex-direction:column}
+  .contract-panel .cp-row{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .contract-panel .cp-row.cp-total{font-weight:800;border-bottom:0}
+  .contract-panel-list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.5}
+  .contract-panel-para{font-size:13.5px;line-height:1.6;color:var(--gray);margin:0}
+  .contract-panel-foot{font-size:12px;color:var(--gray);font-style:italic;margin-top:22px;border-top:1px solid var(--line);padding-top:12px}
   .contract-row{display:flex;justify-content:space-between;font-size:14px;padding:7px 0;border-bottom:1px solid var(--line)}
   .contract-row.total{font-weight:700;font-size:15px;border-bottom:none;padding-top:10px}
   .contract-row.plain{border-bottom:none;color:var(--gray);font-size:13px;padding-top:4px}
@@ -1001,6 +1013,7 @@
     }
     let lastChipTrigger = null; // which header chip opened the current panel
     let replyPanelVenue = null; // venue whose full reply the panel is showing
+    let contractSnapshot = null; // { venueRental, catering, fees, total } for the contract panel
     function closePanel() {
       applyPanel(null);
       // return focus somewhere sensible: the thread input when the thread is
@@ -1008,7 +1021,7 @@
       if (!threadEl.hidden) askThreadEl.focus();
       else (lastChipTrigger ?? document.getElementById('chip-budget')).focus();
     }
-    const PANEL_LABELS = { venue: 'Venue details', composer: 'Compose message to venues', budget: 'Budget overview', location: 'Location', date: 'Wedding date', guests: 'Guest count', reply: 'Full venue reply' };
+    const PANEL_LABELS = { venue: 'Venue details', composer: 'Compose message to venues', budget: 'Budget overview', location: 'Location', date: 'Wedding date', guests: 'Guest count', reply: 'Full venue reply', contract: 'Full contract terms' };
     // ---- resizable panel (author request 2026-07-17) ----------------------
     // One persistent handle element; applyPanel re-appends it after clearing
     // the panel, so its listeners survive content swaps.
@@ -1107,6 +1120,7 @@
         else if (name === 'date') renderDatePanel(body);
         else if (name === 'guests') renderGuestsPanel(body);
         else if (name === 'reply') renderReplyPanel(body);
+        else if (name === 'contract') renderContractPanel(body);
 
         // move focus to the panel's heading (tabindex="-1" — not part of the
         // normal tab order, just a programmatic landing point). preventScroll
@@ -2411,9 +2425,67 @@
       balance.textContent = liveText('Balance: two installments (Apr & Aug 2026)');
       card.appendChild(balance);
 
+      contractSnapshot = { venueRental, catering, fees, total };
+      const expand = document.createElement('button');
+      expand.type = 'button';
+      expand.className = 'contract-expand';
+      expand.append(icon('bank'), ' Expand to full terms');
+      expand.addEventListener('click', () => { lastChipTrigger = expand; applyPanel('contract'); });
+      card.appendChild(expand);
+
       container.appendChild(card);
       scrollStreamToBottom();
       await wait(0);
+    }
+
+    // ---- contract panel: the full document (author 2026-07-17) --------------
+    function renderContractPanel(container) {
+      container.classList.add('contract-panel');
+      const c = contractSnapshot ?? { venueRental: 7450, catering: 0, fees: 0, total: 7450 };
+
+      const h2 = document.createElement('h2');
+      h2.textContent = 'Willow Shore Lodge';
+      container.appendChild(h2);
+      const sub = document.createElement('p');
+      sub.className = 'contract-panel-sub';
+      sub.textContent = liveText('Event contract · September 20, 2026') + ` · ${state?.guestCount ?? 125} guests`;
+      container.appendChild(sub);
+
+      const costH = document.createElement('h3'); costH.textContent = 'Cost breakdown'; container.appendChild(costH);
+      const table = document.createElement('div'); table.className = 'contract-panel-table';
+      [['Venue rental', c.venueRental], ['Catering', c.catering], ['Service fees & tax', c.fees]].forEach(([k, amt]) => {
+        const row = document.createElement('div'); row.className = 'cp-row';
+        const key = document.createElement('span'); key.textContent = k;
+        const val = document.createElement('span'); val.textContent = fmtMoney(amt);
+        row.append(key, val); table.appendChild(row);
+      });
+      const totalRow = document.createElement('div'); totalRow.className = 'cp-row cp-total';
+      const tk = document.createElement('span'); tk.textContent = 'Total';
+      const tv = document.createElement('span'); tv.textContent = fmtMoney(c.total);
+      totalRow.append(tk, tv); table.appendChild(totalRow);
+      container.appendChild(table);
+
+      const payH = document.createElement('h3'); payH.textContent = 'Payment schedule'; container.appendChild(payH);
+      const pay = document.createElement('ul'); pay.className = 'contract-panel-list';
+      [liveText('Deposit due at signing — $5,600'), liveText('Two balance installments (Apr & Aug 2026)'), 'Final payment 14 days before the event'].forEach(t => { const li = document.createElement('li'); li.textContent = t; pay.appendChild(li); });
+      container.appendChild(pay);
+
+      const terms = [
+        ['What\u2019s included', 'Full-day use of the ceremony lawn, pavilion, and glass-walled reception hall; tables, chairs, and house linens; on-site event staff for setup and teardown; two getting-ready suites.'],
+        ['Cancellation & refunds', 'Deposit is refundable up to 90 days before the event, less a $250 administrative fee. Cancellations inside 90 days forfeit the deposit; inside 30 days, 50% of the balance is due.'],
+        ['Weather & rain plan', 'The covered pavilion is guaranteed as an all-weather backup at no additional charge. The venue makes the final indoor/outdoor call by 8:00 AM on the event day.'],
+        ['Insurance & liability', 'A one-day event liability policy ($1M) is required and can be added through the venue for $185. Alcohol service requires a licensed, insured bartender.'],
+        ['Access & hours', 'Vendor load-in from 10:00 AM; event access until 11:00 PM with a one-hour teardown. A complimentary Friday rehearsal hour is included when the date is held.'],
+      ];
+      terms.forEach(([h, body]) => {
+        const th = document.createElement('h3'); th.textContent = h; container.appendChild(th);
+        const para = document.createElement('p'); para.className = 'contract-panel-para'; para.textContent = liveText(body); container.appendChild(para);
+      });
+
+      const foot = document.createElement('p');
+      foot.className = 'contract-panel-foot';
+      foot.textContent = 'Representative terms for this concept — not a binding agreement.';
+      container.appendChild(foot);
     }
 
     async function renderPlaceholder(container, type) {
