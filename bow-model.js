@@ -422,9 +422,23 @@ export const SCRIPT = {
   'tour-booked': {
     thread: 'Vendor reply summary and accessibility comparison',
     blocks: [{ t: 'text', md: 'Booked — you’re confirmed with Maya, and it’s on your calendar. Since accessibility is the deciding factor, I’ll send you a pocket checklist for the visit: doorway widths, the restroom nearest the pavilion, and the accessible-parking distance — so you can verify everything your family needs in person.' }],
-    effects: [{ e: 'interstitial', variant: 'toured' }],
-    chips: [{ label: 'Two weeks later…', goto: 'contract-flag' }],
+    effects: [{ e: 'interstitial', variant: 'toured' }, { e: 'homeState', state: 'contracts' }],
+    // the '2 weeks later' interstitial dismisses to the home dashboard, where the
+    // contract has now arrived (author 2026-07-17) — mirrors '3 days later' → home
+    chips: [],
+    autoGoto: 'home-contract',
     match: ['book the tour', 'friday', 'saturday', 'sunday'],
+  },
+
+  'home-contract': {
+    // home-type beat (no thread) — the dashboard renders its 'contracts' state,
+    // where the agent surfaces the arrived contract as a card. Chips exist for
+    // typed-input matching + graph reachability, not visual rendering.
+    chips: [
+      { label: 'Review the contract', goto: 'contract-flag' },
+      { label: 'Open the contract from Willow Shore', goto: 'contract-flag' }, // PIN
+    ],
+    match: ['contract', 'review', 'sign', 'willow'],
   },
 
   'contract-flag': {

@@ -128,6 +128,12 @@
   #home[data-state="fresh"] .cards[data-when="responded"]{display:none}
   #home[data-state="responded"] .cards[data-when="fresh"]{display:none}
   #home[data-state="responded"] .suggestions{display:none}
+  /* the 'contracts' state (after the tour) surfaces the arrived contract */
+  .cards[data-when="contract"]{display:none}
+  #home[data-state="contracts"] .cards[data-when="fresh"]{display:none}
+  #home[data-state="contracts"] .cards[data-when="responded"]{display:none}
+  #home[data-state="contracts"] .cards[data-when="contract"]{display:grid}
+  #home[data-state="contracts"] .suggestions{display:none}
   .card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:24px;display:flex;flex-direction:column;gap:10px;position:relative}
   .card.highlight{border-color:var(--label-pink);box-shadow:0 0 0 1px var(--label-pink)}
   .card .cat{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
@@ -774,6 +780,33 @@
             <button class="card-cta" data-goto="venue-results">Compare spaces</button>
           </div>
         </div>
+
+        <div class="cards" data-when="contract">
+          <div class="card highlight">
+            <span class="cat" style="color:var(--label-pink)">VENUE <span class="new-pill">New!</span></span>
+            <span class="title">Willow Shore Lodge sent your contract</span>
+            <span class="body">Maya emailed the agreement to sign. I read it through and flagged one line worth a look before you do.</span>
+            <button class="card-cta" data-goto="contract-flag">Review the contract</button>
+          </div>
+          <div class="card">
+            <span class="cat" style="color:var(--label-orange)">LOGISTICS</span>
+            <span class="title">Tour recap &amp; accessibility checklist saved</span>
+            <span class="body">Doorway widths, the nearest restroom, and accessible-parking distance — all confirmed on your visit.</span>
+            <button class="card-cta" data-goto="">See the recap</button>
+          </div>
+          <div class="card">
+            <span class="cat" style="color:var(--label-green)">BUDGET</span>
+            <span class="title">Still $600 under your $45k goal</span>
+            <span class="body">Everything’s tracking after the rebalance. I’ll refresh the moment the contract is signed.</span>
+            <button class="card-cta" data-goto="">Open the budget</button>
+          </div>
+          <div class="card">
+            <span class="cat" style="color:var(--label-blue)">INSPIRATION</span>
+            <span class="title">Pulled 7 desert-chic décor ideas</span>
+            <span class="body">Fits your terra-cotta palette and $2k décor cap.</span>
+            <button class="card-cta" data-goto="">Open mood board</button>
+          </div>
+        </div>
       </div>
     </section>
     <section id="thread" hidden>
@@ -930,6 +963,12 @@
     }
 
     // ---- view toggles -------------------------------------------------------
+    // which home-type beat backs each dashboard state (drives Back-to-home)
+    function homeBeatForState(s) {
+      return s === 'responded' ? 'home-responded'
+        : s === 'contracts' ? 'home-contract'
+        : 'home';
+    }
     function showHomeView() {
       threadEl.hidden = true;
       homeEl.hidden = false;
@@ -2530,6 +2569,7 @@
       sent: ['Messages sent.', '3 days later…'],
       toured: ['Tour booked — Fri Oct 3, 3:00 pm.', 'Two weeks later…'],
     };
+    const INTERSTITIAL_READ_MS = 1900; // dwell so the reader finishes the beat before the overlay covers it
     // The rail's unread-messages badge pulses once when the 'sent' overlay
     // dismisses — the visual payoff for "your replies are on their way".
     function pulseChatBadge() {
@@ -2726,6 +2766,14 @@
       inFlight.delete(id);
       streamEnded();
       renderChips(hasSlotsBlock ? [] : (beat.chips ?? []), wrap);
+      // let the reader finish the agent's closing line before a full-screen
+      // interstitial covers it (author 2026-07-17). Real timer, not wait(), so
+      // the read beat holds even under reduced motion — it paces content, not
+      // motion — mirroring the interstitial's own reduced-motion hold.
+      if ((beat.effects ?? []).some(e => e.e === 'interstitial')) {
+        await new Promise(r => setTimeout(r, INTERSTITIAL_READ_MS));
+        if (stale()) return;
+      }
       // effects (e.g. the 'budget' effect) must land in state BEFORE the panel
       // renders, or a first-time visit to a panel beat (budget-added, rebalance,
       // goal-increase) would paint the panel from the pre-effect budget snapshot.
@@ -2845,7 +2893,7 @@
                     // partial beat so revisiting re-renders it cleanly
       closeReplyModal(); // no-op when no modal is open
       applyPanel(null); // returning to the dashboard closes any open panel
-      state.beat = state.homeState === 'responded' ? 'home-responded' : 'home';
+      state.beat = homeBeatForState(state.homeState);
       showHomeView();
     });
     restartBtn.addEventListener('click', () => {
