@@ -50,4 +50,26 @@ t('white-text fills pass AA (pinkCTA + New! pill fill)', () => {
     assert.ok(ratio >= 4.5, `white on ${varName} (${m[1]}) = ${ratio.toFixed(2)}:1 — below AA`);
   }
 });
+if (fs.existsSync('dist/the-bow.html')) {
+  const dist = fs.readFileSync('dist/the-bow.html', 'utf8');
+  console.log(`dist/the-bow.html: ${(Buffer.byteLength(dist, 'utf8') / 1024).toFixed(0)} KB`);
+  t('dist: whitelabel holds', () => assert.ok(!/knot/i.test(dist)));
+  t('dist: self-contained', () => {
+    assert.ok(!dist.includes('<link '), 'no external stylesheets');
+    assert.ok(!/src="http/.test(dist), 'no external scripts/images');
+    assert.ok(!/fetch\(/.test(dist), 'no runtime fetches');
+    assert.ok(!/url\(https?:/.test(dist), 'no external CSS urls');
+  });
+  t('dist: fonts + photos inlined', () => {
+    assert.ok(dist.includes('data:font/woff2'));
+    assert.ok(dist.includes('data:image/'));
+  });
+  t('dist: SVG sprite survived', () => {
+    assert.ok(dist.includes('id="i-piggy"'), 'piggy-bank sprite icon missing from dist');
+  });
+  t('dist: photos inlined as data URIs (>= 9)', () => {
+    const count = (dist.match(/data:image\/jpeg/g) || []).length;
+    assert.ok(count >= 9, `expected >= 9 data:image/jpeg occurrences, got ${count}`);
+  });
+}
 console.log('the-bow.html content OK');

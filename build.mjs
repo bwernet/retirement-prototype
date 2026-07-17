@@ -67,3 +67,19 @@ const ep = fs.readFileSync('evidence-panel.html', 'utf8')
 if (ep.includes('href="fonts.css"')) throw new Error('evidence-panel inline failed');
 fs.writeFileSync('dist/evidence-panel.html', ep);
 console.log(`Wrote dist/evidence-panel.html (${(ep.length / 1024).toFixed(0)} KB)`);
+
+// the-bow imports bow-model.js and bow-photos.js — inline fonts + both modules.
+const bowFonts = fs.readFileSync('bow-fonts.css', 'utf8');
+const bowModel = fs.readFileSync('bow-model.js', 'utf8').replace(/^export /gm, '');
+const bowPhotos = fs.readFileSync('bow-photos.js', 'utf8').replace(/^export /gm, '');
+const BOW_IMPORT_MODEL_RE = /import \{[^}]+\} from '\.\/bow-model\.js';/;
+const BOW_IMPORT_PHOTOS = `import { PHOTOS } from './bow-photos.js';`;
+const bowSrc = fs.readFileSync('the-bow.html', 'utf8');
+if (!BOW_IMPORT_MODEL_RE.test(bowSrc) || !bowSrc.includes(BOW_IMPORT_PHOTOS)) throw new Error('the-bow import lines drifted — update build.mjs');
+const bow = bowSrc
+  .replace('<link rel="stylesheet" href="bow-fonts.css">', () => `<style>\n${bowFonts}</style>`)
+  .replace(BOW_IMPORT_MODEL_RE, () => bowModel)
+  .replace(BOW_IMPORT_PHOTOS, () => bowPhotos);
+if (bow.includes('bow-fonts.css') || bow.includes("from './bow-")) throw new Error('the-bow inline failed');
+fs.writeFileSync('dist/the-bow.html', bow);
+console.log(`Wrote dist/the-bow.html (${(bow.length / 1024).toFixed(0)} KB)`);
