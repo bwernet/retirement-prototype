@@ -233,7 +233,10 @@ export const SCRIPT = {
     thread: 'Accessible lake-view venues with indoor backup',
     blocks: [{ t: 'text', md: 'All {N} messages are on their way — personalized for each venue and coordinator. I’ll let you know the moment replies land, and I’ll keep watching availability in the meantime.' }], // {N} replaced at render with live recipient count (Task 9)
     effects: [{ e: 'interstitial', variant: 'sent' }, { e: 'homeState', state: 'responded' }],
-    chips: [{ label: 'Back to home', goto: 'home-responded' }],
+    // the '3 days later' interstitial dismisses straight to the home dashboard
+    // (author 2026-07-17) — no manual 'Back to home' tap
+    chips: [],
+    autoGoto: 'home-responded',
     match: ['send', 'message the venues'],
   },
 

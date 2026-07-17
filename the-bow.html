@@ -2539,6 +2539,7 @@
       if (!beat.thread) {
         // home-type beat (home, home-responded): no chat thread to render
         state.beat = id;
+        applyPanel(null); // returning to the dashboard closes any open panel
         showHomeView();
         return;
       }
