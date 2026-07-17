@@ -155,7 +155,12 @@
   /* the panel lives in the growing column, its 420px card pinned to the right
      edge — the shrinking surface unveils it in place, drawer-style */
   #panel{grid-area:1/2;min-width:0;position:relative;overflow:hidden;border-radius:var(--r-lg)}
-  .panel-inner{position:absolute;inset:0 0 0 auto;width:420px;background:var(--card);border-radius:var(--r-lg);overflow-y:auto}
+  /* the card is pinned to the column's LEFT (moving) edge with its cream
+     gutter leading, so it travels WITH the surface's edge as one seam — its
+     right side is clipped until the column finishes growing (author
+     refinement 2026-07-17: card must ride the moving edge, not sit revealed
+     in place, or content reads as lagging the panel) */
+  .panel-inner{position:absolute;inset:0 auto 0 24px;width:420px;background:var(--card);border-radius:var(--r-lg);overflow-y:auto}
   #panel[hidden]{display:none}
   #panel .panel-placeholder{padding:24px;color:var(--gray);font-size:14px}
   .panel-close-bar{position:sticky;top:0;display:flex;justify-content:flex-end;padding:12px 12px 0;background:var(--card);z-index:5}
