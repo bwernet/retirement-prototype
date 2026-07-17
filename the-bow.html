@@ -238,6 +238,9 @@
 
   /* ---- location / date / guests panels (author round 2026-07-17) ---- */
   .panel-sub{font-size:14px;color:var(--gray);margin:4px 0 20px}
+  .chip-panel h2{font-size:22px;margin:0 0 2px}
+  .panel-eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--label-pink);display:flex;align-items:center;gap:5px;margin-bottom:8px}
+  .panel-eyebrow .i{width:14px;height:14px}
   .loc-donut{position:relative;width:190px;height:190px;border-radius:50%;margin:6px auto 18px}
   .loc-donut::after{content:'';position:absolute;inset:30px;background:var(--card);border-radius:50%}
   .donut-center{position:absolute;inset:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:1;padding:8px}
@@ -603,7 +606,7 @@
         <div class="stats">
           <span class="stat"><svg class="i i-pink" aria-hidden="true"><use href="#i-piggy"/></svg> <span class="val">$40k</span> <span class="lbl">budget</span></span>
           <span class="chevron">›</span>
-          <span class="stat"><svg class="i i-orange" aria-hidden="true"><use href="#i-lamp"/></svg> <span class="val" id="stat-vendors">0</span> <span class="lbl">vendors saved</span></span>
+          <span class="stat"><svg class="i i-orange" aria-hidden="true"><use href="#i-lamp"/></svg> <span class="val" id="stat-vendors">12</span> <span class="lbl">vendors saved</span></span>
           <span class="chevron">›</span>
           <span class="stat"><svg class="i" aria-hidden="true"><use href="#i-monitor"/></svg> <span class="val">0</span> <span class="lbl">website visitors</span></span>
           <span class="chevron">›</span>
@@ -1580,6 +1583,7 @@
     }
 
     function renderLocationPanel(container) {
+      container.classList.add('chip-panel');
       const h2 = document.createElement('h2');
       h2.textContent = 'Columbus, OH';
       container.appendChild(h2);
@@ -1660,12 +1664,17 @@
     }
 
     function renderDatePanel(container) {
+      container.classList.add('chip-panel');
+      const eyebrow = document.createElement('div');
+      eyebrow.className = 'panel-eyebrow';
+      eyebrow.append(icon('sparkle', 'i-pink'), ' YOUR WEDDING DAY');
+      container.appendChild(eyebrow);
       const h2 = document.createElement('h2');
       h2.textContent = liveText('Saturday, September 20, 2026');
       container.appendChild(h2);
       const sub = document.createElement('p');
       sub.className = 'panel-sub';
-      sub.textContent = liveText('355 days away');
+      sub.textContent = liveText('355 days away — the countdown is on 🎉');
       container.appendChild(sub);
 
       const wh = document.createElement('h3');
@@ -1702,6 +1711,7 @@
     }
 
     function renderGuestsPanel(container) {
+      container.classList.add('chip-panel');
       const h2 = document.createElement('h2');
       h2.textContent = 'Guest count';
       container.appendChild(h2);
@@ -2647,8 +2657,8 @@
       chipSpentEl.textContent = fmtK(state.budget.spent);
       chipGoalEl.dataset.raw = String(state.budget.goal);
       chipGoalEl.textContent = fmtK(state.budget.goal);
-      statVendorsEl.dataset.raw = '0';
-      statVendorsEl.textContent = '0';
+      statVendorsEl.dataset.raw = '12';
+      statVendorsEl.textContent = '12';
       applyPanel(null);
       chipsEl.replaceChildren();
       streamEl.replaceChildren();
@@ -2664,7 +2674,7 @@
     window.__bowRecipients = state.composerRecipients.length;
     chipSpentEl.dataset.raw = String(state.budget.spent);
     chipGoalEl.dataset.raw = String(state.budget.goal);
-    statVendorsEl.dataset.raw = '0';
+    statVendorsEl.dataset.raw = '12';
     homeEl.dataset.state = state.homeState;
     showHomeView();
   </script>

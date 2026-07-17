@@ -470,7 +470,7 @@ export const SCRIPT = {
     thread: 'Willow Shore Lodge — contract & booking',
     userBubble: 'Book Willow Shore Lodge',
     blocks: [{ t: 'text', md: 'Deposit paid: **$5,600**. Signing confirmed — sending you the countersigned copy now…' }],
-    effects: [{ e: 'budget', apply: 'book' }, { e: 'stat', key: 'vendorsSaved', value: 1 }],
+    effects: [{ e: 'budget', apply: 'book' }, { e: 'stat', key: 'vendorsSaved', value: 13 }],
     autoGoto: 'booked-finale',
     chips: [],
     match: ['book it', 'sign'],
