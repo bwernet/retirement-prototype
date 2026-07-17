@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   BRAND, VENUES, initialBudget, applyVenuePackage, applyRebalance,
-  applyGoalIncrease, applyBooking, fmtMoney, fmtK,
+  applyGoalIncrease, applyBooking, fmtMoney, fmtK, SCRIPT, reachableBeats,
 } from './bow-model.js';
 
 test('brand layer', () => {
@@ -78,4 +78,34 @@ test('formatting', () => {
   assert.equal(fmtK(17500), '$17.5k');
   assert.equal(fmtK(23100), '$23.1k');
   assert.equal(fmtK(40000), '$40k');
+});
+
+test('graph integrity', () => {
+  const ids = Object.keys(SCRIPT);
+  for (const [id, beat] of Object.entries(SCRIPT)) {
+    for (const chip of beat.chips ?? []) {
+      assert.ok(ids.includes(chip.goto), `${id} chip "${chip.label}" -> missing beat ${chip.goto}`);
+    }
+  }
+  const reached = reachableBeats('home');
+  for (const id of ids) {
+    if (id === 'fallback') continue;
+    assert.ok(reached.includes(id), `beat ${id} unreachable from home`);
+  }
+  // only the finale dead-ends
+  for (const [id, beat] of Object.entries(SCRIPT)) {
+    if (id === 'booked-finale') continue;
+    assert.ok((beat.chips ?? []).length > 0 || beat.autoGoto, `beat ${id} dead-ends`);
+  }
+});
+
+test('Act 1 copy pins', () => {
+  assert.ok(SCRIPT['venue-results'].blocks[0].md.startsWith(
+    'While you were offline, I cross-checked your 150-guest head-count'));
+  assert.ok(SCRIPT['venue-results'].blocks[0].md.includes('**Saturday • Sept 20 2026**'));
+  assert.equal(SCRIPT['venue-results'].userBubble, 'Tell me about the venues you found!');
+  assert.ok(SCRIPT['accessibility-draft'].userBubble.startsWith(
+    "I don't see specific answers about wheelchair accessibility."));
+  assert.ok(SCRIPT['accessibility-draft'].blocks[0].md.startsWith(
+    "Absolutely — here's a ready-to-send draft."));
 });

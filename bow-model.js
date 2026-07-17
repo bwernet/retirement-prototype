@@ -118,3 +118,130 @@ export const fmtK = n => {
   const k = n / 1000;
   return '$' + (Number.isInteger(k) ? k : k.toFixed(1)) + 'k';
 };
+
+export const COMPOSER = {
+  subject: 'Accessibility details for [Venue Name] on September 20 2026', // PIN
+  greeting: 'Hi [Coordinator First Name],', // PIN
+  body: [ // PIN — every line verbatim from the screen
+    "My partner and I are considering [Venue Name] for our September 20 2026 wedding (about 150 guests). To ensure every family member can celebrate comfortably — especially those who use wheelchairs or other mobility aids — we'd love to confirm a few details:",
+    '1. Ceremony & reception access – ramps, elevators, or grade-level paths to all primary spaces',
+    '2. Restrooms – location and width of wheelchair-accessible stalls near each area',
+    '3. Doorway & aisle clearances – minimum widths for entry points and dining layouts',
+    '4. Parking / drop-off – number of accessible spots and distance to the main entrance',
+    '5. Any additional considerations – floor surfaces, stage access, or policies we should know',
+    'If you have photos, floor plans, or ADA documentation handy, that would be incredibly helpful. Happy to jump on a quick call if easier.',
+    'Thank you for your time — I look forward to hearing from you!',
+    "Best,\nTony & Carmella\n[Phone • Email]",
+  ],
+};
+
+export const SCRIPT = {
+  home: {
+    // Rendered from markup, not chat. chips here model the suggestion rows + card CTAs.
+    chips: [
+      { label: 'Find perfect venues still available for my wedding dates', goto: 'venue-results' }, // PIN
+      { label: 'Find places in my budget I could save', goto: 'venue-results' }, // PIN (redirect beat opener acknowledges)
+      { label: 'Summarize the (4) vendor responses I\'ve gotten', goto: 'venue-results' }, // PIN — pre-replies this redirects to search
+      { label: 'Compare spaces', goto: 'venue-results' },
+    ],
+    match: ['venue', 'venues', 'lake', 'find', 'available', 'search'],
+  },
+
+  'venue-results': {
+    thread: 'Accessible lake-view venues with indoor backup', // PIN
+    userBubble: 'Tell me about the venues you found!', // PIN
+    blocks: [
+      { t: 'text', md: "While you were offline, I cross-checked your 150-guest head-count, your $9 k venue cap, and your \"must-have indoor backup\" rule against every lake-view property within 30 mi. Then I pinged each venue's live calendar to confirm they still hold **Saturday • Sept 20 2026**.\n\nHere are the five that cleared every filter — no last-minute surprises:" }, // PIN
+      { t: 'venueList' }, // renders VENUES rows with per-venue "Tell me more" chips
+      { t: 'text', md: '**Take a closer look:**' }, // PIN
+      { t: 'carousel' },
+      { t: 'text', md: "**Next moves (pick one or just tell me):**\n*(I'll keep monitoring in case one books out — if availability changes you'll get an alert.)*" }, // PIN
+    ],
+    chips: [
+      { label: 'Tell me more about Willow Shore Lodge', goto: 'willow-detail' },
+      { label: 'Ask all five about wheelchair accessibility', goto: 'accessibility-draft' },
+    ],
+    match: ['tell me about', 'venues you found', 'lake view'],
+  },
+
+  'willow-detail': {
+    thread: 'Accessible lake-view venues with indoor backup',
+    userBubble: 'Tell me more about Willow Shore Lodge',
+    blocks: [{ t: 'text', md: "Here's the full picture on Willow Shore Lodge — I've opened it alongside so you can dig in." }],
+    panel: 'venue',
+    chips: [
+      { label: 'What Saturdays in September 2026 are still open besides the 20th?', goto: 'willow-saturdays' }, // PIN
+      { label: "I don't see answers about wheelchair accessibility — ask all 5 venues", goto: 'accessibility-draft' },
+    ],
+    match: ['willow', 'tell me more', 'detail'],
+  },
+
+  'willow-saturdays': {
+    thread: 'Accessible lake-view venues with indoor backup',
+    userBubble: 'What Saturdays in September 2026 are still open besides the 20th?', // PIN
+    blocks: [{ t: 'text', md: "Willow Shore's calendar shows two other open Saturdays that month: **Sept 5** and **Sept 26**. The 12th is booked and the 19th just went to a courtesy hold. Your 72-hour hold on the 20th is still active — want me to keep it?" }],
+    panel: 'venue',
+    chips: [
+      { label: 'Keep my hold on the 20th', goto: 'accessibility-nudge' },
+      { label: 'Ask all five about wheelchair accessibility', goto: 'accessibility-draft' },
+    ],
+    match: ['saturday', 'september', 'open dates'],
+  },
+
+  'accessibility-nudge': {
+    thread: 'Accessible lake-view venues with indoor backup',
+    blocks: [{ t: 'text', md: "Done — the hold on **Sat · Sept 20 2026** stays active. One thing I noticed: none of the five listings answer your wheelchair-accessibility questions directly. Want me to ask all of them at once?" }],
+    panel: 'venue',
+    chips: [{ label: 'Yes — draft a message to all 5', goto: 'accessibility-draft' }],
+    match: ['keep', 'hold'],
+  },
+
+  'accessibility-draft': {
+    thread: 'Accessible lake-view venues with indoor backup',
+    userBubble: "I don't see specific answers about wheelchair accessibility. Can you draft a message to all 5 asking about accessibility to all ceremony and reception spaces?", // PIN
+    blocks: [
+      { t: 'text', md: "Absolutely — here's a ready-to-send draft. I'll personalize the bracketed fields with each venue's name and coordinator contact, then dispatch all five messages the moment you give the word." }, // PIN
+      { t: 'draftPreview' },
+      { t: 'text', md: "Let me know if you'd like any tweaks before I hit send, or edit directly." }, // PIN
+    ],
+    panel: 'composer',
+    chips: [{ label: 'Looks good — send it', goto: 'messages-sent' }],
+    match: ['wheelchair', 'accessibility', 'accessible', 'ada', 'mobility'],
+  },
+
+  'messages-sent': {
+    thread: 'Accessible lake-view venues with indoor backup',
+    blocks: [{ t: 'text', md: "All {N} messages are on their way — personalized for each venue and coordinator. I'll let you know the moment replies land, and I'll keep watching availability in the meantime." }], // {N} replaced at render with live recipient count (Task 9)
+    effects: [{ e: 'interstitial', variant: 'sent' }, { e: 'homeState', state: 'responded' }],
+    chips: [{ label: 'Back to home', goto: 'home-responded' }],
+    match: ['send', 'message the venues'],
+  },
+
+  'home-responded': {
+    chips: [
+      { label: 'Summarize & compare', goto: 'reply-summary' },
+      { label: 'Summarize the replies to my vendor enquiry', goto: 'reply-summary' }, // PIN
+    ],
+    match: ['replies', 'responded', 'summarize', 'compare'],
+  },
+
+  fallback: {
+    blocks: [{ t: 'text', md: "In this concept I'm focused on Tony & Carmella's venue story — here's what I can help with right now." }],
+    chips: [], // engine re-presents the current beat's chips after this text
+    autoGoto: 'home',
+  },
+
+  // TASK 3 replaces this stub
+  'reply-summary': { blocks: [], chips: [{ label: 'TEMP', goto: 'home' }] },
+};
+
+export function reachableBeats(fromId) {
+  const seen = new Set([fromId]);
+  const queue = [fromId];
+  while (queue.length) {
+    const beat = SCRIPT[queue.shift()];
+    for (const c of beat?.chips ?? []) if (!seen.has(c.goto)) { seen.add(c.goto); queue.push(c.goto); }
+    if (beat?.autoGoto && !seen.has(beat.autoGoto)) { seen.add(beat.autoGoto); queue.push(beat.autoGoto); }
+  }
+  return [...seen];
+}
