@@ -1264,6 +1264,98 @@ function reachableBeats(fromId) {
   return [...seen];
 }
 
+// ---- evergreen dates (author 2026-07-17) -----------------------------------
+// The wedding is always the third Saturday of whichever September makes the
+// countdown closest to ~355 days, so the prototype never goes stale and the
+// story's two date invariants hold by construction: the date is a Saturday
+// (peak-Saturday fee, "Friday dates trend cheaper", Blue Horizon = the Friday
+// before) and it's September in Columbus (lakeside venues, 76°/56°/20% rain).
+// All source copy keeps the original screens' literal dates ("Sept 20 2026");
+// liveDates() swaps them at render time, so the copy pins stay verbatim.
+
+const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAY_MS = 86400000;
+
+function thirdSaturdayOfSeptember(year) {
+  const sept1 = new Date(year, 8, 1);
+  const firstSat = 1 + ((6 - sept1.getDay() + 7) % 7);
+  return new Date(year, 8, firstSat + 14);
+}
+
+const ordinal = n =>
+  n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][Math.min(n % 10, 4)] ?? 'th');
+
+function computeWedding(now = new Date()) {
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const candidates = [0, 1, 2].map(dy => thirdSaturdayOfSeptember(now.getFullYear() + dy))
+    .map(d => ({ d, days: Math.round((d - today) / DAY_MS) }))
+    .filter(c => c.days > 0);
+  const pick = candidates.reduce((best, c) => Math.abs(c.days - 355) < Math.abs(best.days - 355) ? c : best);
+  const W = pick.d, day = W.getDate(), year = W.getFullYear();
+  const friday = new Date(year, 8, day - 1);
+
+  // tour slots: the next Fri/Sat/Sun at least 2 days from today
+  let fri = new Date(today.getTime() + (((5 - today.getDay() + 7) % 7) || 7) * DAY_MS);
+  if ((fri - today) / DAY_MS < 2) fri = new Date(fri.getTime() + 7 * DAY_MS);
+  const slot = d => `${DAYS_SHORT[d.getDay()]} ${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}`;
+
+  // balance installments: ~45% and ~85% of the runway to the wedding
+  const instD = f => new Date(today.getTime() + (W - today) * f);
+  const m1 = instD(0.45), m2 = instD(0.85);
+  const inst = m1.getFullYear() === m2.getFullYear()
+    ? `${MONTHS_SHORT[m1.getMonth()]} & ${MONTHS_SHORT[m2.getMonth()]} ${m2.getFullYear()}`
+    : `${MONTHS_SHORT[m1.getMonth()]} ${m1.getFullYear()} & ${MONTHS_SHORT[m2.getMonth()]} ${m2.getFullYear()}`;
+
+  return {
+    date: W, day, year, daysToGo: pick.days,
+    chip: `${W.getMonth() + 1}/${day}/${String(year).slice(2)}`,               // 9/20/26
+    story: `Sept ${day} ${year}`,                                              // Sept 20 2026
+    long: `September ${day}, ${year}`,                                         // September 20, 2026
+    longNC: `September ${day} ${year}`,                                        // September 20 2026 (composer)
+    fridayLong: `September ${day - 1}, ${year}`,
+    altOpen1: `Sept ${day - 14}`, altOpen2: `Sept ${day + 7}`,
+    bookedOrd: ordinal(day - 7), holdOrd: ordinal(day - 1),
+    tourFri: slot(fri), tourSat: slot(new Date(fri.getTime() + DAY_MS)), tourSun: slot(new Date(fri.getTime() + 2 * DAY_MS)),
+    installments: inst,
+  };
+}
+
+const WEDDING = computeWedding();
+
+// swaps the source copy's canonical fallback dates for the live ones.
+// Longest-match-first so partial strings never clobber longer ones.
+function liveDates(s, w = WEDDING) {
+  return s
+    .replace(/Saturday • Sept 20 2026/g, `Saturday • ${w.story}`)
+    .replace(/Sat · Sept 20 2026/g, `Sat · ${w.story}`)
+    .replace(/September 20 — next open date: September 19, 2026/g, `September ${w.day} — next open date: ${w.fridayLong}`)
+    .replace(/Unavailable on September 20\b/g, `Unavailable on September ${w.day}`)
+    .replace(/September 20, 2026/g, w.long)
+    .replace(/September 20 2026/g, w.longNC)
+    .replace(/September 2026/g, `September ${w.year}`)
+    .replace(/Sept 20, 2026/g, `Sept ${w.day}, ${w.year}`)
+    .replace(/Sept 20 2026/g, w.story)
+    .replace(/9\/20\/26/g, w.chip)
+    .replace(/\*\*Sept 5\*\* and \*\*Sept 26\*\*/g, `**${w.altOpen1}** and **${w.altOpen2}**`)
+    .replace(/The 12th is booked and the 19th just went to a courtesy hold/g, `The ${w.bookedOrd} is booked and the ${w.holdOrd} just went to a courtesy hold`)
+    .replace(/\*\*Friday, September 19\*\*/g, `**Friday, September ${w.day - 1}**`)
+    .replace(/Friday the 19th/g, `Friday the ${w.holdOrd}`)
+    .replace(/Fri Sept 19/g, `Fri Sept ${w.day - 1}`)
+    .replace(/Fri Oct 3/g, w.tourFri)
+    .replace(/Sat Oct 4/g, w.tourSat)
+    .replace(/Sun Oct 5/g, w.tourSun)
+    .replace(/toured Willow Shore on Oct 3/g, `toured Willow Shore on ${w.tourFri.slice(4)}`)
+    .replace(/Apr & Aug 2026/g, w.installments)
+    .replace(/355 days/g, `${w.daysToGo} days`)
+    .replace(/355 DAYS/g, `${w.daysToGo} DAYS`)
+    // generic tails — must run AFTER every longer variant above is consumed
+    .replace(/September 20\b/g, `September ${w.day}`)
+    .replace(/Sept 20\b/g, `Sept ${w.day}`)
+    .replace(/Sept 19\b/g, `Sept ${w.day - 1}`);
+}
+
     // the bow — photo assets. Free-license placeholder images from Lorem Picsum
 // (https://picsum.photos), each sourced from an underlying Unsplash photo.
 // Source table (picsum id / Unsplash author / used as):
@@ -1361,8 +1453,14 @@ const PHOTOS = {
       const n = window.__bowRecipients ?? 5;
       return s.replace(/\{N\}/g, String(n));
     }
+    // every rendered string passes through here: {N} recipient count + the
+    // evergreen date substitution (source copy keeps the canonical fallback
+    // dates so the verbatim pins hold; the live dates appear at render time)
+    function liveText(s) {
+      return liveDates(withRecipientCount(s));
+    }
     function mdToHtml(md) {
-      let s = escapeHtml(withRecipientCount(md));
+      let s = escapeHtml(liveText(md));
       s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
       s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
       return s.split(/\n\n+/).map(para => {
@@ -1409,7 +1507,7 @@ const PHOTOS = {
         const btn = document.createElement('button');
         btn.className = 'chip';
         btn.type = 'button';
-        btn.textContent = c.label;
+        btn.textContent = liveText(c.label);
         btn.addEventListener('click', () => go(c.goto));
         chipsEl.appendChild(btn);
         if (reducedMotion) return;
@@ -1614,7 +1712,7 @@ const PHOTOS = {
 
     // ---- panel content helper: [Token] substitution as pills -----------------
     function appendTextWithPill(parent, text, token, iconName, pillLabel) {
-      const parts = text.split(token);
+      const parts = liveText(text).split(token);
       parts.forEach((part, i) => {
         if (part) parent.appendChild(document.createTextNode(part));
         if (i < parts.length - 1) {
@@ -1653,7 +1751,7 @@ const PHOTOS = {
 
       const pill = document.createElement('span');
       pill.className = 'pill-blue';
-      pill.textContent = 'Free on 9/20/26';
+      pill.textContent = liveText('Free on 9/20/26');
       container.appendChild(pill);
 
       const h2 = document.createElement('h2');
@@ -1717,7 +1815,7 @@ const PHOTOS = {
       const holdLi = document.createElement('li');
       holdLi.append('72-hour courtesy hold active on ');
       const holdStrong = document.createElement('strong');
-      holdStrong.textContent = 'Sat · Sept 20 2026';
+      holdStrong.textContent = liveText('Sat · Sept 20 2026');
       holdLi.appendChild(holdStrong);
       ul.appendChild(holdLi);
       perfectCard.appendChild(ul);
@@ -1731,7 +1829,7 @@ const PHOTOS = {
       const chip1 = document.createElement('button');
       chip1.type = 'button';
       chip1.className = 'action-chip';
-      chip1.textContent = 'What Saturdays in September 2026 are still open besides the 20th?';
+      chip1.textContent = liveText('What Saturdays in September 2026 are still open besides the 20th?');
       chip1.addEventListener('click', () => go('willow-saturdays'));
       const chip2 = document.createElement('button');
       chip2.type = 'button';
@@ -2187,7 +2285,7 @@ const PHOTOS = {
       const rows = document.createElement('div');
       rows.className = 'vendor-rows';
       [
-        ['bank', 'Venues', '5 lake-view matches still free on 9/20/26'],
+        ['bank', 'Venues', liveText('5 lake-view matches still free on 9/20/26')],
         ['camera', 'Photographers', '10 free on your date, “candid-bright” style'],
         ['cake', 'Farm-to-table caterers', '4 within budget, menus from $85/guest'],
         ['disc', 'DJs & bands', '12 in your area'],
@@ -2209,11 +2307,11 @@ const PHOTOS = {
 
     function renderDatePanel(container) {
       const h2 = document.createElement('h2');
-      h2.textContent = 'Saturday, September 20, 2026';
+      h2.textContent = liveText('Saturday, September 20, 2026');
       container.appendChild(h2);
       const sub = document.createElement('p');
       sub.className = 'panel-sub';
-      sub.textContent = '355 days away';
+      sub.textContent = liveText('355 days away');
       container.appendChild(sub);
 
       const wh = document.createElement('h3');
@@ -2237,7 +2335,7 @@ const PHOTOS = {
       container.appendChild(tiles);
       const fine = document.createElement('p');
       fine.className = 'fine-note';
-      fine.textContent = 'Based on the last ten September 20ths in Columbus. I’m watching the forecast — two tent options are already flagged if that 20% turns real.';
+      fine.textContent = liveText('Based on the last ten September 20ths in Columbus. I’m watching the forecast — two tent options are already flagged if that 20% turns real.');
       container.appendChild(fine);
 
       const cta = document.createElement('button');
@@ -2314,7 +2412,7 @@ const PHOTOS = {
     function appendUserBubble(container, text) {
       const el = document.createElement('div');
       el.className = 'msg msg-user';
-      el.textContent = text; // always textContent — never render user input as markup
+      el.textContent = liveText(text); // always textContent — never render user input as markup
       container.appendChild(el);
       scrollStreamToBottom();
     }
@@ -2606,7 +2704,7 @@ const PHOTOS = {
         const availLabel = document.createElement('strong');
         availLabel.textContent = 'Availability: ';
         availLine.appendChild(availLabel);
-        availLine.appendChild(document.createTextNode(v.availability));
+        availLine.appendChild(document.createTextNode(liveText(v.availability)));
         right.appendChild(availLine);
 
         const actions = document.createElement('div');
@@ -2662,7 +2760,7 @@ const PHOTOS = {
       el.appendChild(thead);
       const tbody = document.createElement('tbody');
       const rows = [
-        ['Date', 'Sat Sept 20 ✅', 'Fri Sept 19'],
+        ['Date', liveText('Sat Sept 20 ✅'), liveText('Fri Sept 19')],
         ['Access', '✅ Full', '✅ Full'],
         ['Setting', willow.setting, blue.setting],
         ['Capacity', `${willow.capacity} guests`, `${blue.capacity} guests`],
@@ -2713,7 +2811,7 @@ const PHOTOS = {
 
       const bodyClip = document.createElement('div');
       bodyClip.className = 'draft-body-clip';
-      bodyClip.textContent = COMPOSER.body[0];
+      bodyClip.textContent = liveText(COMPOSER.body[0]);
       card.appendChild(bodyClip);
 
       container.appendChild(card);
@@ -2726,7 +2824,7 @@ const PHOTOS = {
       const row = document.createElement('div');
       row.className = 'slots-row';
       (beat?.chips ?? []).forEach(chip => {
-        const [dayDate, time] = chip.label.split(' · ');
+        const [dayDate, time] = liveText(chip.label).split(' · ');
         const spaceIdx = (dayDate ?? '').indexOf(' ');
         const day = spaceIdx === -1 ? (dayDate ?? '') : dayDate.slice(0, spaceIdx);
         const date = spaceIdx === -1 ? '' : dayDate.slice(spaceIdx + 1);
@@ -2755,7 +2853,7 @@ const PHOTOS = {
       const body = document.createElement('div');
       body.className = 'exchange-body';
       const msgs = [
-        { who: 'You (via the bow):', text: 'We’d love to move forward at the quoted $7,200 for Sept 20 — can you confirm the peak-Saturday fee will be waived per the original quote?' },
+        { who: 'You (via the bow):', text: liveText('We’d love to move forward at the quoted $7,200 for Sept 20 — can you confirm the peak-Saturday fee will be waived per the original quote?') },
         { who: 'Maya · Willow Shore Lodge:', text: 'Confirmed — we’ll honor $7,200. I’ve also added a complimentary rehearsal hour on Friday evening. Updated contract attached.' },
       ];
       msgs.forEach(m => {
@@ -2811,7 +2909,7 @@ const PHOTOS = {
 
       const balance = document.createElement('div');
       balance.className = 'contract-row plain';
-      balance.textContent = 'Balance: two installments (Apr & Aug 2026)';
+      balance.textContent = liveText('Balance: two installments (Apr & Aug 2026)');
       card.appendChild(balance);
 
       container.appendChild(card);
@@ -2881,7 +2979,7 @@ const PHOTOS = {
     let interstitialToken = 0; // restart bumps this so a pending overlay-hide can't fire on a new run
     async function showInterstitial(variant) {
       const tok = ++interstitialToken;
-      const [line1, line2] = INTERSTITIAL_TEXT[variant] ?? ['', ''];
+      const [line1, line2] = (INTERSTITIAL_TEXT[variant] ?? ['', '']).map(liveText);
       interstitialEl.innerHTML = '';
       const wordmarkClone = document.getElementById('wordmark').cloneNode(true);
       wordmarkClone.removeAttribute('id');
@@ -3118,6 +3216,13 @@ const PHOTOS = {
     }
     wireAsk(askEl);
     wireAsk(askThreadEl);
+
+    // evergreen dates in the static markup (countdown, header chip, card
+    // titles) — the source keeps the canonical fallback dates; this one-time
+    // sweep swaps text nodes only, leaving icons and spans intact
+    document.querySelectorAll('.days, #chip-date, .card .title').forEach(el => {
+      el.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = liveDates(n.textContent); });
+    });
 
     // ---- home entry points (suggestions + cards) ------------------------------
     homeEl.addEventListener('click', e => {

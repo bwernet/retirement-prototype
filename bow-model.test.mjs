@@ -5,6 +5,7 @@ import {
   applyGoalIncrease, applyBooking, fmtMoney, fmtK, SCRIPT, reachableBeats,
   matchInput,
 } from './bow-model.js';
+import * as model from './bow-model.js';
 
 test('brand layer', () => {
   assert.equal(BRAND.name, 'the bow');
@@ -156,4 +157,40 @@ test('matcher', () => {
   // regression: stopwords alone must not score ("the" appears in hold-willow's
   // "hold the date" match key and used to count as a hit)
   assert.equal(matchInput("what's the weather like", 'recommendation'), null);
+});
+
+test('evergreen wedding date: always a third September Saturday near 355 days out', () => {
+  const { computeWedding, thirdSaturdayOfSeptember, liveDates } = model;
+  for (const nowStr of ['2026-07-17', '2026-11-01', '2027-01-15', '2027-04-01', '2027-09-25', '2028-02-29']) {
+    const now = new Date(nowStr + 'T12:00:00');
+    const w = computeWedding(now);
+    assert.equal(w.date.getDay(), 6, `${nowStr}: not a Saturday`);
+    assert.equal(w.date.getMonth(), 8, `${nowStr}: not September`);
+    assert.equal(w.date.getDate(), thirdSaturdayOfSeptember(w.year).getDate(), `${nowStr}: not the third Saturday`);
+    assert.ok(w.daysToGo > 0, `${nowStr}: in the past`);
+    assert.ok(Math.abs(w.daysToGo - 355) <= 366, `${nowStr}: implausible countdown ${w.daysToGo}`);
+    // internal coherence
+    assert.equal(w.chip, `9/${w.day}/${String(w.year).slice(2)}`);
+    assert.ok(w.fridayLong.includes(String(w.day - 1)));
+    assert.ok(w.altOpen1.endsWith(String(w.day - 14)) && w.altOpen2.endsWith(String(w.day + 7)));
+  }
+});
+
+test('liveDates swaps every canonical fallback date', () => {
+  const { computeWedding, liveDates } = model;
+  const w = computeWedding(new Date('2027-03-10T12:00:00')); // resolves to Sept 2027 or 2028
+  const swaps = [
+    ['Saturday • Sept 20 2026', `Saturday • ${w.story}`],
+    ['Sat · Sept 20 2026', `Sat · ${w.story}`],
+    ['September 20, 2026', w.long],
+    ['September 20 2026', w.longNC],
+    ['9/20/26', w.chip],
+    ['Available Sept 20, 2026', `Available Sept ${w.day}, ${w.year}`],
+    ['Unavailable on September 20 — next open date: September 19, 2026', `Unavailable on September ${w.day} — next open date: ${w.fridayLong}`],
+    ['355 days away', `${w.daysToGo} days away`],
+    ['Apr & Aug 2026', w.installments],
+  ];
+  for (const [src, expect] of swaps) assert.equal(liveDates(src, w), expect, src);
+  // untouched copy passes through
+  assert.equal(liveDates('no dates here', w), 'no dates here');
 });

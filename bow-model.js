@@ -523,3 +523,95 @@ export function reachableBeats(fromId) {
   }
   return [...seen];
 }
+
+// ---- evergreen dates (author 2026-07-17) -----------------------------------
+// The wedding is always the third Saturday of whichever September makes the
+// countdown closest to ~355 days, so the prototype never goes stale and the
+// story's two date invariants hold by construction: the date is a Saturday
+// (peak-Saturday fee, "Friday dates trend cheaper", Blue Horizon = the Friday
+// before) and it's September in Columbus (lakeside venues, 76°/56°/20% rain).
+// All source copy keeps the original screens' literal dates ("Sept 20 2026");
+// liveDates() swaps them at render time, so the copy pins stay verbatim.
+
+const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAY_MS = 86400000;
+
+export function thirdSaturdayOfSeptember(year) {
+  const sept1 = new Date(year, 8, 1);
+  const firstSat = 1 + ((6 - sept1.getDay() + 7) % 7);
+  return new Date(year, 8, firstSat + 14);
+}
+
+export const ordinal = n =>
+  n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][Math.min(n % 10, 4)] ?? 'th');
+
+export function computeWedding(now = new Date()) {
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const candidates = [0, 1, 2].map(dy => thirdSaturdayOfSeptember(now.getFullYear() + dy))
+    .map(d => ({ d, days: Math.round((d - today) / DAY_MS) }))
+    .filter(c => c.days > 0);
+  const pick = candidates.reduce((best, c) => Math.abs(c.days - 355) < Math.abs(best.days - 355) ? c : best);
+  const W = pick.d, day = W.getDate(), year = W.getFullYear();
+  const friday = new Date(year, 8, day - 1);
+
+  // tour slots: the next Fri/Sat/Sun at least 2 days from today
+  let fri = new Date(today.getTime() + (((5 - today.getDay() + 7) % 7) || 7) * DAY_MS);
+  if ((fri - today) / DAY_MS < 2) fri = new Date(fri.getTime() + 7 * DAY_MS);
+  const slot = d => `${DAYS_SHORT[d.getDay()]} ${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}`;
+
+  // balance installments: ~45% and ~85% of the runway to the wedding
+  const instD = f => new Date(today.getTime() + (W - today) * f);
+  const m1 = instD(0.45), m2 = instD(0.85);
+  const inst = m1.getFullYear() === m2.getFullYear()
+    ? `${MONTHS_SHORT[m1.getMonth()]} & ${MONTHS_SHORT[m2.getMonth()]} ${m2.getFullYear()}`
+    : `${MONTHS_SHORT[m1.getMonth()]} ${m1.getFullYear()} & ${MONTHS_SHORT[m2.getMonth()]} ${m2.getFullYear()}`;
+
+  return {
+    date: W, day, year, daysToGo: pick.days,
+    chip: `${W.getMonth() + 1}/${day}/${String(year).slice(2)}`,               // 9/20/26
+    story: `Sept ${day} ${year}`,                                              // Sept 20 2026
+    long: `September ${day}, ${year}`,                                         // September 20, 2026
+    longNC: `September ${day} ${year}`,                                        // September 20 2026 (composer)
+    fridayLong: `September ${day - 1}, ${year}`,
+    altOpen1: `Sept ${day - 14}`, altOpen2: `Sept ${day + 7}`,
+    bookedOrd: ordinal(day - 7), holdOrd: ordinal(day - 1),
+    tourFri: slot(fri), tourSat: slot(new Date(fri.getTime() + DAY_MS)), tourSun: slot(new Date(fri.getTime() + 2 * DAY_MS)),
+    installments: inst,
+  };
+}
+
+export const WEDDING = computeWedding();
+
+// swaps the source copy's canonical fallback dates for the live ones.
+// Longest-match-first so partial strings never clobber longer ones.
+export function liveDates(s, w = WEDDING) {
+  return s
+    .replace(/Saturday • Sept 20 2026/g, `Saturday • ${w.story}`)
+    .replace(/Sat · Sept 20 2026/g, `Sat · ${w.story}`)
+    .replace(/September 20 — next open date: September 19, 2026/g, `September ${w.day} — next open date: ${w.fridayLong}`)
+    .replace(/Unavailable on September 20\b/g, `Unavailable on September ${w.day}`)
+    .replace(/September 20, 2026/g, w.long)
+    .replace(/September 20 2026/g, w.longNC)
+    .replace(/September 2026/g, `September ${w.year}`)
+    .replace(/Sept 20, 2026/g, `Sept ${w.day}, ${w.year}`)
+    .replace(/Sept 20 2026/g, w.story)
+    .replace(/9\/20\/26/g, w.chip)
+    .replace(/\*\*Sept 5\*\* and \*\*Sept 26\*\*/g, `**${w.altOpen1}** and **${w.altOpen2}**`)
+    .replace(/The 12th is booked and the 19th just went to a courtesy hold/g, `The ${w.bookedOrd} is booked and the ${w.holdOrd} just went to a courtesy hold`)
+    .replace(/\*\*Friday, September 19\*\*/g, `**Friday, September ${w.day - 1}**`)
+    .replace(/Friday the 19th/g, `Friday the ${w.holdOrd}`)
+    .replace(/Fri Sept 19/g, `Fri Sept ${w.day - 1}`)
+    .replace(/Fri Oct 3/g, w.tourFri)
+    .replace(/Sat Oct 4/g, w.tourSat)
+    .replace(/Sun Oct 5/g, w.tourSun)
+    .replace(/toured Willow Shore on Oct 3/g, `toured Willow Shore on ${w.tourFri.slice(4)}`)
+    .replace(/Apr & Aug 2026/g, w.installments)
+    .replace(/355 days/g, `${w.daysToGo} days`)
+    .replace(/355 DAYS/g, `${w.daysToGo} DAYS`)
+    // generic tails — must run AFTER every longer variant above is consumed
+    .replace(/September 20\b/g, `September ${w.day}`)
+    .replace(/Sept 20\b/g, `Sept ${w.day}`)
+    .replace(/Sept 19\b/g, `Sept ${w.day - 1}`);
+}

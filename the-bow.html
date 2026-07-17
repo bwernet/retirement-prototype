@@ -735,7 +735,7 @@
   </main>
   <div id="concept-pill"><span class="pill-text">Concept prototype — not affiliated with any marketplace · </span><span class="pill-short" aria-hidden="true">Concept · </span><button id="restart">Restart</button></div>
   <script type="module">
-    import { BRAND, VENUES, SCRIPT, COMPOSER, matchInput, initialBudget, applyVenuePackage, applyRebalance, applyGoalIncrease, applyBooking, fmtMoney, fmtK } from './bow-model.js';
+    import { BRAND, VENUES, SCRIPT, COMPOSER, matchInput, initialBudget, applyVenuePackage, applyRebalance, applyGoalIncrease, applyBooking, fmtMoney, fmtK, WEDDING, liveDates } from './bow-model.js';
     import { PHOTOS } from './bow-photos.js';
 
     // ---- dom refs ----------------------------------------------------------
@@ -807,8 +807,14 @@
       const n = window.__bowRecipients ?? 5;
       return s.replace(/\{N\}/g, String(n));
     }
+    // every rendered string passes through here: {N} recipient count + the
+    // evergreen date substitution (source copy keeps the canonical fallback
+    // dates so the verbatim pins hold; the live dates appear at render time)
+    function liveText(s) {
+      return liveDates(withRecipientCount(s));
+    }
     function mdToHtml(md) {
-      let s = escapeHtml(withRecipientCount(md));
+      let s = escapeHtml(liveText(md));
       s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
       s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
       return s.split(/\n\n+/).map(para => {
@@ -855,7 +861,7 @@
         const btn = document.createElement('button');
         btn.className = 'chip';
         btn.type = 'button';
-        btn.textContent = c.label;
+        btn.textContent = liveText(c.label);
         btn.addEventListener('click', () => go(c.goto));
         chipsEl.appendChild(btn);
         if (reducedMotion) return;
@@ -1060,7 +1066,7 @@
 
     // ---- panel content helper: [Token] substitution as pills -----------------
     function appendTextWithPill(parent, text, token, iconName, pillLabel) {
-      const parts = text.split(token);
+      const parts = liveText(text).split(token);
       parts.forEach((part, i) => {
         if (part) parent.appendChild(document.createTextNode(part));
         if (i < parts.length - 1) {
@@ -1099,7 +1105,7 @@
 
       const pill = document.createElement('span');
       pill.className = 'pill-blue';
-      pill.textContent = 'Free on 9/20/26';
+      pill.textContent = liveText('Free on 9/20/26');
       container.appendChild(pill);
 
       const h2 = document.createElement('h2');
@@ -1163,7 +1169,7 @@
       const holdLi = document.createElement('li');
       holdLi.append('72-hour courtesy hold active on ');
       const holdStrong = document.createElement('strong');
-      holdStrong.textContent = 'Sat · Sept 20 2026';
+      holdStrong.textContent = liveText('Sat · Sept 20 2026');
       holdLi.appendChild(holdStrong);
       ul.appendChild(holdLi);
       perfectCard.appendChild(ul);
@@ -1177,7 +1183,7 @@
       const chip1 = document.createElement('button');
       chip1.type = 'button';
       chip1.className = 'action-chip';
-      chip1.textContent = 'What Saturdays in September 2026 are still open besides the 20th?';
+      chip1.textContent = liveText('What Saturdays in September 2026 are still open besides the 20th?');
       chip1.addEventListener('click', () => go('willow-saturdays'));
       const chip2 = document.createElement('button');
       chip2.type = 'button';
@@ -1633,7 +1639,7 @@
       const rows = document.createElement('div');
       rows.className = 'vendor-rows';
       [
-        ['bank', 'Venues', '5 lake-view matches still free on 9/20/26'],
+        ['bank', 'Venues', liveText('5 lake-view matches still free on 9/20/26')],
         ['camera', 'Photographers', '10 free on your date, “candid-bright” style'],
         ['cake', 'Farm-to-table caterers', '4 within budget, menus from $85/guest'],
         ['disc', 'DJs & bands', '12 in your area'],
@@ -1655,11 +1661,11 @@
 
     function renderDatePanel(container) {
       const h2 = document.createElement('h2');
-      h2.textContent = 'Saturday, September 20, 2026';
+      h2.textContent = liveText('Saturday, September 20, 2026');
       container.appendChild(h2);
       const sub = document.createElement('p');
       sub.className = 'panel-sub';
-      sub.textContent = '355 days away';
+      sub.textContent = liveText('355 days away');
       container.appendChild(sub);
 
       const wh = document.createElement('h3');
@@ -1683,7 +1689,7 @@
       container.appendChild(tiles);
       const fine = document.createElement('p');
       fine.className = 'fine-note';
-      fine.textContent = 'Based on the last ten September 20ths in Columbus. I’m watching the forecast — two tent options are already flagged if that 20% turns real.';
+      fine.textContent = liveText('Based on the last ten September 20ths in Columbus. I’m watching the forecast — two tent options are already flagged if that 20% turns real.');
       container.appendChild(fine);
 
       const cta = document.createElement('button');
@@ -1760,7 +1766,7 @@
     function appendUserBubble(container, text) {
       const el = document.createElement('div');
       el.className = 'msg msg-user';
-      el.textContent = text; // always textContent — never render user input as markup
+      el.textContent = liveText(text); // always textContent — never render user input as markup
       container.appendChild(el);
       scrollStreamToBottom();
     }
@@ -2052,7 +2058,7 @@
         const availLabel = document.createElement('strong');
         availLabel.textContent = 'Availability: ';
         availLine.appendChild(availLabel);
-        availLine.appendChild(document.createTextNode(v.availability));
+        availLine.appendChild(document.createTextNode(liveText(v.availability)));
         right.appendChild(availLine);
 
         const actions = document.createElement('div');
@@ -2108,7 +2114,7 @@
       el.appendChild(thead);
       const tbody = document.createElement('tbody');
       const rows = [
-        ['Date', 'Sat Sept 20 ✅', 'Fri Sept 19'],
+        ['Date', liveText('Sat Sept 20 ✅'), liveText('Fri Sept 19')],
         ['Access', '✅ Full', '✅ Full'],
         ['Setting', willow.setting, blue.setting],
         ['Capacity', `${willow.capacity} guests`, `${blue.capacity} guests`],
@@ -2159,7 +2165,7 @@
 
       const bodyClip = document.createElement('div');
       bodyClip.className = 'draft-body-clip';
-      bodyClip.textContent = COMPOSER.body[0];
+      bodyClip.textContent = liveText(COMPOSER.body[0]);
       card.appendChild(bodyClip);
 
       container.appendChild(card);
@@ -2172,7 +2178,7 @@
       const row = document.createElement('div');
       row.className = 'slots-row';
       (beat?.chips ?? []).forEach(chip => {
-        const [dayDate, time] = chip.label.split(' · ');
+        const [dayDate, time] = liveText(chip.label).split(' · ');
         const spaceIdx = (dayDate ?? '').indexOf(' ');
         const day = spaceIdx === -1 ? (dayDate ?? '') : dayDate.slice(0, spaceIdx);
         const date = spaceIdx === -1 ? '' : dayDate.slice(spaceIdx + 1);
@@ -2201,7 +2207,7 @@
       const body = document.createElement('div');
       body.className = 'exchange-body';
       const msgs = [
-        { who: 'You (via the bow):', text: 'We’d love to move forward at the quoted $7,200 for Sept 20 — can you confirm the peak-Saturday fee will be waived per the original quote?' },
+        { who: 'You (via the bow):', text: liveText('We’d love to move forward at the quoted $7,200 for Sept 20 — can you confirm the peak-Saturday fee will be waived per the original quote?') },
         { who: 'Maya · Willow Shore Lodge:', text: 'Confirmed — we’ll honor $7,200. I’ve also added a complimentary rehearsal hour on Friday evening. Updated contract attached.' },
       ];
       msgs.forEach(m => {
@@ -2257,7 +2263,7 @@
 
       const balance = document.createElement('div');
       balance.className = 'contract-row plain';
-      balance.textContent = 'Balance: two installments (Apr & Aug 2026)';
+      balance.textContent = liveText('Balance: two installments (Apr & Aug 2026)');
       card.appendChild(balance);
 
       container.appendChild(card);
@@ -2327,7 +2333,7 @@
     let interstitialToken = 0; // restart bumps this so a pending overlay-hide can't fire on a new run
     async function showInterstitial(variant) {
       const tok = ++interstitialToken;
-      const [line1, line2] = INTERSTITIAL_TEXT[variant] ?? ['', ''];
+      const [line1, line2] = (INTERSTITIAL_TEXT[variant] ?? ['', '']).map(liveText);
       interstitialEl.innerHTML = '';
       const wordmarkClone = document.getElementById('wordmark').cloneNode(true);
       wordmarkClone.removeAttribute('id');
@@ -2564,6 +2570,13 @@
     }
     wireAsk(askEl);
     wireAsk(askThreadEl);
+
+    // evergreen dates in the static markup (countdown, header chip, card
+    // titles) — the source keeps the canonical fallback dates; this one-time
+    // sweep swaps text nodes only, leaving icons and spans intact
+    document.querySelectorAll('.days, #chip-date, .card .title').forEach(el => {
+      el.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = liveDates(n.textContent); });
+    });
 
     // ---- home entry points (suggestions + cards) ------------------------------
     homeEl.addEventListener('click', e => {
