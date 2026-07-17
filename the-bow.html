@@ -84,7 +84,11 @@
   h2{font-family:'Figtree';font-weight:800;font-size:22px;margin:48px 0 20px}
 
   .cards{display:grid;grid-template-columns:repeat(3, 1fr);gap:24px}
-  .cards[hidden]{display:none}
+  /* state-driven visibility: display:grid above would defeat the hidden attribute,
+     so grids are shown/hidden purely from #home[data-state] */
+  #home[data-state="fresh"] .cards[data-when="responded"]{display:none}
+  #home[data-state="responded"] .cards[data-when="fresh"]{display:none}
+  #home[data-state="responded"] .suggestions{display:none}
   .card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:24px;display:flex;flex-direction:column;gap:10px;position:relative}
   .card.highlight{border-color:var(--label-pink);box-shadow:0 0 0 1px var(--label-pink)}
   .card .cat{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
@@ -259,7 +263,7 @@
           </div>
         </div>
 
-        <div class="cards" data-when="responded" hidden>
+        <div class="cards" data-when="responded">
           <div class="card highlight">
             <span class="cat" style="color:var(--label-pink)">VENUE <span class="new-pill">New!</span></span>
             <span class="title">4 venues responded to accessibility enquiry</span>
