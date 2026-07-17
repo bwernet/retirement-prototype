@@ -143,8 +143,10 @@
   #chips{display:flex;flex-wrap:wrap;gap:10px;padding:0 32px 16px;width:100%;max-width:1024px;margin:0 auto}
   .thread-ask{margin:0 auto 24px;width:calc(100% - 64px);max-width:960px}
 
-  #panel{position:absolute;top:12px;right:24px;bottom:24px;width:420px;background:var(--card);border-radius:var(--r-lg);overflow-y:auto;transform:translateX(16px);opacity:0;transition:transform .42s ease,opacity .42s ease}
-  #panel.panel-visible{transform:translateX(0);opacity:1}
+  /* the panel enters fully from off-canvas on the SAME curve as the surface
+     margin — the two read as one push, never an overlay (author note 2026-07-17) */
+  #panel{position:absolute;top:12px;right:24px;bottom:24px;width:420px;background:var(--card);border-radius:var(--r-lg);overflow-y:auto;transform:translateX(calc(100% + 24px));transition:transform .42s ease}
+  #panel.panel-visible{transform:translateX(0)}
   #panel[hidden]{display:none}
   #panel .panel-placeholder{padding:24px;color:var(--gray);font-size:14px}
   /* flexible surface: the main view narrows when a panel needs the right side
@@ -1376,10 +1378,16 @@ const PHOTOS = {
       else document.getElementById('chip-budget').focus();
     }
     const PANEL_LABELS = { venue: 'Venue details', composer: 'Compose message to venues', budget: 'Budget overview' };
+    let panelHideTimer = null;
     function applyPanel(name) {
+      // was the panel already on screen? content swaps shouldn't re-run the
+      // slide-in — only a genuinely opening panel animates (author note:
+      // the panel must PUSH the surface, entering in lockstep with the
+      // margin transition, never overlaying content that hasn't moved yet)
+      const wasOpen = !panelEl.hidden && panelEl.classList.contains('panel-visible');
+      clearTimeout(panelHideTimer);
       panelEl.innerHTML = '';
       panelEl.dataset.panel = name || '';
-      panelEl.classList.remove('panel-visible');
       document.removeEventListener('keydown', onPanelKeydown); // never stacks — remove is a no-op when absent
       if (name) {
         panelEl.hidden = false;
@@ -1415,16 +1423,33 @@ const PHOTOS = {
           heading.focus();
         }
 
-        if (reducedMotion) {
+        if (wasOpen || reducedMotion) {
+          // already on screen (content swap) or instant mode: no re-slide
           panelEl.classList.add('panel-visible');
         } else {
-          setTimeout(() => panelEl.classList.add('panel-visible'), 0);
+          // start fully off-canvas, force a layout so the browser commits the
+          // off-screen position, then slide in on the same curve the surface
+          // margin uses — panel and content move together as one push
+          panelEl.classList.remove('panel-visible');
+          void panelEl.offsetWidth;
+          panelEl.classList.add('panel-visible');
         }
       } else {
-        panelEl.hidden = true;
         panelEl.removeAttribute('aria-label');
         threadEl.classList.remove('panel-open');
         homeEl.classList.remove('panel-open');
+        if (wasOpen && !reducedMotion) {
+          // slide out in lockstep with the surface widening, then hide
+          panelEl.classList.remove('panel-visible');
+          panelHideTimer = setTimeout(() => {
+            panelEl.hidden = true;
+            panelEl.innerHTML = '';
+            panelEl.dataset.panel = '';
+          }, 440);
+        } else {
+          panelEl.classList.remove('panel-visible');
+          panelEl.hidden = true;
+        }
       }
     }
 
