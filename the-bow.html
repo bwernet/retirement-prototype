@@ -2165,9 +2165,10 @@
       applyPanel(null);
       chipsEl.replaceChildren();
       streamEl.replaceChildren();
-      // zero the counter directly: superseded chains never stream again after
-      // restart, and streamEnded() clamps at 0 when their aborts fire later
-      activeStreams = 0;
+      // do NOT zero activeStreams here: every started chain decrements exactly
+      // once on its own (abort or finish), so the counter self-balances — a
+      // hard reset would let a stale chain's later abort steal a post-restart
+      // stream's increment and clear aria-busy mid-stream
       streamEl.setAttribute('aria-busy', 'false');
       showHomeView();
     });

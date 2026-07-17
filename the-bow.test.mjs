@@ -40,4 +40,14 @@ t('pinkCTA: :root custom property matches bow-model.js BRAND.pinkCTA (Task 12)',
   assert.equal(cssMatch[1].toUpperCase(), jsMatch[1].toUpperCase(),
     `CSS --pink-cta (${cssMatch[1]}) must equal BRAND.pinkCTA (${jsMatch[1]}) — they can't drift`);
 });
+t('white-text fills pass AA (pinkCTA + New! pill fill)', () => {
+  const lum = h => { const [r, g, b] = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * r + .7152 * g + .0722 * b; };
+  const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + .05) / (y + .05); };
+  for (const varName of ['--pink-cta', '--label-pink-fill']) {
+    const m = html.match(new RegExp(varName + ':\\s*(#[0-9A-Fa-f]{6})'));
+    assert.ok(m, `the-bow.html :root is missing ${varName}`);
+    const ratio = contrast('#FFFFFF', m[1]);
+    assert.ok(ratio >= 4.5, `white on ${varName} (${m[1]}) = ${ratio.toFixed(2)}:1 — below AA`);
+  }
+});
 console.log('the-bow.html content OK');
