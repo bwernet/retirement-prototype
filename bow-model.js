@@ -231,8 +231,243 @@ export const SCRIPT = {
     autoGoto: 'home',
   },
 
-  // TASK 3 replaces this stub
-  'reply-summary': { blocks: [], chips: [{ label: 'TEMP', goto: 'home' }] },
+  'reply-summary': {
+    thread: 'Vendor reply summary and accessibility comparison', // PIN
+    userBubble: 'Summarize the replies to my vendor enquiry', // PIN
+    blocks: [
+      { t: 'text', md: 'Four venues replied to your accessibility note — here’s a quick summary of what each shared. You can click **View full reply** under any venue to read their full messages, see floor plans, or review photos they attached.' }, // PIN
+      { t: 'replyCards' }, // renders the 4 replied venues from VENUES
+      { t: 'recommendationHeading' },
+    ],
+    autoGoto: 'recommendation',
+    chips: [],
+    match: ['summarize', 'replies', 'vendor enquiry', 'compare'],
+  },
+
+  recommendation: {
+    thread: 'Vendor reply summary and accessibility comparison',
+    blocks: [
+      { t: 'text', md: '**My Recommendation**\n\nIf full accessibility and an outdoor ceremony are top priorities:\n\n• **Willow Shore Lodge** – Ideal natural setting, accessible, and available.\n• **Blue Horizon Club** – Equally accessible and weather-proof, but one day earlier.\n\nWould you like me to hold those dates and request detailed quotes for both?' }, // PIN
+    ],
+    chips: [
+      { label: 'Compare Willow Shore Lodge and Blue Horizon Club Side by side', goto: 'compare-side' }, // PIN
+      { label: 'Hold Willow Shore Lodge', goto: 'hold-willow' }, // PIN
+      { label: 'Hold Blue Horizon Club', goto: 'hold-blue' }, // PIN
+    ],
+    match: ['recommend', 'which one', 'best'],
+  },
+
+  'compare-side': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'Compare Willow Shore Lodge and Blue Horizon Club Side by side',
+    blocks: [
+      { t: 'comparison' }, // two-column block: date, setting, capacity, access, rain plan, quote
+      { t: 'text', md: 'The real trade is the **date**: Willow Shore keeps your Sept 20, Blue Horizon means moving to Friday the 19th — and Friday venues in your area trend 20–30% cheaper, so there’s room to negotiate if you’re flexible.' },
+    ],
+    chips: [
+      { label: 'Hold Willow Shore Lodge', goto: 'hold-willow' },
+      { label: 'Hold Blue Horizon Club', goto: 'hold-blue' },
+    ],
+    match: ['side by side', 'compare'],
+  },
+
+  'hold-blue': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'Hold Blue Horizon Club',
+    blocks: [{ t: 'text', md: 'One catch: Blue Horizon can’t do your date — their next opening is **Friday, September 19**. I can hold the 19th, but before you move your date for a venue, it’s worth deciding if Willow Shore gets you everything without the switch. Nothing is charged either way.' }],
+    chips: [
+      { label: 'Hold Willow Shore Lodge instead', goto: 'hold-willow' },
+      { label: 'Compare them side by side', goto: 'compare-side' },
+    ],
+    match: ['blue horizon', 'hold blue'],
+  },
+
+  'hold-willow': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'Hold Willow Shore Lodge',
+    blocks: [{ t: 'text', md: 'Done — your **72-hour courtesy hold** on Willow Shore Lodge for **Sat · Sept 20 2026** is confirmed with Maya, their events coordinator. It expires Thursday at 5 pm, nothing is charged, and you can release it anytime. While it’s active, want to look at what their $7,200 quote actually covers?' }],
+    chips: [{ label: 'Break down what’s included in the quote', goto: 'quote-breakdown' }], // PIN
+    match: ['hold willow', 'hold the date', 'willow shore'],
+  },
+
+  'quote-breakdown': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'Break down what’s included in the quote', // PIN
+    blocks: [
+      { t: 'text', md: 'Here’s what Willow Shore Lodge included in their estimate:\n\n• **Venue rental ($7,200)** – covers full-day use of ceremony lawn, pavilion, and reception hall, plus setup and teardown staff.\n• **Catering ($18,000)** – includes appetizers, entrée options for 150 guests, non-alcoholic beverages, linens, flatware, and serving staff. Alcohol packages are separate.\n• **Service fees & tax ($2,100)** – standard 10% service fee plus local tax on food and beverage.\n\nThe total of **$27,300** represents the core event cost, but add-ons like bar service, décor, or coordination would be additional as soon as they confirm.\n\nWould you like me to:\n\n• Add these details to your budget now,\n• Ask the venue for a more itemized quote, or\n• Estimate add-ons (like bar or rentals) to see the full picture?' }, // PIN
+    ],
+    chips: [
+      { label: 'Add to my budget', goto: 'budget-added' }, // PIN
+      { label: 'Ask the venue for a more itemized quote', goto: 'itemized-quote' }, // PIN
+      { label: 'Estimate add-ons (like bar or rentals)', goto: 'estimate-addons' }, // PIN
+    ],
+    match: ['quote', 'included', 'breakdown', 'estimate'],
+  },
+
+  'itemized-quote': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'Ask the venue for a more itemized quote',
+    blocks: [{ t: 'text', md: 'Sent — I asked Maya for a line-item version splitting rental, staffing, per-guest catering, and every fee. Venues usually turn these around in a day or two; I’ll flag it when it lands. Meanwhile, want the current numbers in your budget so you can see the whole picture?' }],
+    chips: [{ label: 'Add to my budget', goto: 'budget-added' }],
+    match: ['itemized'],
+  },
+
+  'estimate-addons': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'Estimate add-ons (like bar or rentals)',
+    blocks: [{ t: 'text', md: 'Rough add-on ranges for a 125-guest evening at venues like Willow Shore:\n\n• **Bar service** – $2,800–$4,500 catered, or roughly half that if you use their BYO allowance\n• **Rentals** (lounge seating, heaters) – $600–$1,200\n• **Day-of coordination** – $1,500–$2,500\n\nNone of these are committed — they’re planning numbers. Want the core quote in your budget first so the add-ons have context?' }],
+    chips: [{ label: 'Add to my budget', goto: 'budget-added' }],
+    match: ['add-ons', 'bar', 'rentals'],
+  },
+
+  'budget-added': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'Add to my budget',
+    blocks: [
+      { t: 'text', md: 'I’ve added these amounts to your budget:\n\n• Venue: **$7,200**\n• Catering: **$18,000**\n• Fees & tax: **$2,100**\n\nYour total projected wedding cost is now **$51,300**, putting you **$11,300 over** your $40,000 target.\n\nWould you like me to:\n• Adjust your category allocations\n• Or recalculate other categories to stay balanced?' }, // PIN (numbers canonical per spec)
+    ],
+    panel: 'budget',
+    effects: [{ e: 'budget', apply: 'package' }],
+    chips: [
+      { label: 'Rebalance existing budget', goto: 'rebalance' }, // PIN
+      { label: 'Increase total budget', goto: 'goal-increase' }, // PIN
+      { label: 'See cost saving ideas', goto: 'cost-ideas' }, // PIN
+    ],
+    match: ['budget', 'add to my budget'],
+  },
+
+  rebalance: {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'Rebalance existing budget',
+    blocks: [
+      { t: 'text', md: 'Here’s what I can trim without touching anything you’ve booked:\n\n• **Catering** – switch plated dinner to chef stations and confirm your real 125 headcount: $18,000 → **$12,500**\n• **Service fees & tax** – recomputed on the smaller total: $2,100 → **$1,550**\n• **Dress / stationery / cake** – modest trims you flagged as flexible: −**$850**\n\nThat brings projected costs to **$44,400** — better, but honestly still **$4,400 over** your target. Trims alone can’t close the rest without cutting things you care about. Two real options:' },
+    ],
+    panel: 'budget',
+    effects: [{ e: 'budget', apply: 'rebalance' }],
+    chips: [
+      { label: 'Raise my goal to $45k', goto: 'goal-increase' },
+      { label: 'Restart the search with cheaper venues', goto: 'restart-search' },
+    ],
+    match: ['rebalance', 'adjust', 'allocations'],
+  },
+
+  'goal-increase': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'Raise my goal to $45k',
+    blocks: [{ t: 'text', md: 'Updated — your goal budget is now **$45,000**, and with the rebalanced plan you’re **$600 under** it. I’ll warn you before anything pushes past the new target.\n\nThe hold on Willow Shore is still active. Want to see it in person before it expires?' }],
+    panel: 'budget',
+    effects: [{ e: 'budget', apply: 'goal' }],
+    chips: [{ label: 'Set up a tour', goto: 'tour-offer' }],
+    match: ['increase', 'raise', 'goal', '45'],
+  },
+
+  'cost-ideas': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'See cost saving ideas',
+    blocks: [{ t: 'text', md: 'Three that fit your plans:\n\n• **Use Willow Shore’s BYO bar allowance** – typically saves couples $1,500–$2,500 versus a catered package\n• **Digital save-the-dates** – keeps stationery near $350\n• **Chef stations instead of plated dinner** – the single biggest lever at your headcount\n\nWant me to apply the ones that touch your budget?' }],
+    panel: 'budget',
+    chips: [{ label: 'Apply them — rebalance my budget', goto: 'rebalance' }],
+    match: ['saving', 'cheaper', 'ideas'],
+  },
+
+  'restart-search': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'Restart the search with cheaper venues',
+    blocks: [{ t: 'text', md: 'Fair — for reference, **Silver Pines Retreat** ($5,900) was the strongest budget option, though its meadow path is only partially wheelchair-friendly. Given your family’s needs, Willow Shore at the rebalanced **$44,400** with a $45k goal is the plan I’d stand behind. Your call — I can requery, or we keep momentum.' }],
+    panel: 'budget',
+    chips: [
+      { label: 'Raise my goal to $45k and keep Willow Shore', goto: 'goal-increase' },
+    ],
+    match: ['restart', 'cheaper venues', 'silver pines'],
+  },
+
+  'tour-offer': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    userBubble: 'Set up a tour',
+    blocks: [
+      { t: 'text', md: 'Maya has three openings while your hold is active:' },
+      { t: 'slots' }, // Fri Oct 3 · 3:00 pm / Sat Oct 4 · 10:00 am / Sun Oct 5 · 1:00 pm
+    ],
+    chips: [
+      { label: 'Fri Oct 3 · 3:00 pm', goto: 'tour-booked' },
+      { label: 'Sat Oct 4 · 10:00 am', goto: 'tour-booked' },
+      { label: 'Sun Oct 5 · 1:00 pm', goto: 'tour-booked' },
+    ],
+    match: ['tour', 'visit', 'see it'],
+  },
+
+  'tour-booked': {
+    thread: 'Vendor reply summary and accessibility comparison',
+    blocks: [{ t: 'text', md: 'Booked — you’re confirmed with Maya, and it’s on your calendar. Since accessibility is the deciding factor, I’ll send you a pocket checklist for the visit: doorway widths, the restroom nearest the pavilion, and the accessible-parking distance — so you can verify everything your family needs in person.' }],
+    effects: [{ e: 'interstitial', variant: 'toured' }],
+    chips: [{ label: 'Two weeks later…', goto: 'contract-flag' }],
+    match: ['book the tour', 'friday', 'saturday', 'sunday'],
+  },
+
+  'contract-flag': {
+    thread: 'Willow Shore Lodge — contract & booking',
+    blocks: [{ t: 'text', md: 'Hope the tour sealed it — Maya sent the contract over this morning. One flag before you sign: the total came in at **$7,450** — $250 above the quoted $7,200, listed as a “peak Saturday fee.”\n\nThis is usually negotiable, and asking costs nothing. Want me to ask them to honor the original quote?' }],
+    chips: [
+      { label: 'Yes — negotiate it', goto: 'negotiate' },
+      { label: 'It’s fine — proceed at $7,450', goto: 'proceed-asis' },
+      { label: 'Show me the contract', goto: 'show-contract' },
+    ],
+    match: ['contract', 'negotiate', 'fee'],
+  },
+
+  'show-contract': {
+    thread: 'Willow Shore Lodge — contract & booking',
+    userBubble: 'Show me the contract',
+    blocks: [{ t: 'contract', total: 'live' }], // renders from budget state + venueRental 7450
+    chips: [
+      { label: 'Yes — negotiate the $250 fee', goto: 'negotiate' },
+      { label: 'It’s fine — proceed at $7,450', goto: 'proceed-asis' },
+    ],
+    match: ['show', 'contract'],
+  },
+
+  negotiate: {
+    thread: 'Willow Shore Lodge — contract & booking',
+    userBubble: 'Yes — negotiate it',
+    blocks: [
+      { t: 'text', md: 'Done — Maya confirmed they’ll **honor the $7,200 quote**, and she added a complimentary rehearsal hour on the Friday evening before. Here’s the exchange so you have the paper trail:' },
+      { t: 'exchange' }, // collapsed 2-message summary: our ask → venue concession
+      { t: 'contract', total: 'live' },
+    ],
+    effects: [{ e: 'negotiated', venueRental: 7200 }],
+    chips: [{ label: 'Book Willow Shore Lodge', goto: 'book' }],
+    match: ['negotiate', 'honor the quote'],
+  },
+
+  'proceed-asis': {
+    thread: 'Willow Shore Lodge — contract & booking',
+    userBubble: 'It’s fine — proceed at $7,450',
+    blocks: [
+      { t: 'text', md: 'Understood — proceeding at **$7,450**. The updated total is reflected below.' },
+      { t: 'contract', total: 'live' },
+    ],
+    effects: [{ e: 'negotiated', venueRental: 7450 }],
+    chips: [{ label: 'Book Willow Shore Lodge', goto: 'book' }],
+    match: ['proceed', 'fine'],
+  },
+
+  book: {
+    thread: 'Willow Shore Lodge — contract & booking',
+    userBubble: 'Book Willow Shore Lodge',
+    blocks: [{ t: 'text', md: 'Deposit paid: **$5,600**. Signing confirmed — sending you the countersigned copy now…' }],
+    effects: [{ e: 'budget', apply: 'book' }, { e: 'stat', key: 'vendorsSaved', value: 1 }],
+    autoGoto: 'booked-finale',
+    chips: [],
+    match: ['book it', 'sign'],
+  },
+
+  'booked-finale': {
+    thread: 'Willow Shore Lodge — contract & booking',
+    blocks: [{ t: 'text', md: 'It’s official — **Willow Shore Lodge is yours for September 20, 2026.** \u{1F389}\n\nYour deposit is in, the balance is split into two reminders I’ll surface when they’re due, and the rehearsal hour is on the calendar.\n\nHere’s what I’m watching next: catering tasting dates, the tent contingency if the forecast shifts, and your photographer shortlist. Go celebrate — I’ve got the rest.' }],
+    panel: 'budget',
+    chips: [{ label: 'Start over from the beginning', goto: 'home' }],
+    match: [],
+  },
 };
 
 export function reachableBeats(fromId) {

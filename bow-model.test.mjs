@@ -109,3 +109,28 @@ test('Act 1 copy pins', () => {
   assert.ok(SCRIPT['accessibility-draft'].blocks[0].md.startsWith(
     'Absolutely — here’s a ready-to-send draft.'));
 });
+
+test('Act 2/3 copy pins', () => {
+  assert.ok(SCRIPT['reply-summary'].blocks[0].md.startsWith(
+    'Four venues replied to your accessibility note'));
+  assert.ok(SCRIPT['recommendation'].blocks[0].md.includes('**Willow Shore Lodge**'));
+  assert.ok(SCRIPT['recommendation'].blocks[0].md.includes(
+    'Equally accessible and weather-proof, but one day earlier.'));
+  assert.ok(SCRIPT['quote-breakdown'].blocks[0].md.includes('**$27,300**'));
+  assert.ok(SCRIPT['budget-added'].blocks[0].md.includes('**$51,300**'));
+  assert.ok(SCRIPT['budget-added'].blocks[0].md.includes('**$11,300 over**'));
+  assert.ok(SCRIPT['goal-increase'].blocks[0].md.includes('$600 under'));
+  assert.ok(SCRIPT['contract-flag'].blocks[0].md.includes('**$7,450**'));
+  assert.equal(SCRIPT['booked-finale'].chips.length, 1);
+  assert.equal(SCRIPT['booked-finale'].chips[0].goto, 'home');
+});
+
+test('graph has no stubs', () => {
+  assert.ok(!JSON.stringify(SCRIPT).includes('TEMP'));
+});
+
+test('permission-first negotiation', () => {
+  const labels = SCRIPT['contract-flag'].chips.map(c => c.label);
+  assert.ok(labels.some(l => l.includes('negotiate')), 'agent asks before negotiating');
+  assert.ok(labels.some(l => l.toLowerCase().includes('proceed')));
+});
