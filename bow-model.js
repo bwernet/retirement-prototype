@@ -73,6 +73,11 @@ export function initialBudget() {
       { label: 'Cake & desserts', icon: '\u{1F370}', amount: 1000, status: 'planned' },
       { label: 'Hair & makeup', icon: '\u{1F484}', amount: 900, status: 'planned' },
       { label: 'Stationery', icon: '✉️', amount: 600, status: 'planned' },
+      // pre-quote placeholder for the biggest line item — keeps the projected
+      // total realistically close to the goal ($38k vs $40k) until the real
+      // quotes land; applyVenuePackage replaces it with the quoted actuals,
+      // which is the moment the budget tips over the goal (author 2026-07-17)
+      { label: 'Venue & catering (estimate)', icon: '\u{1F3DB}️', amount: 14000, status: 'planned' },
     ],
     quoted: [], // venue package lands here at add-to-budget
     get spent() { return this.paid + this.items.filter(i => i.status === 'booked').reduce((s, i) => s + i.amount, 0); },
@@ -90,6 +95,9 @@ const clone = b => Object.assign(Object.create(Object.getPrototypeOf(b), Object.
 
 export function applyVenuePackage(b) {
   const n = clone(b);
+  // the quoted actuals supersede the pre-quote estimate line:
+  // 38,000 - 14,000 + 27,300 = 51,300 — the tip-over-goal moment
+  n.items = n.items.filter(i => i.label !== 'Venue & catering (estimate)');
   n.quoted = [
     { label: 'Venue rental', icon: '\u{1F3DB}️', amount: 7200 },
     { label: 'Catering', icon: '\u{1F37D}️', amount: 18000 },

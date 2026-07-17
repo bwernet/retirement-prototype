@@ -33,16 +33,20 @@ test('initial budget: committed 17,500 exactly', () => {
   assert.equal(booked.reduce((s, i) => s + i.amount, 0), 15800);
   assert.equal(b.paid + 15800, 17500);
   const planned = b.items.filter(i => i.status === 'planned');
-  assert.equal(planned.reduce((s, i) => s + i.amount, 0), 6500);
-  assert.equal(planned.length, 5);
+  // 6,500 of committed-category plans + the 14,000 venue & catering estimate
+  // (author 2026-07-17: pre-quote projection should sit close to the goal)
+  assert.equal(planned.reduce((s, i) => s + i.amount, 0), 20500);
+  assert.equal(planned.length, 6);
   assert.equal(b.spent, 17500);
-  assert.equal(b.projected, 24000); // 17,500 + 6,500 (no venue yet)
+  assert.equal(b.projected, 38000); // 17,500 + 20,500 (estimate in, no quotes yet)
 });
 
 test('venue package: projected 51,300, over 11,300', () => {
   const b = applyVenuePackage(initialBudget());
   assert.equal(b.quoted.reduce((s, i) => s + i.amount, 0), 27300);
-  assert.equal(b.projected, 51300);
+  assert.ok(!b.items.some(i => i.label === 'Venue & catering (estimate)'),
+    'the quoted actuals must replace the pre-quote estimate line');
+  assert.equal(b.projected, 51300); // 38,000 − 14,000 estimate + 27,300 quoted
   assert.equal(b.projected - b.goal, 11300);
   assert.equal(b.spent, 17500, 'spent chip must NOT move at add-to-budget');
 });

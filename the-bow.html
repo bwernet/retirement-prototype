@@ -226,20 +226,19 @@
   .budget-figure .fig-diff{font-weight:700}
   .budget-figure .fig-diff.over{color:#D64545}
   .budget-figure .fig-diff.under{color:#1F9D55}
-  .budget-bar-wrap{position:relative;margin:26px 0 14px}
-  .budget-bar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--line)}
+  /* one visual system for both views: square segments separated by thin white
+     lines, container-level rounded caps only, neutral #F1F2F4 goal remainder */
+  .budget-bar-wrap{position:relative;margin:10px 0 14px;padding-top:38px}
+  .budget-bar{display:flex;gap:2px;height:14px;border-radius:999px;overflow:hidden}
   .budget-bar .bar-seg{flex-shrink:0;outline-offset:-2px}
-  .budget-bar.cat-bar{gap:2px;background:transparent}
-  .budget-bar.cat-bar .bar-seg{border-radius:3px}
-  .budget-bar.cat-bar .bar-seg:first-child{border-radius:999px 3px 3px 999px}
-  .budget-bar.cat-bar .bar-seg:last-child{border-radius:3px 999px 999px 3px}
-  .budget-bar .seg-remainder{background:#E7DFD4}
-  .bar-tip{position:absolute;bottom:calc(100% + 6px);transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;white-space:nowrap;pointer-events:none;z-index:6}
+  .budget-bar .seg-remainder{background:#F1F2F4}
+  .bar-tip{position:absolute;bottom:calc(100% - 32px);transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;white-space:nowrap;pointer-events:none;z-index:6}
   .bar-tip[hidden]{display:none}
-  .budget-goal-marker{position:absolute;top:-22px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--gray);white-space:nowrap}
+  /* label above, tick line dropping THROUGH the bar to its bottom edge */
+  .budget-goal-marker{position:absolute;top:0;bottom:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--gray);white-space:nowrap;pointer-events:none;z-index:4}
   .budget-goal-marker .pig{display:flex;align-items:center}
   .budget-goal-marker .pig .i{width:14px;height:14px}
-  .budget-goal-marker::after{content:'';position:absolute;bottom:-14px;width:2px;height:14px;background:var(--ink)}
+  .budget-goal-marker::after{content:'';flex:1;width:2px;background:var(--ink);margin-top:2px;border-radius:1px}
   .budget-legend{display:flex;flex-wrap:wrap;gap:12px 18px;font-size:12px;color:var(--gray);margin-bottom:8px}
   .budget-legend .leg-item{display:flex;align-items:center;gap:6px}
   .budget-legend .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -1011,6 +1010,7 @@
       'Photographer': 'camera', 'Videographer': 'video', 'Florist': 'flower',
       'DJ': 'disc', 'Wedding dress': 'dress', 'Tuxedo or suit': 'tux',
       'Cake & desserts': 'cake', 'Hair & makeup': 'brush', 'Stationery': 'mail',
+      'Venue & catering (estimate)': 'bank',
     };
 
     // ---- panel content helper: [Token] substitution as pills -----------------
@@ -1281,7 +1281,8 @@
     let budgetView = 'status'; // persists across panel re-renders; restart resets
     // category palette from the author's reference: pinks -> blues -> golds
     const CAT_PALETTE = ['#FF3EB4', '#F7A9DB', '#FBD9F2', '#9EC7EB', '#C5DBF2', '#E1ECF8', '#F5B700', '#FBE3A0'];
-    const CAT_OTHER_COLOR = '#E7DFD4';
+    const CAT_OTHER_COLOR = '#E3E6EA';
+    const CAT_KEEP = 8; // full palette incl. the yellows; the rest roll up
 
     function setBudgetView(view, container, catBtn, statusBtn) {
       if (budgetView === view) return;
@@ -1317,7 +1318,7 @@
       barWrap.appendChild(marker);
 
       const bar = document.createElement('div');
-      bar.className = 'budget-bar' + (view === 'category' ? ' cat-bar' : '');
+      bar.className = 'budget-bar';
 
       const tip = document.createElement('div');
       tip.className = 'bar-tip';
@@ -1339,11 +1340,10 @@
           ...b.items.map(i => ({ label: i.label, amount: i.amount })),
           { label: 'Deposits paid', amount: paidAmt },
         ].filter(i => i.amount > 0).sort((a, c) => c.amount - a.amount);
-        const KEEP = 6;
-        segments = items.slice(0, KEEP).map((i, idx) => ({ ...i, color: CAT_PALETTE[idx % CAT_PALETTE.length] }));
-        const rest = items.slice(KEEP);
+        segments = items.slice(0, CAT_KEEP).map((i, idx) => ({ ...i, color: CAT_PALETTE[idx % CAT_PALETTE.length] }));
+        const rest = items.slice(CAT_KEEP);
         if (rest.length === 1) {
-          segments.push({ ...rest[0], color: CAT_PALETTE[KEEP % CAT_PALETTE.length] });
+          segments.push({ ...rest[0], color: CAT_OTHER_COLOR });
         } else if (rest.length > 1) {
           segments.push({ label: 'Everything else', amount: rest.reduce((s, i) => s + i.amount, 0), color: CAT_OTHER_COLOR });
         }
