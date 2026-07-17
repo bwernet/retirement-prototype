@@ -652,12 +652,25 @@
         setTimeout(() => { btn.style.opacity = '1'; }, i * 40);
       });
     }
+    function onPanelKeydown(e) {
+      if (e.key !== 'Escape') return;
+      // reply modal takes precedence: its own Escape handler closes it,
+      // and the panel stays open underneath
+      if (document.getElementById('bow-reply-modal')) return;
+      closePanel();
+    }
+    function closePanel() {
+      applyPanel(null);
+      askThreadEl.focus();
+    }
     function applyPanel(name) {
       panelEl.innerHTML = '';
       panelEl.classList.remove('panel-visible');
+      document.removeEventListener('keydown', onPanelKeydown); // never stacks — remove is a no-op when absent
       if (name) {
         panelEl.hidden = false;
         threadEl.classList.add('panel-open');
+        document.addEventListener('keydown', onPanelKeydown);
 
         const closeBar = document.createElement('div');
         closeBar.className = 'panel-close-bar';
@@ -666,10 +679,7 @@
         closeBtn.className = 'panel-close';
         closeBtn.setAttribute('aria-label', 'Close panel');
         closeBtn.textContent = '✕';
-        closeBtn.addEventListener('click', () => {
-          applyPanel(null);
-          askThreadEl.focus();
-        });
+        closeBtn.addEventListener('click', closePanel);
         closeBar.appendChild(closeBtn);
         panelEl.appendChild(closeBar);
 
@@ -818,6 +828,7 @@
       chip2.className = 'action-chip';
       chip2.textContent = 'Show me photos of ceremonies on the terrace';
       chip2.addEventListener('click', () => {
+        if (otherChips.nextElementSibling?.classList.contains('panel-note')) return; // already shown
         const noteEl = document.createElement('div');
         noteEl.className = 'panel-note';
         noteEl.textContent = "(Photo galleries aren't part of this concept — the venues' replies later include floor plans.)";
@@ -954,8 +965,11 @@
       const b = state.budget;
       const bookedAmt = b.items.filter(i => i.status === 'booked').reduce((s, i) => s + i.amount, 0);
       const plannedAmt = b.items.filter(i => i.status === 'planned').reduce((s, i) => s + i.amount, 0);
-      const quotedAmt = b.quoted.reduce((s, i) => s + i.amount, 0);
-      const paidAmt = b.paid; // segmented bar uses paid as-is, not the depositAgainstQuoted-adjusted figure
+      // the deposit is paid *against* the quoted package — net it out of Quoted so
+      // the bar/legend segments always sum to the same total as "Projected costs"
+      // (pre-booking depositAgainstQuoted is 0, so this is a no-op until `book`)
+      const quotedAmt = b.quoted.reduce((s, i) => s + i.amount, 0) - b.depositAgainstQuoted;
+      const paidAmt = b.paid;
       const segTotal = (paidAmt + bookedAmt + quotedAmt + plannedAmt) || 1;
       const projected = b.projected;
       const goal = b.goal;
