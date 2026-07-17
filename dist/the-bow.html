@@ -172,7 +172,6 @@
   .panel-close{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gray)}
   .panel-close:hover{background:rgba(0,0,0,.05);color:var(--ink)}
   .panel-body{padding:0 24px 28px}
-  .panel-note{color:var(--gray);font-size:13px;margin-top:10px;font-style:italic}
 
   /* ---- panel: venue (Task 9) ---- */
   .venue-panel .photo-grid{display:flex;gap:8px;margin-bottom:16px}
@@ -386,8 +385,6 @@
   .btn-outline:hover{background:rgba(0,0,0,.04)}
   .btn-text{text-decoration:underline;text-underline-offset:2px;font-size:13px;font-weight:600;color:var(--ink)}
   .btn-text:hover{color:var(--pink-deep)}
-  .inline-note{color:var(--gray)}
-  .inline-note em{font-style:italic}
 
   .photo-placeholder{width:200px;height:150px;flex-shrink:0;border-radius:var(--r-sm);background:linear-gradient(135deg,#F3E9DC 0%,#DDDBD6 100%);display:flex;align-items:center;justify-content:center;font-size:28px;object-fit:cover}
 
@@ -2343,14 +2340,6 @@ const PHOTOS = {
     ];
 
     // quiet in-panel note, deduped (same pattern as the venue panel chips)
-    function panelNoteAfter(el, text) {
-      if (el.nextElementSibling?.classList.contains('panel-note')) return;
-      const note = document.createElement('p');
-      note.className = 'panel-note';
-      note.textContent = text;
-      el.insertAdjacentElement('afterend', note);
-    }
-
     function renderLocationPanel(container) {
       container.classList.add('chip-panel');
       const h2 = document.createElement('h2');
@@ -2401,8 +2390,7 @@ const PHOTOS = {
       cta.type = 'button';
       cta.className = 'action-chip';
       cta.append('Explore other locations');
-      cta.addEventListener('click', () => panelNoteAfter(cta,
-        '(Your location stays flexible until you book a venue — in this concept, the story stays in Columbus.)'));
+      cta.addEventListener('click', () => showToast('Your location stays flexible until you book a venue — in this concept, the story stays in Columbus.'));
       container.appendChild(cta);
 
       const vh = document.createElement('h3');
@@ -2474,8 +2462,7 @@ const PHOTOS = {
       cta.type = 'button';
       cta.className = 'action-chip';
       cta.append('Explore other dates');
-      cta.addEventListener('click', () => panelNoteAfter(cta,
-        '(Friday dates in your area trend 20–30% cheaper — your date stays flexible until the venue is booked.)'));
+      cta.addEventListener('click', () => showToast('Friday dates in your area trend 20–30% cheaper — your date stays flexible until the venue is booked.'));
       container.appendChild(cta);
     }
 
@@ -2521,8 +2508,7 @@ const PHOTOS = {
       cta.type = 'button';
       cta.className = 'action-chip';
       cta.append('Start your guest list');
-      cta.addEventListener('click', () => panelNoteAfter(cta,
-        '(In the full product this opens guest management — in this concept, planning continues around your estimate.)'));
+      cta.addEventListener('click', () => showToast('In the full product this opens guest management — in this concept, planning continues around your estimate.'));
       container.appendChild(cta);
     }
 
@@ -2595,15 +2581,6 @@ const PHOTOS = {
     }
 
     // ---- block renderer shared helpers ----------------------------------------
-    function appendInlineNote(container, text) {
-      const el = document.createElement('div');
-      el.className = 'msg msg-agent inline-note';
-      const em = document.createElement('em');
-      em.textContent = text;
-      el.appendChild(em);
-      container.appendChild(el);
-      scrollStreamToBottom();
-    }
     const NON_WILLOW_HOLD_NOTE = 'In this concept, Willow Shore Lodge is the booking path — holds on other venues aren’t scripted.';
 
     function makePhotoImg(v) {
@@ -2902,7 +2879,7 @@ const PHOTOS = {
         if (v.id === 'willow') {
           holdBtn.addEventListener('click', () => go('hold-willow'));
         } else {
-          holdBtn.addEventListener('click', () => appendInlineNote(container, NON_WILLOW_HOLD_NOTE));
+          holdBtn.addEventListener('click', () => showToast(NON_WILLOW_HOLD_NOTE));
         }
         actions.appendChild(holdBtn);
         right.appendChild(actions);
