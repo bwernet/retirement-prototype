@@ -499,11 +499,21 @@ export const SCRIPT = {
     match: ['book it', 'sign'],
   },
 
+  'tasting-teaser': {
+    thread: 'Willow Shore Lodge — contract & booking',
+    userBubble: 'Next up: catering tastings',
+    blocks: [{ t: 'text', md: 'On it — Maya is sending tasting windows for the next two weeks, and I’ll surface them here the moment they land, with menus and per-guest pricing attached. You’ll just pick a date.' }],
+    chips: [{ label: 'Start over from the beginning', goto: 'home' }],
+    match: ['tasting', 'catering'],
+  },
+
   'booked-finale': {
     thread: 'Willow Shore Lodge — contract & booking',
     blocks: [{ t: 'text', md: 'It’s official — **Willow Shore Lodge is yours for September 20, 2026.** \u{1F389}\n\nYour deposit is in, the balance is split into two reminders I’ll surface when they’re due, and the rehearsal hour is on the calendar.\n\nHere’s what I’m watching next: catering tasting dates, the tent contingency if the forecast shifts, and your photographer shortlist.\n\nFirst up: I’ve already asked Maya for tasting dates — you’ll have options waiting the next time you stop by. Go celebrate — I’ve got the rest.' }],
     panel: 'budget',
-    chips: [{ label: 'Start over from the beginning', goto: 'home' }],
+    // the finale's visible pill is a real NEXT ACTION, not a reset (author
+    // 2026-07-21) — the concept ends on the agent already working the next item
+    chips: [{ label: 'Next up: catering tastings', goto: 'tasting-teaser' }],
     match: [],
   },
 };

@@ -128,7 +128,9 @@ test('Act 2/3 copy pins', () => {
   assert.ok(SCRIPT['goal-increase'].blocks[0].md.includes('$600 under'));
   assert.ok(SCRIPT['contract-flag'].blocks[0].md.includes('**$7,450**'));
   assert.equal(SCRIPT['booked-finale'].chips.length, 1);
-  assert.equal(SCRIPT['booked-finale'].chips[0].goto, 'home');
+  // finale pill = a real next action; the teaser beat then offers the restart
+  assert.equal(SCRIPT['booked-finale'].chips[0].goto, 'tasting-teaser');
+  assert.equal(SCRIPT['tasting-teaser'].chips[0].goto, 'home');
 });
 
 test('graph has no stubs', () => {
