@@ -50,6 +50,9 @@
     --pink:#FF3EB4; --pink-cta:#E1008A; --pink-deep:#A50064; --pink-pale:#FBD9F2;
     --line:#E2E2E5; --gray:#6E6E7D; --soft:#F2F2F7;
     --bar-h:64px;
+    /* system-level category colors — titles only, each ≥4.5:1 on white */
+    --cat-human:#A85B00; --cat-context:#1C5C98; --cat-agent:#E1008A;
+    --cat-interface:#15806B; --cat-product-state:#6D28D9;
   }
   *{box-sizing:border-box;margin:0}
   html{scroll-behavior:smooth;background:var(--canvas)}
@@ -122,9 +125,14 @@
   /* ---- annotation rail (cards under the frame — no on-product markers) ---- */
   .rail{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;align-items:start}
   .sys-anno{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 15px}
-  .sys-anno .anno-label{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--pink-deep)}
-  .sys-anno .anno-label small{color:var(--gray);font-weight:600;letter-spacing:.04em;margin-left:7px}
+  .sys-anno .anno-cat{font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+  .anno-cat.cat-human{color:var(--cat-human)}
+  .anno-cat.cat-context{color:var(--cat-context)}
+  .anno-cat.cat-agent{color:var(--cat-agent)}
+  .anno-cat.cat-interface{color:var(--cat-interface)}
+  .anno-cat.cat-product-state{color:var(--cat-product-state)}
   .sys-anno .anno-body{font-size:13.5px;line-height:1.45;margin-top:3px;color:var(--ink)}
+  .sys-anno .anno-body b{font-weight:700}
   .rail .sys-anno{opacity:0;transform:translateY(6px);transition:opacity .35s ease, transform .35s ease}
   .rail .sys-anno.show{opacity:1;transform:none}
   @media (prefers-reduced-motion: reduce){ .rail .sys-anno{transition:none;transform:none} }
@@ -245,7 +253,7 @@
           ['Preference', 'Outdoor, lake-view'], ['Requirement', 'Wheelchair accessibility'],
         ],
         annotations: [
-          { layer: 'context', label: 'Context retained', body: 'Planning constraints persist beyond the conversation and shape search, outreach, and later budget decisions.', anchor: 'context-chips' },
+          { layer: 'context', lead: 'Context retained', body: 'Planning constraints persist beyond the conversation and shape search, outreach, and later budget decisions.', anchor: 'context-chips' },
         ] },
       { id: 'gathered', path: [], scrub: true, scrubTarget: '#home', scrubGroup: 'dashboard', size: 's', tapDot: 'home-venue-cta',
         text: 'Scroll on and the dashboard tells it itself: chefs shortlisted, décor pulled, $1,200 already saved — and the card that starts this story: five lake-view venues, screened for their guest list and wheelchair access, still free on their date.',
@@ -255,53 +263,53 @@
       { id: 'findings', path: P1, scrub: true, tapDot: 'venue-card',
         text: 'Ask about the venues and the agent walks you through what it found — five lake-view spots, ranked and screened for capacity, accessibility, and a rain plan. Keep scrolling to read the response the way the couple does.',
         annotations: [
-          { layer: 'agent', label: 'Agent action', body: 'Screens venue options against the couple’s existing constraints.' },
-          { layer: 'interface', label: 'Interface response', body: 'Moves from conversation into a structured surface for comparison.', anchor: 'venue-card' },
+          { layer: 'agent', lead: 'Screening, not just searching', body: 'Screens venue options against the couple’s existing constraints.' },
+          { layer: 'interface', lead: 'From chat to comparison', body: 'Moves from conversation into a structured surface for comparison.', anchor: 'venue-card' },
         ] },
       { id: 'willow', path: P2, panel: 'venue', scrub: true, size: 's', scrubFrom: 'beat-willow-detail',
         text: 'The top match gets a closer look: the agent explains why Willow Shore fits them in the thread, and the full profile — photos, pricing, availability — opens beside it without losing the conversation.',
         annotations: [
-          { layer: 'interface', label: 'Detail in context', body: 'Exploring a result opens beside the thread — the conversation never resets.' },
+          { layer: 'interface', lead: 'Detail in context', body: 'Exploring a result opens beside the thread — the conversation never resets.' },
         ] },
     ]},
     { chapter: 'The missing answer', beats: [
       { id: 'gap', path: P3, live: true, panel: 'none', tapDot: 'draft-preview', // the exchange streams in; the draft leads into the composer
         text: 'One thing no listing really answers: whether Carmella’s family can actually get everywhere on the day. The couple asks — and the agent treats the missing answers as missing, not as fine print to assume away.',
         annotations: [
-          { layer: 'agent', label: 'Evidence gap', body: 'Accessibility has not been verified for every venue.' },
-          { layer: 'agent', label: 'Agent behavior', body: 'Identifies missing evidence instead of treating incomplete listing data as fact.', anchor: 'beat-accessibility-draft' },
+          { layer: 'human', lead: 'Lived knowledge', body: 'The accessibility requirement comes from the couple — context the system could never infer on its own.' },
+          { layer: 'agent', lead: 'Evidence gap', body: 'Accessibility has not been verified for every venue — missing evidence is treated as missing, not as fact.', anchor: 'beat-accessibility-draft' },
         ] },
       { id: 'approval', path: P3, panel: 'composer', focusAnchor: 'approval-send', tapDot: 'approval-send',
         text: 'The agent drafts five personalized messages targeting exactly those gaps — and then stops. Recipients visible, message editable. Nothing is sent without a yes.',
         annotations: [
-          { layer: 'agent', label: 'Prepared by the agent', body: 'Drafts targeted questions using the known information gaps.', anchor: 'composer-draft' },
-          { layer: 'approval', label: 'Requires approval', body: 'The couple can inspect recipients, edit the message, and approve sending.', anchor: 'approval-send' },
+          { layer: 'agent', lead: 'Prepared by the agent', body: 'Drafts targeted questions using the known information gaps.', anchor: 'composer-draft' },
+          { layer: 'human', lead: 'Requires approval', body: 'The couple can inspect recipients, edit the message, and approve sending.', anchor: 'approval-send' },
         ] },
     ]},
     { chapter: 'Three days later', beats: [
       { id: 'returned', path: P4, interstitial: 'sent', tapDot: 'responded-cta', focusAnchor: 'responded-cta', // '3 days later' plays WITH the beat, lifting onto the responded dashboard
         text: 'The messages go out; days pass. When the couple comes back, the dashboard leads with what changed while they were gone: four venues answered the accessibility question.',
         annotations: [
-          { layer: 'interface', label: 'Proactive by design', body: 'The dashboard resurfaces what changed — replies — without being asked.' },
+          { layer: 'interface', lead: 'Proactive by design', body: 'The dashboard resurfaces what changed — replies — without being asked.' },
         ] },
       { id: 'replies', path: P5, scrub: true, live: true, // conversation streams in before scrub takes over
         text: 'Four replies, normalized into the same comparable shape — quote, capacity, rain plan, and accessibility in each venue’s own words. Scroll through them the way the couple would.',
         annotations: [
-          { layer: 'interface', label: 'Structured synthesis', body: 'Responses are normalized into comparable criteria without hiding their sources.' },
-          { layer: 'agent', label: 'Source inputs', body: 'Vendor replies and supporting details remain available.', anchor: 'reply-source' },
-          { layer: 'agent', label: 'Verified, not assumed', body: 'This status comes from the venue’s own reply — which contradicted its listing. The refuting answer stays visible.', anchor: 'access-evidence' },
+          { layer: 'interface', lead: 'Structured synthesis', body: 'Responses are normalized into comparable criteria without hiding their sources.' },
+          { layer: 'context', lead: 'Sources kept', body: 'Vendor replies and supporting details remain available.', anchor: 'reply-source' },
+          { layer: 'agent', lead: 'Verified, not assumed', body: 'This status comes from the venue’s own reply — which contradicted its listing. The refuting answer stays visible.', anchor: 'access-evidence' },
         ] },
       { id: 'recommendation', path: P5, focusAnchor: 'beat-recommendation', tapDot: 'chip-hold-willow',
         text: 'Then a recommendation with the reasons attached: Willow Shore for the setting and full access, Blue Horizon as the weather-proof runner-up. Advice, not a leaderboard.',
         annotations: [
-          { layer: 'agent', label: 'Recommendation with reasons', body: 'Two finalists, each carrying the “why” — the couple decides with the evidence in view.' },
+          { layer: 'human', lead: 'The call stays theirs', body: 'A recommendation with the reasons attached — the couple decides with the evidence in view.' },
         ] },
     ]},
     { chapter: 'Making the call', beats: [
       { id: 'quote', path: P6, scrub: true, scrubFrom: 'beat-hold-willow', tapDot: 'chip-budget-added',
         text: 'A free five-day hold on Willow Shore buys time to decide — and the agent gives the honest cost picture: the $7,200 quote is venue-only. With catering and service fees, the real number is about $27,300. Keep scrolling through the breakdown.',
         annotations: [
-          { layer: 'agent', label: 'Honest math', body: 'The quote is venue-only; the agent adds catering and service estimates so the decision uses the real total.' },
+          { layer: 'agent', lead: 'Honest math', body: 'The quote is venue-only; the agent adds catering and service estimates so the decision uses the real total.' },
         ] },
       { id: 'added', path: P6a, scrub: true, size: 's', scrubFrom: 'beat-budget-added', tapDot: 'chip-rebalance',
         text: 'They add it to the budget — and the plan tips over: $51,300 projected against a $40k goal. $11,300 over, shown plainly, not softened.',
@@ -312,14 +320,14 @@
       { id: 'goal', path: P7, scrub: true, size: 's', scrubFrom: 'beat-goal-increase', tapDot: 'chip-tour-offer',
         text: 'So the couple makes the call themselves: goal up to $45k, keeping the venue they actually want. Landing: $600 under, eyes open.',
         annotations: [
-          { layer: 'product-state', label: 'Live budget math', body: 'The projection recomputes as quotes replace estimates — the trade-offs are visible, not narrated.' },
+          { layer: 'product-state', lead: 'Live budget math', body: 'The projection recomputes as quotes replace estimates — the trade-offs are visible, not narrated.' },
         ] },
     ]},
     { chapter: 'Booked', beats: [
       { id: 'contract-arrives', path: P8, interstitial: 'toured', tapDot: 'contract-cta', focusAnchor: 'contract-cta', // 'Two weeks later' plays WITH the beat; dashboard centers the contract card
         text: 'A tour with the venue coordinator seals it. Two weeks later the dashboard leads with news: Willow Shore sent the contract — and the agent read it first.',
         annotations: [
-          { layer: 'agent', label: 'Watchful between moments', body: 'Tour booked, calendar synced — and the incoming contract is reviewed before the couple opens it.' },
+          { layer: 'agent', lead: 'Watchful between moments', body: 'Tour booked, calendar synced — and the incoming contract is reviewed before the couple opens it.' },
         ] },
       { id: 'flag', path: P8f, scrub: true, size: 's', scrubFrom: 'beat-contract-flag', tapDot: 'chip-negotiate',
         text: 'One flag before signing: a $250 “peak Saturday fee” that wasn’t in the quote. The agent asks permission before doing anything about it — negotiating costs nothing, but it’s the couple’s call.',
@@ -330,8 +338,8 @@
       { id: 'booked', path: P9, loop: true, scrub: true, scrubFrom: 'beat-book',
         text: 'Booked — deposit in, reminders scheduled, rehearsal hour on the calendar. And the decision doesn’t stay in the chat: budget, vendor status, and the plan itself all update, feeding richer context into every decision after.',
         annotations: [
-          { layer: 'product-state', label: 'Decision recorded', body: 'The selected venue becomes part of the shared planning state.', anchor: 'context-chips' },
-          { layer: 'product-state', label: 'Connected updates', body: 'Budget, vendor status, checklist, and future recommendations can now reflect the decision.' },
+          { layer: 'product-state', lead: 'Decision recorded', body: 'The selected venue becomes part of the shared planning state.', anchor: 'context-chips' },
+          { layer: 'product-state', lead: 'Connected updates', body: 'Budget, vendor status, checklist, and future recommendations can now reflect the decision.' },
         ] },
     ]},
   ];
@@ -350,19 +358,24 @@
   const overlay = $('#overlay');
   const stepsEl = $('#steps');
 
+  // The five system levels of the underlying model (author 2026-07-21):
+  //   Human — what the user knows.       Context — persistent information.
+  //   Agent — what the system decides.   Interface — where work happens.
+  //   Product state — what changes permanently.
   const LAYERS = {
-    context: 'Context', agent: 'Agent', interface: 'Interface',
-    approval: 'Approval', 'product-state': 'Product state',
+    human: 'Human', context: 'Context', agent: 'Agent',
+    interface: 'Interface', 'product-state': 'Product state',
   };
   function annoCard(a) {
     const d = document.createElement('div');
     d.className = 'sys-anno';
-    const label = document.createElement('p'); label.className = 'anno-label';
-    label.textContent = a.label;
-    const layer = document.createElement('small'); layer.textContent = LAYERS[a.layer] ?? a.layer;
-    label.appendChild(layer);
-    const body = document.createElement('p'); body.className = 'anno-body'; body.textContent = a.body;
-    d.append(label, body);
+    const cat = document.createElement('p');
+    cat.className = 'anno-cat cat-' + a.layer;
+    cat.textContent = LAYERS[a.layer] ?? a.layer;
+    const body = document.createElement('p'); body.className = 'anno-body';
+    if (a.lead) { const b = document.createElement('b'); b.textContent = a.lead + '. '; body.appendChild(b); }
+    body.appendChild(document.createTextNode(a.body));
+    d.append(cat, body);
     return d;
   }
   function renderRail(idx) {
