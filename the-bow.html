@@ -867,6 +867,7 @@
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let reducedMotion = prefersReducedMotion;
     let storyInstant = false; // true only while a story seek is replaying beats
+    let storySuppressPanel = false; // story seek with panel:'none' — beats must not open panels
     const wait = ms => new Promise(r => setTimeout(r, reducedMotion ? 0 : ms));
 
     // ---- state ---------------------------------------------------------------
@@ -2762,7 +2763,7 @@
           if (node) streamEl.scrollTop = node.getBoundingClientRect().top - streamEl.getBoundingClientRect().top + streamEl.scrollTop - 8;
         } else node?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
         // chips are already inline in the transcript node — nothing to redo
-        applyPanelForBeat(beat);
+        if (!storySuppressPanel) applyPanelForBeat(beat);
         // if this beat's autoGoto tail was invalidated before its target rendered
         // (e.g. Restart/Back mid-chain), re-follow it so the story can't dead-end
         if (beat.autoGoto && !isRendered(beat.autoGoto)) {
@@ -2823,7 +2824,7 @@
       // renders, or a first-time visit to a panel beat (budget-added, rebalance,
       // goal-increase) would paint the panel from the pre-effect budget snapshot.
       for (const eff of beat.effects ?? []) applyEffect(eff);
-      applyPanelForBeat(beat);
+      if (!storySuppressPanel) applyPanelForBeat(beat);
 
       if (beat.autoGoto) {
         await wait(600);
@@ -2992,6 +2993,10 @@
       const tok = ++storySeekToken;
       storyInstant = true;
       reducedMotion = true;
+      // panel:'none' → the story wants the conversation full-focus: close any
+      // open panel now and keep beat-declared panels from opening during replay
+      storySuppressPanel = panel === 'none';
+      if (storySuppressPanel) applyPanel(null);
       // forward-scroll fast path: when the new path purely extends the last
       // completed one, play only the new suffix — adjacent story beats flow
       // without a restart flash. Anything else replays from a clean restart.
@@ -3024,7 +3029,7 @@
       // optional posed panel: the case study may show a panel the interactive
       // flow opens via direct manipulation (e.g. the venue profile a card
       // click opens) alongside the chat answer — a pose, not a flow claim
-      if (panel) applyPanel(panel);
+      if (panel && panel !== 'none') applyPanel(panel);
       reducedMotion = prefersReducedMotion;
       storyInstant = false;
       window.parent.postMessage({ bowStory: 'seek-done', beat: state.beat }, '*');

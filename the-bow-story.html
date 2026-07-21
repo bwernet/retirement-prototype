@@ -245,13 +245,13 @@
         ] },
     ]},
     { chapter: 'The missing answer', beats: [
-      { id: 'gap', path: P3, focusAnchor: 'beat-accessibility-draft',
+      { id: 'gap', path: P3, live: true, panel: 'none', // the exchange streams in, chat full-focus
         text: 'One thing no listing really answers: whether Carmella’s family can actually get everywhere on the day. The couple asks — and the agent treats the missing answers as missing, not as fine print to assume away.',
         annotations: [
           { layer: 'agent', label: 'Evidence gap', body: 'Accessibility has not been verified for every venue.' },
           { layer: 'agent', label: 'Agent behavior', body: 'Identifies missing evidence instead of treating incomplete listing data as fact.', anchor: 'beat-accessibility-draft' },
         ] },
-      { id: 'approval', path: P3, focusAnchor: 'approval-send',
+      { id: 'approval', path: P3, panel: 'composer', focusAnchor: 'approval-send',
         text: 'The agent drafts five personalized messages targeting exactly those gaps — and then stops. Recipients visible, message editable. Nothing is sent without a yes.',
         annotations: [
           { layer: 'agent', label: 'Prepared by the agent', body: 'Drafts targeted questions using the known information gaps.', anchor: 'composer-draft' },
