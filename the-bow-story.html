@@ -217,7 +217,7 @@
 
   const CHAPTERS = [
     { chapter: 'While you were away', beats: [
-      { id: 'home', path: [], scrub: true, scrubTarget: '#home', size: 's',
+      { id: 'home', path: [], scrub: true, scrubTarget: '#home', scrubGroup: 'dashboard', size: 's',
         text: 'Tony & Carmella come back to a dashboard that has been busy without them — every card already shaped by constraints the agent knows.',
         constraints: [
           ['Location', 'Columbus, OH'], ['Wedding date', 'September, next year'],
@@ -227,7 +227,7 @@
         annotations: [
           { layer: 'context', label: 'Context retained', body: 'Planning constraints persist beyond the conversation and shape search, outreach, and later budget decisions.', anchor: 'context-chips' },
         ] },
-      { id: 'gathered', path: [], scrub: true, scrubTarget: '#home', size: 's',
+      { id: 'gathered', path: [], scrub: true, scrubTarget: '#home', scrubGroup: 'dashboard', size: 's',
         text: 'Scroll on and the dashboard tells it itself: chefs shortlisted, décor pulled, $1,200 already saved — and the card that starts this story: five lake-view venues, screened for their guest list and wheelchair access, still free on their date.',
         annotations: [] },
     ]},
@@ -238,7 +238,7 @@
           { layer: 'agent', label: 'Agent action', body: 'Screens venue options against the couple’s existing constraints.' },
           { layer: 'interface', label: 'Interface response', body: 'Moves from conversation into a structured surface for comparison.', anchor: 'venue-card' },
         ] },
-      { id: 'willow', path: P2, panel: 'venue',
+      { id: 'willow', path: P2, panel: 'venue', scrub: true, size: 's', scrubFrom: 'beat-willow-detail',
         text: 'The top match gets a closer look: the agent explains why Willow Shore fits them in the thread, and the full profile — photos, pricing, availability — opens beside it without losing the conversation.',
         annotations: [
           { layer: 'interface', label: 'Detail in context', body: 'Exploring a result opens beside the thread — the conversation never resets.' },
@@ -488,7 +488,7 @@
     renderBar(idx);
     rail.replaceChildren(); // cards re-render once the seek settles
     renderBeatPanel(idx);
-    scrubScroller = null; scrubTargetPx = null;
+    scrubScroller = null; scrubTargetPx = null; scrubFromPx = 0;
     clearTimeout(followTimer); followTimer = null;
     if (protoReady) {
       if (!isForward(prev, idx)) box.classList.add('masking'); // dim the restart replay
@@ -527,6 +527,13 @@
     }
     if (b.scrub) {
       scrubScroller = doc?.querySelector(b.scrubTarget ?? '#stream') ?? null; // cached for the beat
+      scrubFromPx = 0;
+      if (b.scrubFrom && scrubScroller) {
+        // scrub only the tail of the scroller, starting at this anchor — the
+        // beat reads ITS OWN exchange end-to-end instead of rewinding the thread
+        const el = doc.querySelector(`[data-story-anchor="${b.scrubFrom}"]`);
+        if (el) scrubFromPx = Math.max(0, el.getBoundingClientRect().top - scrubScroller.getBoundingClientRect().top + scrubScroller.scrollTop - 10);
+      }
       scrubTick(); // sync to current progress (the follower eases the catch-up)
     }
     renderRail(idx);          // annotation cards, below the frame — never over it
@@ -537,16 +544,21 @@
      it — this coalesces scrollTop writes to ~60Hz regardless of scroll-event
      rate, and softens the catch-up after a live stream un-gates the scrub.
      The scroller node is cached per beat at settle (no per-event queries). */
-  // contiguous scrub beats sharing a scroller form one GROUP: progress spans
-  // the whole run, so the scrubbed surface never snaps back at a beat boundary
+  // contiguous scrub beats sharing an EXPLICIT scrubGroup form one range:
+  // progress spans the whole run, so the scrubbed surface never snaps back
+  // at the boundary (ch1's dashboard). Ungrouped scrub beats are singletons —
+  // adjacent stream scrubs must NOT merge when their content grows between
+  // beats (findings → willow), or progress mapping goes wrong.
   const SCRUB_GROUP = BEATS.map((b, i) => {
     if (!b.scrub) return null;
-    const t = b.scrubTarget ?? '#stream';
-    let s0 = i; while (s0 > 0 && BEATS[s0 - 1].scrub && (BEATS[s0 - 1].scrubTarget ?? '#stream') === t) s0--;
-    let e0 = i; while (e0 < BEATS.length - 1 && BEATS[e0 + 1].scrub && (BEATS[e0 + 1].scrubTarget ?? '#stream') === t) e0++;
+    const g = b.scrubGroup;
+    if (!g) return [i, i];
+    let s0 = i; while (s0 > 0 && BEATS[s0 - 1].scrub && BEATS[s0 - 1].scrubGroup === g) s0--;
+    let e0 = i; while (e0 < BEATS.length - 1 && BEATS[e0 + 1].scrub && BEATS[e0 + 1].scrubGroup === g) e0++;
     return [s0, e0];
   });
   let scrubScroller = null;
+  let scrubFromPx = 0;
   let scrubTargetPx = null;
   let followTimer = null;
   function scrubTick() {
@@ -561,7 +573,7 @@
     const p = Math.min(1, Math.max(0, (mid - top) / Math.max(1, height)));
     const max = scrubScroller.scrollHeight - scrubScroller.clientHeight;
     if (max <= 0) return;
-    scrubTargetPx = p * max;
+    scrubTargetPx = scrubFromPx + p * Math.max(0, max - scrubFromPx);
     if (RM) { scrubScroller.scrollTop = scrubTargetPx; return; } // no added motion under reduced motion
     ensureFollower();
   }
