@@ -2380,6 +2380,7 @@
     async function renderDraftPreview(container) {
       const card = document.createElement('div');
       card.className = 'draft-preview-card';
+      card.dataset.storyAnchor = 'draft-preview'; // case-study anchor: the in-chat draft that expands into the composer
 
       const subject = document.createElement('div');
       subject.className = 'draft-subject';
