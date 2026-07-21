@@ -676,9 +676,14 @@
     const [g0, g1] = SCRUB_GROUP[shownBeat];
     const m = metrics();
     const top = m[g0].top, height = (m[g1].top + m[g1].height) - top;
-    // progress through the scrub group (viewport center as the read head)
+    // progress through the scrub group (viewport center as the read head).
+    // The span is clamped to what the center can actually REACH — near the
+    // end of the page the center stops innerHeight/2 short of the last
+    // section's bottom, which silently made the final scrub beat top out
+    // around p≈0.78 and cut off the conversation's ending.
     const mid = window.scrollY + window.innerHeight / 2;
-    const p = Math.min(1, Math.max(0, (mid - top) / Math.max(1, height)));
+    const reachableEnd = Math.min(top + height, document.documentElement.scrollHeight - window.innerHeight / 2);
+    const p = Math.min(1, Math.max(0, (mid - top) / Math.max(1, reachableEnd - top)));
     const max = scrubScroller.scrollHeight - scrubScroller.clientHeight;
     if (max <= 0) return;
     scrubTargetPx = scrubFromPx + p * Math.max(0, max - scrubFromPx);
