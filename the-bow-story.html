@@ -92,6 +92,7 @@
      progress, while a single sticky panel swaps its text in place. */
   .spacer{height:72vh}
   .spacer.scrub{height:150vh}
+  .spacer.scrub-s{height:100vh}   /* shorter scrub: ch1's dashboard read */
   /* FIXED height: the sticky panel sits above the spacers in layout flow, so
      its height must not vary with beat content — content may overflow the box
      visually (no clipping), but spacer offsets stay stable for the cache */
@@ -145,6 +146,7 @@
     .m-panel .beat-text{color:var(--gray);font-size:14px}
     .spacer{height:60vh}
     .spacer.scrub{height:110vh}
+    .spacer.scrub-s{height:85vh}
     .stage-pill{padding:5px 11px 5px 6px;font-size:12px;gap:6px}
     .stage-pill .dot{width:16px;height:16px;font-size:9.5px}
   }
@@ -211,7 +213,7 @@
 
   const CHAPTERS = [
     { chapter: 'While you were away', beats: [
-      { id: 'home', path: [],
+      { id: 'home', path: [], scrub: true, scrubTarget: '#home', size: 's',
         text: 'Tony & Carmella come back to a dashboard that has been busy without them — every card already shaped by constraints the agent knows.',
         constraints: [
           ['Location', 'Columbus, OH'], ['Wedding date', 'September, next year'],
@@ -221,7 +223,7 @@
         annotations: [
           { layer: 'context', label: 'Context retained', body: 'Planning constraints persist beyond the conversation and shape search, outreach, and later budget decisions.', anchor: 'context-chips' },
         ] },
-      { id: 'gathered', path: [], scrub: true, scrubTarget: '#home',
+      { id: 'gathered', path: [], scrub: true, scrubTarget: '#home', size: 's',
         text: 'Scroll on and the dashboard tells it itself: chefs shortlisted, décor pulled, $1,200 already saved — and the card that starts this story: five lake-view venues, screened for their guest list and wheelchair access, still free on their date.',
         annotations: [] },
     ]},
@@ -356,7 +358,7 @@
   /* ---- build scroll track (invisible spacers) + text panels ---- */
   BEATS.forEach((b, i) => {
     const sec = document.createElement('div');
-    sec.className = 'spacer' + (b.scrub ? ' scrub' : '');
+    sec.className = 'spacer' + (b.scrub ? ' scrub' + (b.size === 's' ? ' scrub-s' : '') : '');
     sec.dataset.index = i;
     sec.setAttribute('aria-hidden', 'true');
     stepsEl.appendChild(sec);
@@ -366,15 +368,27 @@
   const beatPanel = $('#beat-panel');
   const mPanel = $('#m-panel');
   const FIRST_SCRUB = BEATS.findIndex(b => b.scrub); // hint teaches once, not four times
-  function fillPanel(el, idx, withAnnos) {
-    el.replaceChildren();
-    const b = BEATS[idx];
+  function makePanelParts(root) {
     const head = document.createElement('div'); head.className = 'panel-head';
+    const body = document.createElement('div'); body.className = 'panel-body';
+    root.replaceChildren(head, body);
+    return { root, head, body };
+  }
+  const PANELS = [
+    { ...makePanelParts(beatPanel), annos: false },
+    { ...makePanelParts(mPanel), annos: true },
+  ];
+  function fillHead(head, idx) {
+    const b = BEATS[idx];
+    head.replaceChildren();
     const eyebrow = document.createElement('p'); eyebrow.className = 'chapter-eyebrow';
     eyebrow.textContent = `Chapter ${b.chapterIdx + 1} of ${CHAPTERS.length} · ${b.chapterTitle}`;
     const h = document.createElement('h2'); h.textContent = b.chapterTitle;
     head.append(eyebrow, h);
-    const body = document.createElement('div'); body.className = 'panel-body';
+  }
+  function fillBody(body, idx, withAnnos) {
+    const b = BEATS[idx];
+    body.replaceChildren();
     const p = document.createElement('p'); p.className = 'beat-text'; p.textContent = b.text;
     body.appendChild(p);
     if (b.constraints) {
@@ -391,28 +405,24 @@
       body.appendChild(hint);
     }
     if (withAnnos) b.annotations.forEach(a => { const c = annoCard(a); c.classList.add('show'); body.appendChild(c); });
-    el.append(head, body);
   }
-  // one sticky panel swaps its text in place — paragraphs never scroll past
-  // each other. Within a chapter only the BODY crossfades (the title holds);
-  // crossing a chapter boundary fades the whole panel (author 2026-07-21)
+  // the title/eyebrow are PERSISTENT nodes — between beats of the same chapter
+  // they are not touched at all (no rebuild, no fade); only the body swaps.
+  // Crossing a chapter boundary fades the whole panel and rebuilds the head.
   let panelToken = 0;
   let panelChapter = -1;
   function renderBeatPanel(idx) {
     const tok = ++panelToken;
-    const sameChapter = BEATS[idx].chapterIdx === panelChapter;
+    const chapterChanged = BEATS[idx].chapterIdx !== panelChapter;
     panelChapter = BEATS[idx].chapterIdx;
-    const fadeEls = sameChapter
-      ? [beatPanel.querySelector('.panel-body'), mPanel.querySelector('.panel-body')].filter(Boolean)
-      : [beatPanel, mPanel];
+    const fadeEls = PANELS.map(pp => chapterChanged ? pp.root : pp.body);
     const swap = () => {
       if (tok !== panelToken) return;
-      fillPanel(beatPanel, idx, false);
-      fillPanel(mPanel, idx, true);
-      [beatPanel, mPanel].forEach(el => {
-        el.classList.remove('hidden');
-        el.querySelector('.panel-body')?.classList.remove('hidden');
+      PANELS.forEach(pp => {
+        if (chapterChanged) fillHead(pp.head, idx);
+        fillBody(pp.body, idx, pp.annos);
       });
+      fadeEls.forEach(el => el.classList.remove('hidden'));
       sectionMetrics = null; // panel height may have changed → remeasure lazily
     };
     if (RM) { swap(); return; }
@@ -523,6 +533,15 @@
      it — this coalesces scrollTop writes to ~60Hz regardless of scroll-event
      rate, and softens the catch-up after a live stream un-gates the scrub.
      The scroller node is cached per beat at settle (no per-event queries). */
+  // contiguous scrub beats sharing a scroller form one GROUP: progress spans
+  // the whole run, so the scrubbed surface never snaps back at a beat boundary
+  const SCRUB_GROUP = BEATS.map((b, i) => {
+    if (!b.scrub) return null;
+    const t = b.scrubTarget ?? '#stream';
+    let s0 = i; while (s0 > 0 && BEATS[s0 - 1].scrub && (BEATS[s0 - 1].scrubTarget ?? '#stream') === t) s0--;
+    let e0 = i; while (e0 < BEATS.length - 1 && BEATS[e0 + 1].scrub && (BEATS[e0 + 1].scrubTarget ?? '#stream') === t) e0++;
+    return [s0, e0];
+  });
   let scrubScroller = null;
   let scrubTargetPx = null;
   let followTimer = null;
@@ -530,8 +549,10 @@
     if (shownBeat < 0 || seeking || !protoReady || !scrubScroller) return;
     const b = BEATS[shownBeat];
     if (!b.scrub) return;
-    const { top, height } = metrics()[shownBeat];
-    // progress through the beat's section (viewport center as the read head)
+    const [g0, g1] = SCRUB_GROUP[shownBeat];
+    const m = metrics();
+    const top = m[g0].top, height = (m[g1].top + m[g1].height) - top;
+    // progress through the scrub group (viewport center as the read head)
     const mid = window.scrollY + window.innerHeight / 2;
     const p = Math.min(1, Math.max(0, (mid - top) / Math.max(1, height)));
     const max = scrubScroller.scrollHeight - scrubScroller.clientHeight;
