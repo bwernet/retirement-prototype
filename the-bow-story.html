@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>the knot, agentic — an annotated case study</title>
+<link rel="stylesheet" href="bow-fonts.css">
+<style>
+  /* ============================================================
+     the-bow-story.html — scrollytelling case study around the
+     existing prototype (same-origin iframe of dist/the-bow.html,
+     driven with postMessage seeks; frame is a passive exhibit).
+
+     Author round 2026-07-21 (v5):
+     — Annotation beacons/rail REMOVED for now (they flashed
+       during scroll). The annotation copy is retained, unrendered,
+       in the beat data for a future round.
+     — Beat activation has ONE source of truth (viewport-center
+       rule + 28px boundary hysteresis). IO and the scroll listener
+       both feed the same computation — the previous IO-band vs
+       center-point disagreement caused restart flashing at beat
+       boundaries (worst at 1→2 and 2→3).
+     — Non-forward transitions (restart replays) briefly dim the
+       frame instead of flashing the home screen.
+     — Chapter 1 scrubs DOWN the dashboard itself and zooms into
+       the venue card that starts the story.
+     — Chapter 5 plays the full budget conversation beat by beat:
+       quote → added ($11.3k over) → rebalance → goal raise.
+     ============================================================ */
+  :root{
+    --canvas:#F7F8FA; --ink:#171719; --card:#FFFFFF;
+    --pink:#FF3EB4; --pink-cta:#E1008A; --pink-deep:#A50064; --pink-pale:#FBD9F2;
+    --line:#E2E2E5; --gray:#6E6E7D; --soft:#F2F2F7;
+    --bar-h:64px;
+  }
+  *{box-sizing:border-box;margin:0}
+  html{scroll-behavior:smooth;background:var(--canvas)}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+  body{font:400 16px/1.55 'Figtree',system-ui,sans-serif;background:var(--canvas);color:var(--ink)}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+
+  /* ---- intro ---- */
+  .intro{max-width:760px;margin:0 auto;padding:72px 24px 40px}
+  .intro .kicker{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink-deep)}
+  .intro h1{font-size:clamp(28px,4.5vw,44px);font-weight:800;line-height:1.12;margin:10px 0 14px}
+  .intro p{color:var(--gray);font-size:17px;max-width:620px}
+  .intro .fullscreen-link{display:inline-block;margin-top:18px;font-weight:600;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+
+  /* ---- chapter bar (nav + progress, spans both columns) ---- */
+  .stage-bar{position:sticky;top:0;z-index:50;background:var(--canvas);border-bottom:1px solid var(--line);height:var(--bar-h)}
+  .stage-bar .bar-inner{max-width:1560px;margin:0 auto;padding:0 24px;height:100%;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none}
+  .stage-bar .bar-inner::-webkit-scrollbar{display:none}
+  .stage-pill{flex:0 0 auto;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 15px 7px 8px;font-size:13.5px;font-weight:600;color:var(--gray);background:var(--card);transition:all .3s ease;white-space:nowrap}
+  .stage-pill .dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--soft);color:var(--gray);flex-shrink:0}
+  .stage-pill.is-done{color:var(--ink)}
+  .stage-pill.is-done .dot{background:var(--ink);color:#fff}
+  .stage-pill[aria-current="step"]{color:var(--pink-deep);border-color:var(--pink-cta);background:var(--pink-pale)}
+  .stage-pill[aria-current="step"] .dot{background:var(--pink-cta);color:#fff}
+  .stage-pill:hover:not([aria-current="step"]){border-color:var(--gray)}
+  .stage-arrow{color:var(--line);font-size:13px;user-select:none;flex:0 0 auto}
+  .loop-mark{display:none;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--pink-deep);flex:0 0 auto;margin-left:2px}
+  .loop-mark svg{width:15px;height:15px}
+  .stage-bar.looping .loop-mark{display:flex}
+  @media (prefers-reduced-motion: reduce){ .stage-pill{transition:none} }
+
+  /* ---- layout: prototype LEFT, narrative RIGHT ---- */
+  .story{max-width:1560px;margin:0 auto;padding:24px 24px 120px;display:grid;grid-template-columns:1fr minmax(300px,380px);gap:48px;align-items:start}
+  .narrative{min-width:0}
+  .stage-col{min-width:0;position:sticky;top:calc(var(--bar-h) + 16px)}
+
+  /* ---- narrative beats ---- */
+  .step{min-height:72vh;display:flex;flex-direction:column;justify-content:center;padding:24px 0}
+  .step.scrub{min-height:150vh}          /* scrub beats hold the screen while the prototype scrolls */
+  .step.chapter-start{border-top:1px solid var(--line)}
+  .step:first-of-type{border-top:0}
+  .step .chapter-eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink-deep)}
+  .step h2{font-size:24px;font-weight:800;margin:8px 0 12px;line-height:1.2}
+  .step p.beat-text{color:var(--gray);font-size:16.5px}
+  .step .scrub-hint{margin-top:12px;font-size:12.5px;font-weight:600;color:var(--pink-deep);display:flex;align-items:center;gap:6px}
+  .step .scrub-hint svg{width:13px;height:13px}
+  .step .constraints{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+  .step .constraints li{font-size:14.5px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 12px}
+  .step .constraints li b{font-weight:700}
+  .step.is-active .chapter-eyebrow{color:var(--pink-cta)}
+
+  /* ---- prototype frame: passive exhibit ---- */
+  .proto-box{position:relative;border:1px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden;box-shadow:0 18px 44px -30px rgba(22,29,36,.35)}
+  .proto-scale{transform-origin:0 0;transition:transform .55s cubic-bezier(.25,.7,.3,1), opacity .18s ease}
+  .proto-box.masking .proto-scale{opacity:.12} /* dims restart replays instead of flashing */
+  .proto-scale iframe{display:block;border:0;width:1024px;height:700px;background:#FBF1E6;pointer-events:none}
+  @media (prefers-reduced-motion: reduce){ .proto-scale{transition:none} }
+
+  /* ---- mobile: single column, pinned frame under the bar ---- */
+  @media (max-width: 1099px){
+    :root{--bar-h:52px}
+    .story{grid-template-columns:1fr;gap:0;padding-top:0}
+    .stage-col{position:sticky;top:var(--bar-h);z-index:30;background:var(--canvas);padding:12px 0 10px;order:-1}
+    .step{min-height:0;padding:34px 0}
+    .step.scrub{min-height:120vh}
+    .stage-pill{padding:5px 11px 5px 6px;font-size:12px;gap:6px}
+    .stage-pill .dot{width:16px;height:16px;font-size:9.5px}
+  }
+</style>
+</head>
+<body>
+
+<header class="intro">
+  <p class="kicker">Experiment · agentic planning</p>
+  <h1>What happens when the planner works for you</h1>
+  <p>A scripted prototype of an agent-led wedding marketplace, followed start to finish: one couple, one venue decision, and an agent that searches, asks, negotiates, and books — with the humans holding every meaningful yes.</p>
+  <a class="fullscreen-link" href="dist/the-bow.html" target="_blank" rel="noopener">Try the full interactive prototype ↗</a>
+</header>
+
+<nav class="stage-bar" id="stage-bar" aria-label="Story chapters">
+  <div class="bar-inner" id="bar-inner"></div>
+</nav>
+
+<main class="story">
+  <div class="stage-col">
+    <div class="proto-box" id="proto-box">
+      <div class="proto-scale" id="proto-scale">
+        <!-- passive exhibit: posed by the story's scroll, not clickable.
+             The interactive version is the full-screen link above. -->
+        <iframe id="proto" src="dist/the-bow.html" title="the bow prototype, posed at the current story beat (non-interactive exhibit)" tabindex="-1"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div class="narrative">
+    <div id="steps"></div>
+  </div>
+</main>
+
+<script type="module">
+  /* ============================================================
+     Story data — edit chapters/beats here.
+     Each beat: { path, text, scrub?, scrubTarget?, zoomAnchor?,
+                  zoomAt?, focusAnchor?, panel?, loop?, annotations }
+     path        ordered beat ids replayed by the prototype's
+                 storySeek(); forward beats continue as suffixes.
+     scrub       true → tall section; page-scroll drives the
+                 scroller (scrubTarget, default '#stream').
+     zoomAnchor  during a scrub, past zoomAt progress the frame
+                 zooms into this element (reversible).
+     annotations RETAINED BUT NOT RENDERED (author 2026-07-21:
+                 beacons/rail flashed during scroll — copy kept
+                 here for a future round).
+     ============================================================ */
+  const P1 = ['venue-results'];
+  const P2 = [...P1, 'willow-detail'];
+  const P3 = [...P2, 'accessibility-draft'];
+  const P4 = [...P3, 'messages-sent'];
+  const P5 = [...P4, 'reply-summary'];
+  const P6 = [...P5, 'hold-willow', 'quote-breakdown'];
+  const P6a = [...P6, 'budget-added'];
+  const P6b = [...P6a, 'rebalance'];
+  const P7 = [...P6b, 'goal-increase'];
+  const P8 = [...P7, 'tour-offer', 'tour-booked'];
+  const P9 = [...P8, 'contract-flag', 'negotiate', 'book'];
+
+  const CHAPTERS = [
+    { chapter: 'While you were away', beats: [
+      { id: 'home', path: [],
+        text: 'Tony & Carmella come back to a dashboard that has been busy without them — every card already shaped by constraints the agent knows.',
+        constraints: [
+          ['Location', 'Columbus, OH'], ['Wedding date', 'September, next year'],
+          ['Guest count', '125'], ['Budget', '$40k'],
+          ['Preference', 'Outdoor, lake-view'], ['Requirement', 'Wheelchair accessibility'],
+        ],
+        annotations: [
+          { layer: 'context', label: 'Context retained', body: 'Planning constraints persist beyond the conversation and shape search, outreach, and later budget decisions.', anchor: 'context-chips' },
+        ] },
+      { id: 'gathered', path: [], scrub: true, scrubTarget: '#home',
+        zoomAnchor: '.cards[data-when="fresh"] .card:first-child', zoomAt: 0.55,
+        text: 'Scroll on and the dashboard tells it itself: chefs shortlisted, décor pulled, $1,200 already saved — and the card that starts this story: five lake-view venues, screened for their guest list and wheelchair access, still free on their date.',
+        annotations: [] },
+    ]},
+    { chapter: 'The findings', beats: [
+      { id: 'findings', path: P1, scrub: true,
+        text: 'Ask about the venues and the agent walks you through what it found — five lake-view spots, ranked and screened for capacity, accessibility, and a rain plan. Keep scrolling to read the response the way the couple does.',
+        annotations: [
+          { layer: 'agent', label: 'Agent action', body: 'Screens venue options against the couple’s existing constraints.' },
+          { layer: 'interface', label: 'Interface response', body: 'Moves from conversation into a structured surface for comparison.', anchor: 'venue-card' },
+        ] },
+      { id: 'willow', path: P2, panel: 'venue',
+        text: 'The top match gets a closer look: the agent explains why Willow Shore fits them in the thread, and the full profile — photos, pricing, availability — opens beside it without losing the conversation.',
+        annotations: [
+          { layer: 'interface', label: 'Detail in context', body: 'Exploring a result opens beside the thread — the conversation never resets.' },
+        ] },
+    ]},
+    { chapter: 'The missing answer', beats: [
+      { id: 'gap', path: P3, focusAnchor: 'beat-accessibility-draft',
+        text: 'One thing no listing really answers: whether Carmella’s family can actually get everywhere on the day. The couple asks — and the agent treats the missing answers as missing, not as fine print to assume away.',
+        annotations: [
+          { layer: 'agent', label: 'Evidence gap', body: 'Accessibility has not been verified for every venue.' },
+          { layer: 'agent', label: 'Agent behavior', body: 'Identifies missing evidence instead of treating incomplete listing data as fact.', anchor: 'beat-accessibility-draft' },
+        ] },
+      { id: 'approval', path: P3, focusAnchor: 'approval-send',
+        text: 'The agent drafts five personalized messages targeting exactly those gaps — and then stops. Recipients visible, message editable. Nothing is sent without a yes.',
+        annotations: [
+          { layer: 'agent', label: 'Prepared by the agent', body: 'Drafts targeted questions using the known information gaps.', anchor: 'composer-draft' },
+          { layer: 'approval', label: 'Requires approval', body: 'The couple can inspect recipients, edit the message, and approve sending.', anchor: 'approval-send' },
+        ] },
+    ]},
+    { chapter: 'Three days later', beats: [
+      { id: 'returned', path: P4,
+        text: 'The messages go out; days pass. When the couple comes back, the dashboard leads with what changed while they were gone: four venues answered the accessibility question.',
+        annotations: [
+          { layer: 'interface', label: 'Proactive by design', body: 'The dashboard resurfaces what changed — replies — without being asked.' },
+        ] },
+      { id: 'replies', path: P5, scrub: true,
+        text: 'Four replies, normalized into the same comparable shape — quote, capacity, rain plan, and accessibility in each venue’s own words. Scroll through them the way the couple would.',
+        annotations: [
+          { layer: 'interface', label: 'Structured synthesis', body: 'Responses are normalized into comparable criteria without hiding their sources.' },
+          { layer: 'agent', label: 'Source inputs', body: 'Vendor replies and supporting details remain available.', anchor: 'reply-source' },
+          { layer: 'agent', label: 'Verified, not assumed', body: 'This status comes from the venue’s own reply — which contradicted its listing. The refuting answer stays visible.', anchor: 'access-evidence' },
+        ] },
+      { id: 'recommendation', path: P5, focusAnchor: 'beat-recommendation',
+        text: 'Then a recommendation with the reasons attached: Willow Shore for the setting and full access, Blue Horizon as the weather-proof runner-up. Advice, not a leaderboard.',
+        annotations: [
+          { layer: 'agent', label: 'Recommendation with reasons', body: 'Two finalists, each carrying the “why” — the couple decides with the evidence in view.' },
+        ] },
+    ]},
+    { chapter: 'Making the call', beats: [
+      { id: 'quote', path: P6, scrub: true,
+        text: 'A free five-day hold on Willow Shore buys time to decide — and the agent gives the honest cost picture: the $7,200 quote is venue-only. With catering and service fees, the real number is about $27,300. Keep scrolling through the breakdown.',
+        annotations: [
+          { layer: 'agent', label: 'Honest math', body: 'The quote is venue-only; the agent adds catering and service estimates so the decision uses the real total.' },
+        ] },
+      { id: 'added', path: P6a,
+        text: 'They add it to the budget — and the plan tips over: $51,300 projected against a $40k goal. $11,300 over, shown plainly, not softened.',
+        annotations: [] },
+      { id: 'rebalance', path: P6b,
+        text: 'The agent rebalances what it can — the catering package, the dress, stationery, cake — finding $6,900 in trims. And it is honest about the limit: trims can’t close the last $4,400.',
+        annotations: [] },
+      { id: 'goal', path: P7,
+        text: 'So the couple makes the call themselves: goal up to $45k, keeping the venue they actually want. Landing: $600 under, eyes open.',
+        annotations: [
+          { layer: 'product-state', label: 'Live budget math', body: 'The projection recomputes as quotes replace estimates — the trade-offs are visible, not narrated.' },
+        ] },
+    ]},
+    { chapter: 'Booked', beats: [
+      { id: 'contract-arrives', path: P8,
+        text: 'A tour with the venue coordinator seals it. Two weeks later the dashboard leads with news: Willow Shore sent the contract — and the agent read it first.',
+        annotations: [
+          { layer: 'agent', label: 'Watchful between moments', body: 'Tour booked, calendar synced — and the incoming contract is reviewed before the couple opens it.' },
+        ] },
+      { id: 'booked', path: P9, loop: true,
+        text: 'One flag before signing: a $250 “peak Saturday fee” that wasn’t in the quote. Asking costs nothing — the venue honors the original $7,200. Booked. And the decision doesn’t stay in the chat: budget, vendor status, and the plan itself all update, feeding richer context into every decision after.',
+        annotations: [
+          { layer: 'product-state', label: 'Decision recorded', body: 'The selected venue becomes part of the shared planning state.', anchor: 'context-chips' },
+          { layer: 'product-state', label: 'Connected updates', body: 'Budget, vendor status, checklist, and future recommendations can now reflect the decision.' },
+        ] },
+    ]},
+  ];
+
+  // flatten chapters → beats with chapter metadata
+  const BEATS = [];
+  CHAPTERS.forEach((ch, ci) => ch.beats.forEach((b, bi) => BEATS.push({ ...b, chapterIdx: ci, chapterTitle: ch.chapter, chapterStart: bi === 0 })));
+
+  /* ============================================================ */
+  const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s);
+  const proto = $('#proto');
+  const box = $('#proto-box');
+  const scaleEl = $('#proto-scale');
+  const stepsEl = $('#steps');
+  const barEl = $('#stage-bar');
+  const barInner = $('#bar-inner');
+
+  let activeBeat = -1;       // beat the scroll narrative wants
+  let shownBeat = -1;        // beat currently displayed
+  let seeking = false;       // between seek send and seek-done
+  let protoReady = false;
+  let scale = 1;
+  let zoom = null;           // {k, cx, cy} in prototype-logical px, or null
+
+  /* ---- build narrative ---- */
+  BEATS.forEach((b, i) => {
+    const sec = document.createElement('section');
+    sec.className = 'step' + (b.scrub ? ' scrub' : '') + (b.chapterStart ? ' chapter-start' : '');
+    sec.id = `beat-${b.id}`;
+    sec.dataset.index = i;
+    const eyebrow = document.createElement('p'); eyebrow.className = 'chapter-eyebrow';
+    eyebrow.textContent = `Chapter ${b.chapterIdx + 1} of ${CHAPTERS.length} · ${b.chapterTitle}`;
+    sec.appendChild(eyebrow);
+    if (b.chapterStart) {
+      const h = document.createElement('h2'); h.textContent = b.chapterTitle;
+      sec.appendChild(h);
+    }
+    const p = document.createElement('p'); p.className = 'beat-text'; p.textContent = b.text;
+    sec.appendChild(p);
+    if (b.scrub) {
+      const hint = document.createElement('p'); hint.className = 'scrub-hint';
+      hint.innerHTML = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M4 10l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Keep scrolling — the screen scrolls with you</span>';
+      sec.appendChild(hint);
+    }
+    if (b.constraints) {
+      const ul = document.createElement('ul'); ul.className = 'constraints';
+      b.constraints.forEach(([k, v]) => {
+        const li = document.createElement('li'); const bd = document.createElement('b');
+        bd.textContent = k + ': '; li.append(bd, v); ul.appendChild(li);
+      });
+      sec.appendChild(ul);
+    }
+    stepsEl.appendChild(sec);
+  });
+  const sections = [...document.querySelectorAll('.step')];
+
+  /* ---- chapter bar: nav + progress in one row ---- */
+  CHAPTERS.forEach((ch, i) => {
+    if (i) { const a = document.createElement('span'); a.className = 'stage-arrow'; a.textContent = '→'; a.setAttribute('aria-hidden', 'true'); barInner.appendChild(a); }
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'stage-pill';
+    btn.dataset.index = i;
+    const dot = document.createElement('span'); dot.className = 'dot'; dot.textContent = String(i + 1);
+    const lab = document.createElement('span'); lab.textContent = ch.chapter;
+    btn.append(dot, lab);
+    btn.addEventListener('click', () => {
+      const first = BEATS.findIndex(b => b.chapterIdx === i);
+      sections[first].scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' });
+    });
+    barInner.appendChild(btn);
+  });
+  const loopMark = document.createElement('span');
+  loopMark.className = 'loop-mark';
+  loopMark.innerHTML = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.7-3.75" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M13 1.5V4.5H10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>feeds context</span>';
+  barInner.appendChild(loopMark);
+
+  function renderBar(beatIdx) {
+    const b = BEATS[beatIdx];
+    barEl.classList.toggle('looping', !!b.loop);
+    barInner.querySelectorAll('.stage-pill').forEach((el, i) => {
+      const active = i === b.chapterIdx;
+      if (active) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current');
+      el.classList.toggle('is-done', i < b.chapterIdx);
+      el.querySelector('.dot').textContent = i < b.chapterIdx ? '✓' : String(i + 1); /* state readable without color */
+    });
+    const active = barInner.querySelectorAll('.stage-pill')[b.chapterIdx];
+    active?.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
+  }
+
+  /* ---- frame transform (base scale + optional zoom) ---- */
+  function setFrameTransform() {
+    if (zoom) {
+      const k = scale * zoom.k;
+      let tx = box.clientWidth / (2 * k) - zoom.cx;   // center zoom.cx/cy in the box
+      let ty = box.clientHeight / (2 * k) - zoom.cy;
+      tx = Math.min(0, Math.max(box.clientWidth / k - 1024, tx));  // never expose gaps
+      ty = Math.min(0, Math.max(box.clientHeight / k - 700, ty));
+      scaleEl.style.transform = `scale(${k}) translate(${tx}px, ${ty}px)`;
+    } else {
+      scaleEl.style.transform = `scale(${scale})`;
+    }
+  }
+
+  /* ---- beat activation ---- */
+  function isForward(prevIdx, idx) {
+    // suffix continuation (incl. equal path) never restarts — no mask needed
+    if (prevIdx < 0) return true;
+    const prev = BEATS[prevIdx].path, next = BEATS[idx].path;
+    return next.length >= prev.length && prev.every((id, i) => next[i] === id);
+  }
+
+  function showBeat(idx) {
+    const prev = shownBeat;
+    shownBeat = idx;
+    renderBar(idx);
+    sections.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+    if (zoom && !BEATS[idx].zoomAnchor) { zoom = null; setFrameTransform(); }
+    if (protoReady) {
+      if (!isForward(prev, idx)) box.classList.add('masking'); // dim the restart replay
+      seeking = true;
+      proto.contentWindow.postMessage({ bowStory: 'seek', path: BEATS[idx].path, panel: BEATS[idx].panel }, '*');
+    }
+  }
+
+  // center an element inside the prototype's own scroll containers WITHOUT
+  // scrollIntoView — in a same-origin iframe scrollIntoView also scrolls the
+  // parent page, which fought the reader's scroll.
+  function centerInScrollParents(el) {
+    let p = el.parentElement;
+    while (p) {
+      if (p.scrollHeight > p.clientHeight + 4) {
+        const pr = p.getBoundingClientRect(), er = el.getBoundingClientRect();
+        p.scrollTop += (er.top - pr.top) - (p.clientHeight / 2 - er.height / 2);
+      }
+      p = p.parentElement;
+    }
+  }
+
+  function settleBeat(idx) {
+    box.classList.remove('masking');
+    const b = BEATS[idx];
+    const doc = proto.contentDocument;
+    if (b.focusAnchor && doc) {
+      const el = doc.querySelector(`[data-story-anchor="${b.focusAnchor}"]`);
+      if (el) centerInScrollParents(el);
+    }
+    if (b.scrub) scrubTick(); // sync scroller (and zoom) to current progress immediately
+  }
+
+  /* ---- scroll-linked scrub: the prototype follows the reader ---- */
+  function scrubTick() {
+    if (shownBeat < 0 || seeking || !protoReady) return;
+    const b = BEATS[shownBeat];
+    if (!b.scrub) return;
+    const doc = proto.contentDocument;
+    const scroller = doc?.querySelector(b.scrubTarget ?? '#stream');
+    if (!scroller) return;
+    const sec = sections[shownBeat];
+    // progress through the beat's section (viewport center as the read head)
+    const mid = window.scrollY + window.innerHeight / 2;
+    const p = Math.min(1, Math.max(0, (mid - sec.offsetTop) / Math.max(1, sec.offsetHeight)));
+    const max = scroller.scrollHeight - scroller.clientHeight;
+    if (max > 0) scroller.scrollTop = p * max;
+    // optional zoom into a target element past a progress threshold (reversible)
+    if (b.zoomAnchor) {
+      if (p > (b.zoomAt ?? 0.6)) {
+        const el = doc.querySelector(b.zoomAnchor);
+        const r = el?.getBoundingClientRect();
+        if (r && r.width > 0) {
+          zoom = { k: Math.min(1.5, (1024 * 0.66) / r.width), cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
+          setFrameTransform();
+        }
+      } else if (zoom) {
+        zoom = null;
+        setFrameTransform();
+      }
+    }
+  }
+
+  /* ---- prototype messages ---- */
+  window.addEventListener('message', e => {
+    const d = e.data;
+    if (!d || !d.bowStory) return;
+    if (d.bowStory === 'ready') {
+      protoReady = true;
+      fitFrame();
+      activeBeat = Math.max(activeBeat, 0);
+      showBeat(activeBeat);
+    } else if (d.bowStory === 'seek-done') {
+      seeking = false;
+      if (shownBeat >= 0) settleBeat(shownBeat);
+    }
+  });
+
+  /* ---- scroll driving: ONE source of truth ----
+     Both IntersectionObserver and the scroll listener feed the same
+     viewport-center computation (with a 28px boundary dead zone). Two
+     different rules fighting each other is what caused restart flashing
+     at beat boundaries. IO is kept as a trigger because it fires in
+     environments that batch scroll events. */
+  const HYST = 28;
+  function computeActiveBeat() {
+    const mid = window.scrollY + window.innerHeight / 2;
+    let cand = null;
+    sections.forEach(s => {
+      if (s.offsetTop <= mid && mid < s.offsetTop + s.offsetHeight) cand = Number(s.dataset.index);
+    });
+    if (cand == null || cand === activeBeat) return;
+    const s = sections[cand];
+    if (mid - s.offsetTop < HYST || (s.offsetTop + s.offsetHeight) - mid < HYST) return; // boundary dead zone
+    activeBeat = cand;
+    showBeat(cand);
+  }
+  const io = new IntersectionObserver(() => computeActiveBeat(),
+    { rootMargin: '-42% 0px -42% 0px', threshold: 0 });
+  sections.forEach(s => io.observe(s));
+
+  let scrollTick = null;
+  window.addEventListener('scroll', () => {
+    scrubTick();
+    if (scrollTick) return;
+    scrollTick = setTimeout(() => { scrollTick = null; computeActiveBeat(); }, 120);
+  }, { passive: true });
+
+  /* ---- frame scaling (logical 1024×700 → column width) ---- */
+  function fitFrame() {
+    const w = box.clientWidth;
+    scale = w / 1024;
+    box.style.height = (700 * scale) + 'px';
+    setFrameTransform();
+  }
+  window.addEventListener('resize', () => { fitFrame(); });
+  fitFrame();
+</script>
+</body>
+</html>
