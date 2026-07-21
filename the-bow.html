@@ -319,6 +319,13 @@
     .budget-items-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   }
   .budget-item-card{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;min-width:0}
+  .booked-venue-card{background:#FDEEF7;border-color:#F3B9DE}
+  .booked-venue-card .bi-label{font-weight:700}
+  .bv-pill{flex-shrink:0;background:var(--label-pink-fill);color:#fff;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 7px}
+  /* booking confetti — to strip the flourish: delete this block, celebrateBooking(), and its single call */
+  .confetti{position:absolute;inset:0 0 auto 0;height:75%;pointer-events:none;overflow:hidden;z-index:5}
+  .confetti i{position:absolute;top:-12px;width:7px;height:11px;border-radius:2px;animation:confetti-fall linear forwards}
+  @keyframes confetti-fall{to{transform:translateY(70vh) rotate(540deg);opacity:0}}
   .budget-item-card .bi-icon{font-size:18px}
   .budget-item-card .bi-label{flex:1;font-size:13px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .budget-item-card .bi-amt{font-size:13px;font-weight:700}
@@ -1077,6 +1084,26 @@
       if (!threadEl.hidden) askThreadEl.focus();
       else (lastChipTrigger ?? document.getElementById('chip-budget')).focus();
     }
+    // ---- booking celebration (strip: delete this block + its single call) ----
+    const ENABLE_BOOKING_CONFETTI = true; // flip to false to remove the flourish
+    let bookingCelebrated = false; // once per run; Restart resets
+    function celebrateBooking(host) {
+      const wrap = document.createElement('div');
+      wrap.className = 'confetti';
+      wrap.setAttribute('aria-hidden', 'true');
+      const colors = ['#FF3EB4', '#F5B700', '#9EC7EB', '#A50064', '#FBD9F2'];
+      for (let i = 0; i < 26; i++) {
+        const piece = document.createElement('i');
+        piece.style.left = (4 + Math.random() * 92) + '%';
+        piece.style.background = colors[i % colors.length];
+        piece.style.animationDelay = (Math.random() * 0.5) + 's';
+        piece.style.animationDuration = (1.3 + Math.random() * 0.9) + 's';
+        wrap.appendChild(piece);
+      }
+      host.appendChild(wrap);
+      setTimeout(() => wrap.remove(), 3400);
+    }
+
     const PANEL_LABELS = { venue: 'Venue details', composer: 'Compose message to venues', budget: 'Budget overview', location: 'Location', date: 'Wedding date', guests: 'Guest count', reply: 'Full venue reply', contract: 'Full contract terms' };
     // ---- resizable panel (author request 2026-07-17) ----------------------
     // One persistent handle element; applyPanel re-appends it after clearing
@@ -1713,17 +1740,38 @@
       const booked = b.items.filter(i => i.status === 'booked');
       const planned = b.items.filter(i => i.status === 'planned');
 
+      // the freshly-booked venue leads the Booked section (display only —
+      // the model's spent math counts the deposit via `paid`, unchanged)
+      const venueBooked = !!b.venueBooked;
+      const venueAmt = venueBooked ? (b.quoted.find(i => i.label === 'Venue rental')?.amount ?? 0) : 0;
       const bookedHead = document.createElement('div');
       bookedHead.className = 'budget-section-head remaining-head';
       const bookedTitle = document.createElement('span');
-      bookedTitle.textContent = `Booked (${booked.length})`;
+      bookedTitle.textContent = `Booked (${booked.length + (venueBooked ? 1 : 0)})`;
       const bookedAmtWrap = document.createElement('span');
       bookedAmtWrap.className = 'remaining-amt';
-      bookedAmtWrap.appendChild(animatedAmount('booked-total', bookedAmt, 'strong'));
+      bookedAmtWrap.appendChild(animatedAmount('booked-total', bookedAmt + venueAmt, 'strong'));
       bookedAmtWrap.appendChild(document.createTextNode(' Booked total'));
       bookedHead.append(bookedTitle, bookedAmtWrap);
       container.appendChild(bookedHead);
-      container.appendChild(buildBudgetItemsGrid(booked));
+      const bookedGrid = buildBudgetItemsGrid(booked);
+      if (venueBooked) {
+        const card = document.createElement('div');
+        card.className = 'budget-item-card booked-venue-card';
+        card.dataset.storyAnchor = 'venue-booked-card';
+        const iconWrap = document.createElement('span'); iconWrap.className = 'bi-icon'; iconWrap.appendChild(icon('bank'));
+        const label = document.createElement('span'); label.className = 'bi-label'; label.textContent = 'Willow Shore Lodge';
+        const pill = document.createElement('span'); pill.className = 'bv-pill'; pill.textContent = 'Booked';
+        const amt = animatedAmount('item-venue-booked', venueAmt, 'span', 'bi-amt');
+        const chev = document.createElement('span'); chev.className = 'bi-chevron'; chev.textContent = '›';
+        card.append(iconWrap, label, pill, amt, chev);
+        bookedGrid.prepend(card);
+      }
+      container.appendChild(bookedGrid);
+      if (venueBooked && !bookingCelebrated) {
+        bookingCelebrated = true;
+        if (ENABLE_BOOKING_CONFETTI && !prefersReducedMotion) celebrateBooking(container.parentNode ?? container);
+      }
 
       const remHead = document.createElement('div');
       remHead.className = 'budget-section-head remaining-head';
@@ -2963,6 +3011,7 @@
         wm.style.clipPath = '';
       }
       state = freshState();
+      bookingCelebrated = false;
       window.__bowRecipients = state.composerRecipients.length;
       prevBudgetAmounts = {};
       setPanelW(PANEL_DEFAULT);

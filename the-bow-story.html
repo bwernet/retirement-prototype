@@ -232,7 +232,8 @@
   const P7 = [...P6b, 'goal-increase'];
   const P8 = [...P7, 'tour-offer', 'tour-booked'];
   const P8f = [...P8, 'contract-flag'];
-  const P9 = [...P8f, 'negotiate', 'book'];
+  const P8c = [...P8f, 'show-contract'];
+  const P9 = [...P8c, 'negotiate', 'book'];
 
   const CHAPTERS = [
     { chapter: 'While you were away', beats: [
@@ -320,8 +321,11 @@
         annotations: [
           { layer: 'agent', label: 'Watchful between moments', body: 'Tour booked, calendar synced — and the incoming contract is reviewed before the couple opens it.' },
         ] },
-      { id: 'flag', path: P8f, scrub: true, size: 's', scrubFrom: 'beat-contract-flag', tapDot: 'chip-negotiate',
+      { id: 'flag', path: P8f, scrub: true, size: 's', scrubFrom: 'beat-contract-flag', tapDot: 'chip-show-contract',
         text: 'One flag before signing: a $250 “peak Saturday fee” that wasn’t in the quote. The agent asks permission before doing anything about it — negotiating costs nothing, but it’s the couple’s call.',
+        annotations: [] },
+      { id: 'contract', path: P8c, panel: 'contract', scrub: true, size: 's', scrubFrom: 'beat-show-contract', tapDot: 'chip-negotiate',
+        text: 'Before any decision, the contract itself: venue rental, catering minimum, the payment schedule — and the full terms open beside the thread. Nothing is signed sight unseen.',
         annotations: [] },
       { id: 'booked', path: P9, loop: true, scrub: true, scrubFrom: 'beat-negotiate',
         text: 'Asking works — the venue honors the original $7,200. Booked. And the decision doesn’t stay in the chat: budget, vendor status, and the plan itself all update, feeding richer context into every decision after.',

@@ -130,6 +130,7 @@ export function applyBooking(b, venueRental) {
   // Deposit is paid *against* the quoted package: move 5,600 of quoted into paid
   // without double-counting — represent by tracking depositAgainstQuoted.
   n.depositAgainstQuoted = 5600;
+  n.venueBooked = true; // presentation flag: the budget panel celebrates + lists the venue atop Booked
   return n;
 }
 
