@@ -273,7 +273,7 @@
         ] },
     ]},
     { chapter: 'Three days later', beats: [
-      { id: 'returned', path: P4, live: true, tapDot: 'responded-cta', focusAnchor: 'responded-cta', // messages-sent streams + the '3 days later' interstitial plays; dashboard centers the replies card
+      { id: 'returned', path: P4, interstitial: 'sent', tapDot: 'responded-cta', focusAnchor: 'responded-cta', // '3 days later' plays WITH the beat, lifting onto the responded dashboard
         text: 'The messages go out; days pass. When the couple comes back, the dashboard leads with what changed while they were gone: four venues answered the accessibility question.',
         annotations: [
           { layer: 'interface', label: 'Proactive by design', body: 'The dashboard resurfaces what changed — replies — without being asked.' },
@@ -310,7 +310,7 @@
         ] },
     ]},
     { chapter: 'Booked', beats: [
-      { id: 'contract-arrives', path: P8, tapDot: 'contract-cta',
+      { id: 'contract-arrives', path: P8, interstitial: 'toured', tapDot: 'contract-cta', // 'Two weeks later' plays WITH the beat
         text: 'A tour with the venue coordinator seals it. Two weeks later the dashboard leads with news: Willow Shore sent the contract — and the agent read it first.',
         annotations: [
           { layer: 'agent', label: 'Watchful between moments', body: 'Tour booked, calendar synced — and the incoming contract is reviewed before the couple opens it.' },
@@ -512,7 +512,7 @@
     if (protoReady) {
       if (!isForward(prev, idx)) box.classList.add('masking'); // dim the restart replay
       seeking = true;
-      proto.contentWindow.postMessage({ bowStory: 'seek', path: BEATS[idx].path, panel: BEATS[idx].panel, live: BEATS[idx].live }, '*');
+      proto.contentWindow.postMessage({ bowStory: 'seek', path: BEATS[idx].path, panel: BEATS[idx].panel, live: BEATS[idx].live, interstitial: BEATS[idx].interstitial }, '*');
       // watchdog: a lost seek-done must never freeze the scrub/rail — live
       // beats stream for ~10s, so they get a much longer leash
       clearTimeout(seekWatchdog);
@@ -590,6 +590,13 @@
     const target = doc?.querySelector(`[data-story-anchor="${BEATS[idx].tapDot}"]`);
     const r = target?.getBoundingClientRect();
     if (!r || r.width === 0) { dotEl.style.display = 'none'; return; }
+    // never float over the time-passing overlay — recheck as it lifts
+    const inter = doc.getElementById('interstitial');
+    if (inter && !inter.hidden) {
+      dotEl.style.display = 'none';
+      setTimeout(() => { if (idx === shownBeat) positionTapDot(idx); }, 450);
+      return;
+    }
     const px = r.right - 3, py = r.top + 3; // badge point: top-right corner
     // hide when the pin point leaves the frame OR any clipping ancestor's
     // visible box — the dot must never float over surrounding chrome

@@ -3296,7 +3296,8 @@ const PHOTOS = {
       badge.classList.add('pulse');
     }
     let interstitialToken = 0; // restart bumps this so a pending overlay-hide can't fire on a new run
-    async function showInterstitial(variant) {
+    async function showInterstitial(variant, forceMotion = false) {
+      const instant = reducedMotion && !forceMotion; // story seeks force the full overlay despite the instant replay path
       const tok = ++interstitialToken;
       const [line1, line2] = (INTERSTITIAL_TEXT[variant] ?? ['', '']).map(liveText);
       interstitialEl.innerHTML = '';
@@ -3307,7 +3308,7 @@ const PHOTOS = {
       const l2 = document.createElement('div'); l2.className = 'line2'; l2.textContent = line2;
       interstitialEl.append(wordmarkClone, l1, l2);
       let shimmerSweep = null;
-      if (!reducedMotion) {
+      if (!instant) {
         const shimmerBar = document.createElement('div');
         shimmerBar.className = 'interstitial-shimmer';
         shimmerSweep = document.createElement('div');
@@ -3317,7 +3318,7 @@ const PHOTOS = {
       }
       interstitialEl.hidden = false;
 
-      if (reducedMotion) {
+      if (instant) {
         // Simple static overlay: no fade (CSS transition is already off under
         // reduced motion), no shimmer, no badge pulse — just a 1.2s hold then
         // swap. `wait()` collapses to 0ms under reduced motion, so the hold
@@ -3330,14 +3331,15 @@ const PHOTOS = {
         return;
       }
 
-      await wait(0);
+      const hold = ms => new Promise(r => setTimeout(r, ms)); // real timers: forceMotion must not collapse
+      await hold(0);
       if (tok !== interstitialToken) return;
       interstitialEl.classList.add('show'); // 300ms fade-in
       shimmerSweep?.classList.add('play'); // single 1.2s sweep, then still
-      await wait(2200); // total dwell
+      await hold(2200); // total dwell
       if (tok !== interstitialToken) return;
       interstitialEl.classList.remove('show'); // 300ms fade-out
-      await wait(300);
+      await hold(300);
       if (tok !== interstitialToken) return;
       interstitialEl.hidden = true;
       if (variant === 'sent') pulseChatBadge();
@@ -3660,7 +3662,7 @@ const PHOTOS = {
     // Presentation logic stays in the story page; this is the only control hook.
     let storySeekToken = 0; // newest seek wins; superseded replays abandon silently
     let storyLastPath = null; // last COMPLETED seek path; null = state unknown → full replay
-    async function storySeek(path, panel, live) {
+    async function storySeek(path, panel, live, interstitial) {
       const tok = ++storySeekToken;
       storyInstant = true;
       reducedMotion = true;
@@ -3676,6 +3678,10 @@ const PHOTOS = {
         && storyLastPath.every((id, i) => path[i] === id);
       const suffix = isExtension ? path.slice(storyLastPath.length) : path;
       if (!isExtension) restartBtn.click(); // full deterministic reset (state, panels, transcripts)
+      // time-passing beats: the overlay appears WITH the beat (covering the
+      // replay) and lifts onto the changed state — fire-and-forget, full
+      // motion unless the reader prefers reduced motion
+      if (interstitial) showInterstitial(interstitial, !prefersReducedMotion);
       for (let i = 0; i < suffix.length; i++) {
         if (tok !== storySeekToken) { storyLastPath = null; return; }
         // live:true → the FINAL beat of the seek streams in real time (typing,
@@ -3708,7 +3714,7 @@ const PHOTOS = {
     if (window.parent !== window) {
       window.addEventListener('message', e => {
         const d = e.data;
-        if (d && d.bowStory === 'seek' && Array.isArray(d.path)) storySeek(d.path, d.panel, d.live);
+        if (d && d.bowStory === 'seek' && Array.isArray(d.path)) storySeek(d.path, d.panel, d.live, d.interstitial);
       });
       window.parent.postMessage({ bowStory: 'ready' }, '*');
     }
