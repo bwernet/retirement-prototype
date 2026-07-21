@@ -577,13 +577,9 @@
     // hide while the anchor is off-screen inside the prototype (scrubbed away)
     if (!r || r.width === 0 || r.bottom < 8 || r.top > 692) { dotEl.style.display = 'none'; return; }
     dotEl.style.display = '';
-    dotEl.style.left = ((r.left + r.width / 2) * scale) + 'px';
-    dotEl.style.top = ((r.top + r.height / 2) * scale) + 'px';
-  }
-  let dotTick = null;
-  function scheduleDotReposition() {
-    if (dotTick || shownBeat < 0) return;
-    dotTick = setTimeout(() => { dotTick = null; positionTapDot(shownBeat); }, 100);
+    // badge position: pinned to the element's top-right corner
+    dotEl.style.left = ((r.right - 3) * scale) + 'px';
+    dotEl.style.top = ((r.top + 3) * scale) + 'px';
   }
 
   /* ---- scroll-linked scrub: the prototype follows the reader ----
@@ -621,8 +617,7 @@
     const max = scrubScroller.scrollHeight - scrubScroller.clientHeight;
     if (max <= 0) return;
     scrubTargetPx = scrubFromPx + p * Math.max(0, max - scrubFromPx);
-    scheduleDotReposition(); // the dot rides its anchor while content scrubs
-    if (RM) { scrubScroller.scrollTop = scrubTargetPx; return; } // no added motion under reduced motion
+    if (RM) { scrubScroller.scrollTop = scrubTargetPx; positionTapDot(shownBeat); return; } // no added motion under reduced motion
     ensureFollower();
   }
   function ensureFollower() {
@@ -631,8 +626,9 @@
       followTimer = null;
       if (scrubTargetPx == null || !scrubScroller) return;
       const d = scrubTargetPx - scrubScroller.scrollTop;
-      if (Math.abs(d) < 0.75) { scrubScroller.scrollTop = scrubTargetPx; return; }
+      if (Math.abs(d) < 0.75) { scrubScroller.scrollTop = scrubTargetPx; positionTapDot(shownBeat); return; }
       scrubScroller.scrollTop += d * 0.22;
+      positionTapDot(shownBeat); // lockstep — the dot moves in the same frame as the content
       followTimer = setTimeout(step, 16);
     };
     followTimer = setTimeout(step, 16);
