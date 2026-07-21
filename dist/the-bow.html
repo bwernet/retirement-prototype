@@ -162,6 +162,9 @@
   /* the panel lives in the growing column, its 420px card pinned to the right
      edge — the shrinking surface unveils it in place, drawer-style */
   #panel{grid-area:1/2;min-width:0;position:relative;overflow:hidden;border-radius:var(--r-lg)}
+  /* panel headings receive PROGRAMMATIC focus on open (a11y landing point for
+     reading order) — headings aren't interactive, so no visible focus ring */
+  #panel h2[tabindex="-1"]:focus{outline:none}
   /* the card is pinned to the column's LEFT (moving) edge with its cream
      gutter leading, so it travels WITH the surface's edge as one seam — its
      right side is clipped until the column finishes growing (author
