@@ -95,8 +95,12 @@
   .spacer.scrub-s{height:100vh}   /* shorter scrub: ch1's dashboard read */
   /* FIXED height: the sticky panel sits above the spacers in layout flow, so
      its height must not vary with beat content — content may overflow the box
-     visually (no clipping), but spacer offsets stay stable for the cache */
-  .narr-sticky{position:sticky;top:calc(var(--bar-h) + 16px);height:62vh;display:flex;flex-direction:column;justify-content:center}
+     visually (no clipping), but spacer offsets stay stable for the cache.
+     TOP-ANCHORED, not centered: with centering, every body-height change
+     (long text, constraints list) redistributed the space and slid the title
+     to a new y — the "titles blink and move" bug. Anchored at a constant
+     offset, the head never moves; the body grows downward beneath it. */
+  .narr-sticky{position:sticky;top:calc(var(--bar-h) + 16px);height:62vh;display:flex;flex-direction:column;justify-content:flex-start;padding-top:9vh}
   .beat-panel{transition:opacity .22s ease, transform .22s ease}
   .beat-panel.hidden{opacity:0;transform:translateY(6px)}
   /* between beats of the SAME chapter only the body fades — the title holds */
