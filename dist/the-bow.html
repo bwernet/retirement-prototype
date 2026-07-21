@@ -712,7 +712,7 @@
             <span class="cat" style="color:var(--label-pink)">VENUE</span>
             <span class="title">5 lake-view venues still free on 9/20/26</span>
             <span class="body">Filtered for 150-guest capacity, indoor backup, and wheelchair accessibility.</span>
-            <button class="card-cta" data-goto="venue-results">Compare spaces</button>
+            <button class="card-cta" data-goto="venue-results" data-story-anchor="home-venue-cta">Compare spaces</button>
           </div>
           <div class="card">
             <span class="cat" style="color:var(--label-orange)">CATERING</span>
@@ -751,7 +751,7 @@
             <span class="cat" style="color:var(--label-pink)">VENUE <span class="new-pill">New!</span></span>
             <span class="title">4 venues responded to accessibility enquiry</span>
             <span class="body">Willow Shore Lodge, Harborcrest Pavilion, Silver Pines Retreat, and Blue Horizon Club have sent over their accommodations and floor plans</span>
-            <button class="card-cta" data-goto="reply-summary">Summarize &amp; compare</button>
+            <button class="card-cta" data-goto="reply-summary" data-story-anchor="responded-cta">Summarize &amp; compare</button>
           </div>
           <div class="card">
             <span class="cat" style="color:var(--label-orange)">PAPER</span>
@@ -790,7 +790,7 @@
             <span class="cat" style="color:var(--label-pink)">VENUE <span class="new-pill">New!</span></span>
             <span class="title">Willow Shore Lodge sent your contract</span>
             <span class="body">Maya emailed the agreement to sign. I read it through and flagged one line worth a look before you do.</span>
-            <button class="card-cta" data-goto="contract-flag">Review the contract</button>
+            <button class="card-cta" data-goto="contract-flag" data-story-anchor="contract-cta">Review the contract</button>
           </div>
           <div class="card">
             <span class="cat" style="color:var(--label-orange)">LOGISTICS</span>
@@ -1692,6 +1692,7 @@ const PHOTOS = {
         const btn = document.createElement('button');
         btn.className = 'chip';
         btn.type = 'button';
+        btn.dataset.storyAnchor = 'chip-' + c.goto; // case-study anchor: the tap that leads there
         btn.textContent = liveText(c.label);
         btn.addEventListener('click', () => { dismissChipGroup(group); go(c.goto); });
         group.appendChild(btn);
