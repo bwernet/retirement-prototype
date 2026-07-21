@@ -11,7 +11,13 @@
      existing prototype (same-origin iframe of dist/the-bow.html,
      driven with postMessage seeks; frame is a passive exhibit).
 
-     Author round 2026-07-21 (v5):
+     Author round 2026-07-21 (v6):
+     — Narrative text no longer scrolls by as stacked paragraphs:
+       ONE sticky text panel crossfades between beats; invisible
+       spacer sections drive activation and scrub progress.
+     — The replies beat plays LIVE: the conversation streams in
+       (typing, staggered cards) before scrub takes over —
+       seek-done gates the scrub until the stream completes.
      — On-product annotation MARKERS (beacons/overlay) removed —
        nothing renders over the prototype. The annotation CARDS
        stay: a rail under the frame on desktop, in-step cards on
@@ -69,23 +75,27 @@
   .narrative{min-width:0}
   .stage-col{min-width:0;position:sticky;top:calc(var(--bar-h) + 16px)}
 
-  /* ---- narrative beats ---- */
-  .step{min-height:72vh;display:flex;flex-direction:column;justify-content:center;padding:24px 0}
-  .step.scrub{min-height:150vh}          /* scrub beats hold the screen while the prototype scrolls */
-  .step.chapter-start{border-top:1px solid var(--line)}
-  .step:first-of-type{border-top:0}
-  .step .chapter-eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink-deep)}
-  .step h2{font-size:24px;font-weight:800;margin:8px 0 12px;line-height:1.2}
-  .step p.beat-text{color:var(--gray);font-size:16.5px}
-  .step .scrub-hint{margin-top:12px;font-size:12.5px;font-weight:600;color:var(--pink-deep);display:flex;align-items:center;gap:6px}
-  .step .scrub-hint svg{width:13px;height:13px}
-  .step .constraints{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
-  .step .constraints li{font-size:14.5px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 12px}
-  .step .constraints li b{font-weight:700}
-  .step.is-active .chapter-eyebrow{color:var(--pink-cta)}
+  /* ---- narrative: sticky crossfading text panel + invisible spacers ----
+     The reader never scrolls paragraphs past each other: spacer sections
+     (one per beat; taller for scrub beats) drive activation and scrub
+     progress, while a single sticky panel swaps its text in place. */
+  .spacer{height:72vh}
+  .spacer.scrub{height:150vh}
+  .narr-sticky{position:sticky;top:calc(var(--bar-h) + 16px);min-height:56vh;display:flex;flex-direction:column;justify-content:center}
+  .beat-panel{transition:opacity .22s ease, transform .22s ease}
+  .beat-panel.hidden{opacity:0;transform:translateY(6px)}
+  @media (prefers-reduced-motion: reduce){ .beat-panel{transition:none;transform:none} }
+  .beat-panel .chapter-eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink-cta)}
+  .beat-panel h2{font-size:24px;font-weight:800;margin:8px 0 12px;line-height:1.2}
+  .beat-panel .beat-text{color:var(--gray);font-size:16.5px}
+  .beat-panel .scrub-hint{margin-top:12px;font-size:12.5px;font-weight:600;color:var(--pink-deep);display:flex;align-items:center;gap:6px}
+  .beat-panel .scrub-hint svg{width:13px;height:13px}
+  .beat-panel .constraints{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+  .beat-panel .constraints li{font-size:14.5px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 12px}
+  .beat-panel .constraints li b{font-weight:700}
 
-  /* mobile-only per-beat annotation cards (desktop uses the rail) */
-  .step .m-annos{display:none}
+  /* mobile beat panel (text + annotation cards under the pinned frame) */
+  .m-panel{display:none}
 
   /* ---- annotation rail (cards under the frame — no on-product markers) ---- */
   .rail{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;align-items:start}
@@ -108,11 +118,16 @@
     :root{--bar-h:52px}
     .story{grid-template-columns:1fr;gap:0;padding-top:0}
     .stage-col{position:sticky;top:var(--bar-h);z-index:30;background:var(--canvas);padding:12px 0 10px;order:-1}
-    .rail{display:none}        /* annotations live inside each beat instead */
-    .step{min-height:0;padding:34px 0}
-    .step.scrub{min-height:120vh}
-    .step .m-annos{display:flex;flex-direction:column;gap:8px;margin-top:16px}
-    .step .m-annos .sys-anno{opacity:1;transform:none}
+    .rail{display:none}        /* annotations render in the mobile panel instead */
+    .narr-sticky{display:none}
+    .m-panel{display:block;margin-top:12px;transition:opacity .22s ease}
+    .m-panel.hidden{opacity:0}
+    .m-panel .sys-anno{opacity:1;transform:none;margin-top:8px}
+    .m-panel .chapter-eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink-cta)}
+    .m-panel h2{font-size:18px;font-weight:800;margin:4px 0 6px}
+    .m-panel .beat-text{color:var(--gray);font-size:14px}
+    .spacer{height:60vh}
+    .spacer.scrub{height:110vh}
     .stage-pill{padding:5px 11px 5px 6px;font-size:12px;gap:6px}
     .stage-pill .dot{width:16px;height:16px;font-size:9.5px}
   }
@@ -141,9 +156,11 @@
       </div>
     </div>
     <div class="rail" id="rail"></div>
+    <div class="m-panel" id="m-panel"></div>
   </div>
 
   <div class="narrative">
+    <div class="narr-sticky"><div class="beat-panel" id="beat-panel" aria-live="polite"></div></div>
     <div id="steps"></div>
   </div>
 </main>
@@ -223,7 +240,7 @@
         annotations: [
           { layer: 'interface', label: 'Proactive by design', body: 'The dashboard resurfaces what changed — replies — without being asked.' },
         ] },
-      { id: 'replies', path: P5, scrub: true,
+      { id: 'replies', path: P5, scrub: true, live: true, // conversation streams in before scrub takes over
         text: 'Four replies, normalized into the same comparable shape — quote, capacity, rain plan, and accessibility in each venue’s own words. Scroll through them the way the couple would.',
         annotations: [
           { layer: 'interface', label: 'Structured synthesis', body: 'Responses are normalized into comparable criteria without hiding their sources.' },
@@ -315,43 +332,58 @@
   let protoReady = false;
   let scale = 1;
 
-  /* ---- build narrative ---- */
+  /* ---- build scroll track (invisible spacers) + text panels ---- */
   BEATS.forEach((b, i) => {
-    const sec = document.createElement('section');
-    sec.className = 'step' + (b.scrub ? ' scrub' : '') + (b.chapterStart ? ' chapter-start' : '');
-    sec.id = `beat-${b.id}`;
+    const sec = document.createElement('div');
+    sec.className = 'spacer' + (b.scrub ? ' scrub' : '');
     sec.dataset.index = i;
+    sec.setAttribute('aria-hidden', 'true');
+    stepsEl.appendChild(sec);
+  });
+  const sections = [...document.querySelectorAll('.spacer')];
+
+  const beatPanel = $('#beat-panel');
+  const mPanel = $('#m-panel');
+  function fillPanel(el, idx, withAnnos) {
+    el.replaceChildren();
+    const b = BEATS[idx];
     const eyebrow = document.createElement('p'); eyebrow.className = 'chapter-eyebrow';
     eyebrow.textContent = `Chapter ${b.chapterIdx + 1} of ${CHAPTERS.length} · ${b.chapterTitle}`;
-    sec.appendChild(eyebrow);
-    if (b.chapterStart) {
-      const h = document.createElement('h2'); h.textContent = b.chapterTitle;
-      sec.appendChild(h);
-    }
+    const h = document.createElement('h2'); h.textContent = b.chapterTitle;
     const p = document.createElement('p'); p.className = 'beat-text'; p.textContent = b.text;
-    sec.appendChild(p);
-    if (b.scrub) {
-      const hint = document.createElement('p'); hint.className = 'scrub-hint';
-      hint.innerHTML = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M4 10l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Keep scrolling — the screen scrolls with you</span>';
-      sec.appendChild(hint);
-    }
+    el.append(eyebrow, h, p);
     if (b.constraints) {
       const ul = document.createElement('ul'); ul.className = 'constraints';
       b.constraints.forEach(([k, v]) => {
         const li = document.createElement('li'); const bd = document.createElement('b');
         bd.textContent = k + ': '; li.append(bd, v); ul.appendChild(li);
       });
-      sec.appendChild(ul);
+      el.appendChild(ul);
     }
-    /* mobile annotation cards (desktop uses the rail; text exists in-document either way) */
-    if (b.annotations.length) {
-      const m = document.createElement('div'); m.className = 'm-annos';
-      b.annotations.forEach(a => { const c = annoCard(a); c.classList.add('show'); m.appendChild(c); });
-      sec.appendChild(m);
+    if (b.scrub) {
+      const hint = document.createElement('p'); hint.className = 'scrub-hint';
+      hint.innerHTML = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M4 10l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Keep scrolling — the screen scrolls with you</span>';
+      el.appendChild(hint);
     }
-    stepsEl.appendChild(sec);
-  });
-  const sections = [...document.querySelectorAll('.step')];
+    if (withAnnos) b.annotations.forEach(a => { const c = annoCard(a); c.classList.add('show'); el.appendChild(c); });
+  }
+  // one sticky panel swaps its text in place (crossfade) — paragraphs never
+  // scroll past each other (author 2026-07-21)
+  let panelToken = 0;
+  function renderBeatPanel(idx) {
+    const tok = ++panelToken;
+    const swap = () => {
+      if (tok !== panelToken) return;
+      fillPanel(beatPanel, idx, false);
+      fillPanel(mPanel, idx, true);
+      beatPanel.classList.remove('hidden');
+      mPanel.classList.remove('hidden');
+    };
+    if (RM) { swap(); return; }
+    beatPanel.classList.add('hidden');
+    mPanel.classList.add('hidden');
+    setTimeout(swap, 220);
+  }
 
   /* ---- chapter bar: nav + progress in one row ---- */
   CHAPTERS.forEach((ch, i) => {
@@ -405,11 +437,11 @@
     shownBeat = idx;
     renderBar(idx);
     rail.replaceChildren(); // cards re-render once the seek settles
-    sections.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+    renderBeatPanel(idx);
     if (protoReady) {
       if (!isForward(prev, idx)) box.classList.add('masking'); // dim the restart replay
       seeking = true;
-      proto.contentWindow.postMessage({ bowStory: 'seek', path: BEATS[idx].path, panel: BEATS[idx].panel }, '*');
+      proto.contentWindow.postMessage({ bowStory: 'seek', path: BEATS[idx].path, panel: BEATS[idx].panel, live: BEATS[idx].live }, '*');
     }
   }
 

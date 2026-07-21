@@ -2979,7 +2979,13 @@ const PHOTOS = {
       // (author 2026-07-20)
       if (reducedMotion) { cards.forEach(c => c.classList.add('show')); return; }
       await wait(0); // let the opacity:0 state paint before transitioning
-      cards[0]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // bring the first card fully into view via ELEMENT scrolling only —
+      // scrollIntoView would also scroll the parent page when this app is
+      // embedded in the case study's same-origin iframe
+      if (cards[0]) {
+        const sr = streamEl.getBoundingClientRect(), cr = cards[0].getBoundingClientRect();
+        if (cr.bottom > sr.bottom) streamEl.scrollTo({ top: streamEl.scrollTop + (cr.bottom - sr.bottom), behavior: 'smooth' });
+      }
       for (const card of cards) {
         card.classList.add('show');
         await wait(140);
@@ -3655,7 +3661,7 @@ const PHOTOS = {
     // Presentation logic stays in the story page; this is the only control hook.
     let storySeekToken = 0; // newest seek wins; superseded replays abandon silently
     let storyLastPath = null; // last COMPLETED seek path; null = state unknown → full replay
-    async function storySeek(path, panel) {
+    async function storySeek(path, panel, live) {
       const tok = ++storySeekToken;
       storyInstant = true;
       reducedMotion = true;
@@ -3667,9 +3673,16 @@ const PHOTOS = {
         && storyLastPath.every((id, i) => path[i] === id);
       const suffix = isExtension ? path.slice(storyLastPath.length) : path;
       if (!isExtension) restartBtn.click(); // full deterministic reset (state, panels, transcripts)
-      for (const id of suffix) {
+      for (let i = 0; i < suffix.length; i++) {
         if (tok !== storySeekToken) { storyLastPath = null; return; }
-        await go(id); // autoGoto tails (home-responded, recommendation…) replay inside
+        // live:true → the FINAL beat of the seek streams in real time (typing,
+        // staggered cards) while everything before it stays instant; seek-done
+        // fires only after the stream completes, so the story page holds its
+        // scrub until the conversation has fully arrived
+        const playLive = live && i === suffix.length - 1;
+        if (playLive) { reducedMotion = prefersReducedMotion; storyInstant = false; }
+        await go(suffix[i]); // autoGoto tails (home-responded, recommendation…) replay inside
+        if (playLive) { reducedMotion = true; storyInstant = true; }
       }
       if (tok !== storySeekToken) { storyLastPath = null; return; }
       storyLastPath = path.slice();
@@ -3684,7 +3697,7 @@ const PHOTOS = {
     if (window.parent !== window) {
       window.addEventListener('message', e => {
         const d = e.data;
-        if (d && d.bowStory === 'seek' && Array.isArray(d.path)) storySeek(d.path, d.panel);
+        if (d && d.bowStory === 'seek' && Array.isArray(d.path)) storySeek(d.path, d.panel, d.live);
       });
       window.parent.postMessage({ bowStory: 'ready' }, '*');
     }
