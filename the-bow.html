@@ -2733,10 +2733,6 @@
       const gen = ++currentGen; // this navigation supersedes any in-flight chain
       const stale = () => gen !== currentGen;
 
-      // story hook: when embedded (case-study page), announce every navigation
-      // so the parent can keep its stage indicator in sync with free interaction
-      if (window.parent !== window) window.parent.postMessage({ bowStory: 'beat', id }, '*');
-
       if (!beat.thread) {
         // home-type beat (home, home-responded): no chat thread to render
         dismissLiveChips();
@@ -3016,6 +3012,14 @@
         if (playLive) { reducedMotion = true; storyInstant = true; }
       }
       if (tok !== storySeekToken) { storyLastPath = null; return; }
+      // a same-path seek can land while an earlier live stream is still
+      // rendering (go() re-entry is a no-op on inFlight beats) — hold seek-done
+      // until every in-flight beat finishes, so the story page never un-gates
+      // its scrub against a running stream
+      while (inFlight.size) {
+        if (tok !== storySeekToken) { storyLastPath = null; return; }
+        await new Promise(r => setTimeout(r, 120));
+      }
       storyLastPath = path.slice();
       // optional posed panel: the case study may show a panel the interactive
       // flow opens via direct manipulation (e.g. the venue profile a card

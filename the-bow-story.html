@@ -11,7 +11,18 @@
      existing prototype (same-origin iframe of dist/the-bow.html,
      driven with postMessage seeks; frame is a passive exhibit).
 
-     Author round 2026-07-21 (v6):
+     Author round 2026-07-21 (v7) — stability + polish pass:
+     — seek watchdog (lost seek-done can no longer freeze the
+       scrub/rail); backward skims debounce 260ms so only the
+       final position replays; scrub writes go through a small
+       exponential follower (softens the post-stream catch-up and
+       coalesces scrollTop writes); section offsets + the scrub
+       scroller are cached, not re-read per scroll event.
+     — Panel fades: the chapter title stays put between beats of
+       the same chapter — only the body crossfades. Scrub hint
+       appears once (first scrub beat). Finale split into two
+       beats: the contract flag, then the booked payoff.
+     Earlier (v6):
      — Narrative text no longer scrolls by as stacked paragraphs:
        ONE sticky text panel crossfades between beats; invisible
        spacer sections drive activation and scrub progress.
@@ -81,10 +92,16 @@
      progress, while a single sticky panel swaps its text in place. */
   .spacer{height:72vh}
   .spacer.scrub{height:150vh}
-  .narr-sticky{position:sticky;top:calc(var(--bar-h) + 16px);min-height:56vh;display:flex;flex-direction:column;justify-content:center}
+  /* FIXED height: the sticky panel sits above the spacers in layout flow, so
+     its height must not vary with beat content — content may overflow the box
+     visually (no clipping), but spacer offsets stay stable for the cache */
+  .narr-sticky{position:sticky;top:calc(var(--bar-h) + 16px);height:62vh;display:flex;flex-direction:column;justify-content:center}
   .beat-panel{transition:opacity .22s ease, transform .22s ease}
   .beat-panel.hidden{opacity:0;transform:translateY(6px)}
-  @media (prefers-reduced-motion: reduce){ .beat-panel{transition:none;transform:none} }
+  /* between beats of the SAME chapter only the body fades — the title holds */
+  .panel-body{transition:opacity .22s ease, transform .22s ease}
+  .panel-body.hidden{opacity:0;transform:translateY(6px)}
+  @media (prefers-reduced-motion: reduce){ .beat-panel,.panel-body{transition:none;transform:none} }
   .beat-panel .chapter-eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink-cta)}
   .beat-panel h2{font-size:24px;font-weight:800;margin:8px 0 12px;line-height:1.2}
   .beat-panel .beat-text{color:var(--gray);font-size:16.5px}
@@ -189,7 +206,8 @@
   const P6b = [...P6a, 'rebalance'];
   const P7 = [...P6b, 'goal-increase'];
   const P8 = [...P7, 'tour-offer', 'tour-booked'];
-  const P9 = [...P8, 'contract-flag', 'negotiate', 'book'];
+  const P8f = [...P8, 'contract-flag'];
+  const P9 = [...P8f, 'negotiate', 'book'];
 
   const CHAPTERS = [
     { chapter: 'While you were away', beats: [
@@ -277,8 +295,11 @@
         annotations: [
           { layer: 'agent', label: 'Watchful between moments', body: 'Tour booked, calendar synced — and the incoming contract is reviewed before the couple opens it.' },
         ] },
+      { id: 'flag', path: P8f,
+        text: 'One flag before signing: a $250 “peak Saturday fee” that wasn’t in the quote. The agent asks permission before doing anything about it — negotiating costs nothing, but it’s the couple’s call.',
+        annotations: [] },
       { id: 'booked', path: P9, loop: true,
-        text: 'One flag before signing: a $250 “peak Saturday fee” that wasn’t in the quote. Asking costs nothing — the venue honors the original $7,200. Booked. And the decision doesn’t stay in the chat: budget, vendor status, and the plan itself all update, feeding richer context into every decision after.',
+        text: 'Asking works — the venue honors the original $7,200. Booked. And the decision doesn’t stay in the chat: budget, vendor status, and the plan itself all update, feeding richer context into every decision after.',
         annotations: [
           { layer: 'product-state', label: 'Decision recorded', body: 'The selected venue becomes part of the shared planning state.', anchor: 'context-chips' },
           { layer: 'product-state', label: 'Connected updates', body: 'Budget, vendor status, checklist, and future recommendations can now reflect the decision.' },
@@ -344,44 +365,58 @@
 
   const beatPanel = $('#beat-panel');
   const mPanel = $('#m-panel');
+  const FIRST_SCRUB = BEATS.findIndex(b => b.scrub); // hint teaches once, not four times
   function fillPanel(el, idx, withAnnos) {
     el.replaceChildren();
     const b = BEATS[idx];
+    const head = document.createElement('div'); head.className = 'panel-head';
     const eyebrow = document.createElement('p'); eyebrow.className = 'chapter-eyebrow';
     eyebrow.textContent = `Chapter ${b.chapterIdx + 1} of ${CHAPTERS.length} · ${b.chapterTitle}`;
     const h = document.createElement('h2'); h.textContent = b.chapterTitle;
+    head.append(eyebrow, h);
+    const body = document.createElement('div'); body.className = 'panel-body';
     const p = document.createElement('p'); p.className = 'beat-text'; p.textContent = b.text;
-    el.append(eyebrow, h, p);
+    body.appendChild(p);
     if (b.constraints) {
       const ul = document.createElement('ul'); ul.className = 'constraints';
       b.constraints.forEach(([k, v]) => {
         const li = document.createElement('li'); const bd = document.createElement('b');
         bd.textContent = k + ': '; li.append(bd, v); ul.appendChild(li);
       });
-      el.appendChild(ul);
+      body.appendChild(ul);
     }
-    if (b.scrub) {
+    if (b.scrub && idx === FIRST_SCRUB) {
       const hint = document.createElement('p'); hint.className = 'scrub-hint';
       hint.innerHTML = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M4 10l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Keep scrolling — the screen scrolls with you</span>';
-      el.appendChild(hint);
+      body.appendChild(hint);
     }
-    if (withAnnos) b.annotations.forEach(a => { const c = annoCard(a); c.classList.add('show'); el.appendChild(c); });
+    if (withAnnos) b.annotations.forEach(a => { const c = annoCard(a); c.classList.add('show'); body.appendChild(c); });
+    el.append(head, body);
   }
-  // one sticky panel swaps its text in place (crossfade) — paragraphs never
-  // scroll past each other (author 2026-07-21)
+  // one sticky panel swaps its text in place — paragraphs never scroll past
+  // each other. Within a chapter only the BODY crossfades (the title holds);
+  // crossing a chapter boundary fades the whole panel (author 2026-07-21)
   let panelToken = 0;
+  let panelChapter = -1;
   function renderBeatPanel(idx) {
     const tok = ++panelToken;
+    const sameChapter = BEATS[idx].chapterIdx === panelChapter;
+    panelChapter = BEATS[idx].chapterIdx;
+    const fadeEls = sameChapter
+      ? [beatPanel.querySelector('.panel-body'), mPanel.querySelector('.panel-body')].filter(Boolean)
+      : [beatPanel, mPanel];
     const swap = () => {
       if (tok !== panelToken) return;
       fillPanel(beatPanel, idx, false);
       fillPanel(mPanel, idx, true);
-      beatPanel.classList.remove('hidden');
-      mPanel.classList.remove('hidden');
+      [beatPanel, mPanel].forEach(el => {
+        el.classList.remove('hidden');
+        el.querySelector('.panel-body')?.classList.remove('hidden');
+      });
+      sectionMetrics = null; // panel height may have changed → remeasure lazily
     };
     if (RM) { swap(); return; }
-    beatPanel.classList.add('hidden');
-    mPanel.classList.add('hidden');
+    fadeEls.forEach(el => el.classList.add('hidden'));
     setTimeout(swap, 220);
   }
 
@@ -432,16 +467,25 @@
     return next.length >= prev.length && prev.every((id, i) => next[i] === id);
   }
 
+  let seekWatchdog = null;
   function showBeat(idx) {
     const prev = shownBeat;
     shownBeat = idx;
     renderBar(idx);
     rail.replaceChildren(); // cards re-render once the seek settles
     renderBeatPanel(idx);
+    scrubScroller = null; scrubTargetPx = null;
+    clearTimeout(followTimer); followTimer = null;
     if (protoReady) {
       if (!isForward(prev, idx)) box.classList.add('masking'); // dim the restart replay
       seeking = true;
       proto.contentWindow.postMessage({ bowStory: 'seek', path: BEATS[idx].path, panel: BEATS[idx].panel, live: BEATS[idx].live }, '*');
+      // watchdog: a lost seek-done must never freeze the scrub/rail — live
+      // beats stream for ~10s, so they get a much longer leash
+      clearTimeout(seekWatchdog);
+      seekWatchdog = setTimeout(() => {
+        if (seeking) { seeking = false; settleBeat(shownBeat); }
+      }, BEATS[idx].live ? 30000 : 8000);
     }
   }
 
@@ -467,24 +511,46 @@
       const el = doc.querySelector(`[data-story-anchor="${b.focusAnchor}"]`);
       if (el) centerInScrollParents(el);
     }
-    if (b.scrub) scrubTick(); // sync the scroller to current progress immediately
+    if (b.scrub) {
+      scrubScroller = doc?.querySelector(b.scrubTarget ?? '#stream') ?? null; // cached for the beat
+      scrubTick(); // sync to current progress (the follower eases the catch-up)
+    }
     renderRail(idx);          // annotation cards, below the frame — never over it
   }
 
-  /* ---- scroll-linked scrub: the prototype follows the reader ---- */
+  /* ---- scroll-linked scrub: the prototype follows the reader ----
+     scrubTick only computes a TARGET; a small exponential follower applies
+     it — this coalesces scrollTop writes to ~60Hz regardless of scroll-event
+     rate, and softens the catch-up after a live stream un-gates the scrub.
+     The scroller node is cached per beat at settle (no per-event queries). */
+  let scrubScroller = null;
+  let scrubTargetPx = null;
+  let followTimer = null;
   function scrubTick() {
-    if (shownBeat < 0 || seeking || !protoReady) return;
+    if (shownBeat < 0 || seeking || !protoReady || !scrubScroller) return;
     const b = BEATS[shownBeat];
     if (!b.scrub) return;
-    const doc = proto.contentDocument;
-    const scroller = doc?.querySelector(b.scrubTarget ?? '#stream');
-    if (!scroller) return;
-    const sec = sections[shownBeat];
+    const { top, height } = metrics()[shownBeat];
     // progress through the beat's section (viewport center as the read head)
     const mid = window.scrollY + window.innerHeight / 2;
-    const p = Math.min(1, Math.max(0, (mid - sec.offsetTop) / Math.max(1, sec.offsetHeight)));
-    const max = scroller.scrollHeight - scroller.clientHeight;
-    if (max > 0) scroller.scrollTop = p * max;
+    const p = Math.min(1, Math.max(0, (mid - top) / Math.max(1, height)));
+    const max = scrubScroller.scrollHeight - scrubScroller.clientHeight;
+    if (max <= 0) return;
+    scrubTargetPx = p * max;
+    if (RM) { scrubScroller.scrollTop = scrubTargetPx; return; } // no added motion under reduced motion
+    ensureFollower();
+  }
+  function ensureFollower() {
+    if (followTimer) return;
+    const step = () => {
+      followTimer = null;
+      if (scrubTargetPx == null || !scrubScroller) return;
+      const d = scrubTargetPx - scrubScroller.scrollTop;
+      if (Math.abs(d) < 0.75) { scrubScroller.scrollTop = scrubTargetPx; return; }
+      scrubScroller.scrollTop += d * 0.22;
+      followTimer = setTimeout(step, 16);
+    };
+    followTimer = setTimeout(step, 16);
   }
 
   /* ---- prototype messages ---- */
@@ -493,11 +559,13 @@
     if (!d || !d.bowStory) return;
     if (d.bowStory === 'ready') {
       protoReady = true;
+      sectionMetrics = null;
       fitFrame();
       activeBeat = Math.max(activeBeat, 0);
       showBeat(activeBeat);
     } else if (d.bowStory === 'seek-done') {
       seeking = false;
+      clearTimeout(seekWatchdog);
       if (shownBeat >= 0) settleBeat(shownBeat);
     }
   });
@@ -509,17 +577,42 @@
      at beat boundaries. IO is kept as a trigger because it fires in
      environments that batch scroll events. */
   const HYST = 28;
-  function computeActiveBeat() {
+  // section offsets are cached — invalidated on resize/load, not re-read
+  // per scroll event
+  let sectionMetrics = null;
+  function measureSections() { sectionMetrics = sections.map(s => ({ top: s.offsetTop, height: s.offsetHeight })); }
+  function metrics() { if (!sectionMetrics) measureSections(); return sectionMetrics; }
+  window.addEventListener('load', () => { sectionMetrics = null; });
+
+  function candidateBeat() {
+    const m = metrics();
     const mid = window.scrollY + window.innerHeight / 2;
-    let cand = null;
-    sections.forEach(s => {
-      if (s.offsetTop <= mid && mid < s.offsetTop + s.offsetHeight) cand = Number(s.dataset.index);
-    });
+    for (let i = 0; i < m.length; i++) {
+      if (m[i].top <= mid && mid < m[i].top + m[i].height) {
+        if (mid - m[i].top < HYST || (m[i].top + m[i].height) - mid < HYST) return null; // dead zone
+        return i;
+      }
+    }
+    return null;
+  }
+  // forward activations fire immediately (suffix seeks are cheap); backward
+  // ones settle 260ms first, so skimming up collapses to ONE restart replay
+  // at the final position instead of a chain of superseded ones
+  let backTimer = null;
+  function computeActiveBeat() {
+    const cand = candidateBeat();
     if (cand == null || cand === activeBeat) return;
-    const s = sections[cand];
-    if (mid - s.offsetTop < HYST || (s.offsetTop + s.offsetHeight) - mid < HYST) return; // boundary dead zone
-    activeBeat = cand;
-    showBeat(cand);
+    if (cand > activeBeat) {
+      if (backTimer) { clearTimeout(backTimer); backTimer = null; }
+      activeBeat = cand;
+      showBeat(cand);
+    } else if (!backTimer) {
+      backTimer = setTimeout(() => {
+        backTimer = null;
+        const settled = candidateBeat();
+        if (settled != null && settled !== activeBeat) { activeBeat = settled; showBeat(settled); }
+      }, 260);
+    }
   }
   const io = new IntersectionObserver(() => computeActiveBeat(),
     { rootMargin: '-42% 0px -42% 0px', threshold: 0 });
@@ -539,7 +632,7 @@
     box.style.height = (700 * scale) + 'px';
     setFrameTransform();
   }
-  window.addEventListener('resize', () => { fitFrame(); });
+  window.addEventListener('resize', () => { sectionMetrics = null; fitFrame(); });
   fitFrame();
 </script>
 </body>

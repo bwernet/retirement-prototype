@@ -16,9 +16,9 @@ t('brand: approved client wordmark present', () => {
 t('disclaimer pill present', () => {
   assert.ok(html.includes('Concept prototype'));
 });
-t('story hooks: seek listener, beat broadcast, both anchors', () => {
+t('story hooks: seek listener, stream drain, both anchors', () => {
   assert.ok(html.includes("d.bowStory === 'seek'"), 'storySeek message listener');
-  assert.ok(html.includes("bowStory: 'beat'"), 'beat broadcast to parent');
+  assert.ok(html.includes('while (inFlight.size)'), 'seek-done drains in-flight streams');
   assert.ok(html.includes("storyAnchor = 'approval-send'"), 'approval anchor');
   assert.ok(html.includes("storyAnchor = 'access-evidence'"), 'evidence anchor');
 });
