@@ -159,7 +159,6 @@
     .story{grid-template-columns:1fr;gap:0;padding-top:0}
     .stage-col{position:sticky;top:var(--bar-h);z-index:30;background:var(--canvas);padding:12px 0 10px;order:-1}
     .rail{display:none}        /* annotations render in the mobile panel instead */
-    .overlay{display:none}     /* tap-dots are a desktop affordance */
     .narr-sticky{display:none}
     .m-panel{display:block;margin-top:12px;transition:opacity .22s ease}
     .m-panel.hidden{opacity:0}
@@ -572,7 +571,7 @@
     overlay.replaceChildren();
     dotEl = null;
     dotClippers = [];
-    if (window.innerWidth < 1100 || !BEATS[idx].tapDot) return;
+    if (!BEATS[idx].tapDot) return;
     const doc = proto.contentDocument;
     const target = doc?.querySelector(`[data-story-anchor="${BEATS[idx].tapDot}"]`);
     if (target) {
@@ -626,10 +625,17 @@
     }
     if (!visible) { dotEl.style.display = 'none'; return; }
     dotEl.style.display = '';
-    dotEl.style.left = (r.left * scale) + 'px';
-    dotEl.style.top = (r.top * scale) + 'px';
-    dotEl.style.width = (r.width * scale) + 'px';
-    dotEl.style.height = (r.height * scale) + 'px';
+    // touch-friendly minimum: pad small hit areas to ≥40px (screen px) while
+    // the dot stays pinned to the element's true top-right corner
+    const MIN = 40;
+    let x = r.left * scale, y = r.top * scale, w = r.width * scale, h = r.height * scale;
+    const padX = Math.max(0, (MIN - w) / 2), padY = Math.max(0, (MIN - h) / 2);
+    dotEl.style.left = (x - padX) + 'px';
+    dotEl.style.top = (y - padY) + 'px';
+    dotEl.style.width = (w + 2 * padX) + 'px';
+    dotEl.style.height = (h + 2 * padY) + 'px';
+    const dot = dotEl.firstChild;
+    if (dot) { dot.style.right = padX + 'px'; dot.style.top = padY + 'px'; }
   }
 
   /* ---- scroll-linked scrub: the prototype follows the reader ----
