@@ -3,7 +3,7 @@
 
 export const BRAND = {
   name: 'the bow',
-  disclaimer: 'Concept prototype — not affiliated with any marketplace',
+  disclaimer: 'Concept prototype',
   cream: '#FBF1E6', ink: '#171719', card: '#FFFFFF',
   pink: '#FF3EB4',        // decorative pink — chips/segments/gradients only, NOT for white text fills
   // pinkCTA: #FF3EB4 darkened (HSL lightness 62.16% → 44.16%, -18 pts in 1-pt

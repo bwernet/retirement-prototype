@@ -6,11 +6,30 @@ const html = fs.readFileSync('the-bow.html', 'utf8');
 const modelJs = fs.readFileSync('bow-model.js', 'utf8');
 const t = (name, fn) => { try { fn(); console.log('ok -', name); } catch (e) { console.error('FAIL -', name); throw e; } };
 
-t('whitelabel: client name absent', () => {
-  assert.ok(!/knot/i.test(html));
+// Whitelabel guard lifted 2026-07-20: The Knot gave written OK to show the real
+// brand, so the logo + nav icons are the client's actual marks and the wordmark's
+// accessible name reads "the knot". The knot-absence assertion is retired; the
+// brand is now permitted throughout the artifact.
+t('brand: approved client wordmark present', () => {
+  assert.ok(/id="wordmark"[^>]*aria-label="the knot"/.test(html));
 });
 t('disclaimer pill present', () => {
-  assert.ok(html.includes('Concept prototype — not affiliated with any marketplace'));
+  assert.ok(html.includes('Concept prototype'));
+});
+t('story hooks: seek listener, beat broadcast, both anchors', () => {
+  assert.ok(html.includes("d.bowStory === 'seek'"), 'storySeek message listener');
+  assert.ok(html.includes("bowStory: 'beat'"), 'beat broadcast to parent');
+  assert.ok(html.includes("storyAnchor = 'approval-send'"), 'approval anchor');
+  assert.ok(html.includes("storyAnchor = 'access-evidence'"), 'evidence anchor');
+});
+t('story page: embeds dist, six chapters, fine-grained beats, scrub + anchors', () => {
+  const story = fs.readFileSync('the-bow-story.html', 'utf8');
+  assert.ok(story.includes('src="dist/the-bow.html"'), 'iframe loads the dist artifact');
+  assert.equal((story.match(/chapter: '/g) || []).length, 6, 'six story chapters');
+  assert.ok((story.match(/path: /g) || []).length >= 10, 'fine-grained beats');
+  assert.ok(story.includes('scrub: true'), 'scroll-linked scrub beats');
+  assert.ok(story.includes("anchor: 'approval-send'"));
+  assert.ok(story.includes("anchor: 'access-evidence'"));
 });
 t('home dashboard pins', () => {
   assert.ok(html.includes('355 DAYS TO GO!'));
@@ -53,7 +72,8 @@ t('white-text fills pass AA (pinkCTA + New! pill fill)', () => {
 if (fs.existsSync('dist/the-bow.html')) {
   const dist = fs.readFileSync('dist/the-bow.html', 'utf8');
   console.log(`dist/the-bow.html: ${(Buffer.byteLength(dist, 'utf8') / 1024).toFixed(0)} KB`);
-  t('dist: whitelabel holds', () => assert.ok(!/knot/i.test(dist)));
+  // Whitelabel lifted 2026-07-20 (brand approved) — dist carries the real wordmark
+  t('dist: approved client wordmark present', () => assert.ok(/aria-label="the knot"/.test(dist)));
   t('dist: self-contained', () => {
     assert.ok(!dist.includes('<link '), 'no external stylesheets');
     assert.ok(!/src="http/.test(dist), 'no external scripts/images');

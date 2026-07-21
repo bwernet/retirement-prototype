@@ -47,7 +47,7 @@
   #rail .hamburger{width:36px;height:36px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;border-radius:8px}
   #rail .hamburger:hover{background:rgba(0,0,0,.05)}
   #rail .rail-items{display:flex;flex-direction:column;gap:4px;flex:1}
-  .rail-item{width:68px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:9px 4px;border-radius:12px;color:var(--ink)}
+  .rail-item{width:68px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:9px 4px;border-radius:12px;color:var(--ink);text-decoration:none}
   .rail-item:hover{background:rgba(0,0,0,.04)}
   .rail-item .label{font-size:11px;font-weight:500;letter-spacing:.01em}
   .rail-item[aria-current="page"]{position:relative}
@@ -434,7 +434,10 @@
   .carousel-arrow[hidden]{display:none}
 
   /* reply cards */
-  .reply-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:18px;margin-bottom:14px;display:grid;grid-template-columns:200px 1fr;gap:18px}
+  /* cards mount hidden and stagger-fade in (renderReplyCards adds .show);
+     .show persists on the transcript node so revisits render instantly */
+  .reply-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:18px;margin-bottom:14px;display:grid;grid-template-columns:200px 1fr;gap:18px;opacity:0;transform:translateY(10px);transition:opacity .5s ease, transform .5s ease}
+  .reply-card.show{opacity:1;transform:none}
   .reply-meta-col{display:flex;flex-direction:column;gap:6px}
   .reply-meta-col .meta-line{font-size:13px;color:var(--gray)}
   .reply-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
@@ -502,7 +505,7 @@
 
   @media (prefers-reduced-motion: reduce){
     .msg.typing span{animation:none}
-    .block-placeholder,.chip,.toast,#interstitial,.carousel-track,.action-chip{transition:none}
+    .block-placeholder,.chip,.toast,#interstitial,.carousel-track,.action-chip,.reply-card{transition:none}
     .interstitial-shimmer-sweep.play{animation:none}
     .chat-badge.pulse{animation:none}
   }
@@ -511,7 +514,7 @@
   @media (max-width: 760px){
     body{grid-template-columns:1fr}
 
-    /* rail becomes a fixed bottom bar: icons only, horizontal, AI first (already
+    /* rail becomes a fixed bottom bar: icons only, horizontal, Agent first (already
        first in DOM order); hamburger hidden; chat-btn + avatar stay inline at the
        end. If all 7 rail items + chat + avatar don't fit at very narrow widths the
        bar scrolls horizontally within itself (overflow-x:auto) rather than ever
@@ -598,48 +601,52 @@
     <ul class="rail-items">
       <li>
         <a class="rail-item" href="#" aria-current="page">
-          <span class="icon-wrap">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 1.5c.7 3.4 1.6 4.3 5 5-3.4.7-4.3 1.6-5 5-.7-3.4-1.6-4.3-5-5 3.4-.7 4.3-1.6 5-5z" fill="var(--pink)"/><path d="M16.5 13c.35 1.7.8 2.15 2.5 2.5-1.7.35-2.15.8-2.5 2.5-.35-1.7-.8-2.15-2.5-2.5 1.7-.35 2.15-.8 2.5-2.5z" fill="var(--pink)"/></svg>
-          </span>
-          <span class="label">AI</span>
+          <svg class="rail-ico" width="26" height="24" viewBox="0 0 31 29" fill="none" aria-hidden="true"><path opacity="0.6" d="M7.60972 2.86713C14.987 -1.91418 24.4721 -0.583294 28.8382 5.87393C33.2044 12.2819 30.7453 21.3516 23.368 26.1329C15.9907 30.9142 6.50563 29.5833 2.13949 23.1261C-2.17647 16.7181 0.232439 7.64844 7.60972 2.86713Z" fill="#FFE4FB"/>
+<path d="M17 7.6718C17 7.6718 20.087 6.91891 20.4022 4C20.4022 4 22.3043 6.57142 25 6.13127C25 6.13127 23.4457 8.16987 24.6848 11.5058C24.6848 11.5058 21.8696 10.1737 19.587 13C19.587 13.0116 19.4457 9.64091 17 7.6718Z" fill="#FEBBF7"/>
+<path d="M21.0766 17.1312C17.4257 18.4072 14.3797 21.0353 12.5455 24.4494L12.1756 25.1376L12.062 24.7328C10.8205 20.7125 8.05667 17.2868 4.40317 15.1846L4.2142 15.0731L4.9017 14.8744C8.55243 13.7583 11.6642 11.3646 13.6304 8.09934L13.6965 8.01395L13.8761 8.49313C15.1572 11.9326 17.5613 14.8794 20.6537 16.8284L21.0766 17.1312Z" fill="#FF44CB"/></svg>
+          <span class="label">Agent</span>
         </a>
       </li>
       <li>
         <a class="rail-item" href="#">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3.5" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 7.5H17" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 2V5M13.5 2V5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <svg class="rail-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.4796 2.43466C21.4796 2.07568 21.1886 1.78467 20.8296 1.78467H4.7C4.34101 1.78467 4.05 2.07568 4.05 2.43466V6.81801H2.64999C2.29101 6.81801 2 7.10902 2 7.46801C2 7.82703 2.29101 8.11803 2.64999 8.11803H4.05V11.3253H2.64999C2.29101 11.3253 2 11.6163 2 11.9753C2 12.3343 2.29101 12.6253 2.64999 12.6253H4.05V15.8219H2.64999C2.29101 15.8219 2 16.1129 2 16.4718C2 16.8309 2.29101 17.1219 2.64999 17.1219H4.05V21.4747C4.05 21.8337 4.34101 22.1247 4.7 22.1247H20.8296C21.1886 22.1247 21.4796 21.8337 21.4796 21.4747V2.43466ZM20.1795 20.7847H5.37L5.34999 3.12466H20.1596L20.1795 20.7847ZM8.97333 10.0728L9.37548 5.00897L11.6206 5.18728L11.1513 11.0963C11.4744 11.1649 11.7926 11.1959 12.097 11.1867C12.7419 11.1672 13.3049 10.971 13.7557 10.5956C14.2061 10.2206 14.6218 9.6022 14.8577 8.6062L17.0492 9.12528C16.722 10.5066 16.0867 11.5854 15.1968 12.3264C14.3072 13.0671 13.2406 13.4054 12.165 13.4379C11.5431 13.4566 10.9128 13.3745 10.2952 13.2059C10.3108 13.2295 10.3265 13.2531 10.3422 13.2766C10.9746 14.2244 11.6832 15.1254 12.411 15.7804C13.1601 16.4547 13.7878 16.7412 14.2721 16.748C15.2405 16.7616 15.8478 16.3946 16.3166 15.771C16.4318 15.6177 16.5414 15.4445 16.6452 15.2508C16.7397 15.0744 16.8286 14.8827 16.9122 14.6762L19 15.5207C18.8901 15.7925 18.7676 16.0584 18.6302 16.3149C18.4792 16.5963 18.3093 16.8681 18.1169 17.1242C17.244 18.2855 15.9732 19.0243 14.2404 19C12.9478 18.9818 11.8076 18.2674 10.9043 17.4544C10.8235 17.3817 10.7434 17.3071 10.6641 17.2309L10.5267 18.9604L8.2816 18.7821L8.60373 14.7267C8.55813 14.6598 8.51313 14.5932 8.4688 14.5267C7.78128 13.4964 7.21393 12.4741 6.81976 11.7133C6.62206 11.3316 6.46641 11.0129 6.3595 10.788C6.30601 10.6754 6.26463 10.5862 6.2362 10.5242C6.22198 10.4931 6.21099 10.4688 6.20333 10.4519C6.1995 10.4433 6.19651 10.4367 6.19436 10.4319L6.19096 10.4242C6.19096 10.4242 6.19046 10.4232 7.21995 9.96678L6.19046 10.4232L8.07018 9.22848C8.3449 9.54475 8.64978 9.82735 8.97333 10.0728Z" fill="currentColor"/></svg>
           <span class="label">Plan</span>
         </a>
       </li>
       <li>
         <a class="rail-item" href="#">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2.5" y="2.5" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="11.5" y="2.5" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="2.5" y="11.5" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="11.5" y="11.5" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/></svg>
+          <svg class="rail-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19.7204 9.60349L16.8824 8.60449L17.5594 4.93249C17.6474 4.45549 17.3304 3.99449 16.8564 3.90649L15.8474 3.71649L15.9884 3.30749L21.2524 5.16049L19.7204 9.60349ZM15.8254 20.8945L14.6894 20.4945L15.5434 15.8595L17.3434 16.4935L15.8254 20.8945ZM13.1924 21.4825L8.27342 20.5565L11.7904 19.8325C12.2634 19.7355 12.5704 19.2705 12.4734 18.7975L12.0134 16.5185L14.0374 16.8995L13.1924 21.4825ZM4.86642 15.2765L10.2204 14.1725L11.1234 18.6485L5.76942 19.7515L4.86642 15.2765ZM7.88442 2.59949L8.79642 7.11849L3.44242 8.22049L2.53042 3.70249L7.88442 2.59949ZM10.7334 10.1735L15.1254 11.0005L14.2724 15.6265L11.7374 15.1505L10.7334 10.1735ZM3.69842 9.48949L9.05242 8.38649L9.96442 12.9045L4.61042 14.0075L3.69842 9.48949ZM17.7664 15.2695L15.7814 14.5715L16.6444 9.89249L19.2984 10.8275L17.7664 15.2695ZM10.7334 4.07149L16.2134 5.10149L15.3604 9.72849L10.4564 8.80549L10.1444 7.25949L10.7334 4.07149ZM22.0684 4.07549L16.0244 1.94949C15.8024 1.87049 15.5654 1.88349 15.3534 1.98549C15.1394 2.08649 14.9794 2.26649 14.9004 2.49349L14.5624 3.47449L10.5674 2.72349C10.3364 2.67849 10.1014 2.72749 9.90642 2.86049C9.71042 2.99449 9.57842 3.19649 9.53642 3.42849L9.45742 3.85649L9.07042 1.93449C9.02342 1.70249 8.88942 1.50249 8.69142 1.37349C8.49442 1.24549 8.26242 1.19949 8.03442 1.24849L1.86342 2.51849C1.39142 2.61549 1.08442 3.08049 1.18042 3.55349L4.58242 20.4135C4.62742 20.6435 4.76042 20.8425 4.95542 20.9735C5.10142 21.0715 5.26842 21.1215 5.44042 21.1215C5.49942 21.1215 5.55942 21.1155 5.61842 21.1035L6.37142 20.9485C6.43942 21.2915 6.70542 21.5785 7.06842 21.6465L13.3644 22.8315C13.4174 22.8405 13.4714 22.8455 13.5254 22.8455C13.7014 22.8455 13.8734 22.7925 14.0224 22.6905C14.2164 22.5565 14.3464 22.3555 14.3884 22.1245L14.4504 21.7825L15.7934 22.2545C15.8884 22.2875 15.9854 22.3025 16.0794 22.3025C16.4444 22.3025 16.7864 22.0745 16.9134 21.7085L22.6094 5.19449C22.7644 4.73849 22.5224 4.23649 22.0684 4.07549Z" fill="currentColor"/></svg>
           <span class="label">Inspo</span>
         </a>
       </li>
       <li>
         <a class="rail-item" href="#">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="7" cy="6.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M2.5 16c0-2.8 2-4.5 4.5-4.5s4.5 1.7 4.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="14.5" cy="7" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M12.5 16c0-2.3 1.5-3.8 3.5-3.8s3.5 1.5 3.5 3.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <svg class="rail-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.256 20.4438C14.256 19.7638 14.257 18.0848 14.259 17.9758C14.325 16.4678 15.433 15.2868 16.781 15.2868H19.246C20.594 15.2868 21.702 16.4688 21.769 17.9478L21.772 20.4438H14.256ZM2.304 17.9768C2.371 16.4688 3.48 15.2868 4.827 15.2868H7.292C8.641 15.2868 9.748 16.4678 9.814 17.9488L9.818 20.4438H2.301C2.301 19.7608 2.303 18.0668 2.304 17.9768ZM10.838 13.3308H13.304C14.052 13.3308 14.745 13.7238 15.221 14.3558C13.944 14.9728 13.03 16.3138 12.96 17.9138C12.957 17.9828 12.956 19.7468 12.955 20.4438H11.118L11.113 17.9198C11.044 16.3338 10.15 15.0068 8.896 14.3798C9.369 13.7288 10.068 13.3308 10.838 13.3308ZM23.069 17.9188C22.97 15.7148 21.291 13.9868 19.246 13.9868H16.781C16.706 13.9868 16.636 14.0058 16.562 14.0098C15.867 12.7888 14.638 12.0308 13.304 12.0308H10.838C9.504 12.0308 8.267 12.8018 7.577 14.0168C7.482 14.0098 7.39 13.9868 7.292 13.9868H4.827C2.782 13.9868 1.104 15.7148 1.005 17.9248C1.003 17.9828 1 20.6668 1 20.7248C1 21.3058 1.374 21.7438 1.869 21.7438H22.204C22.699 21.7438 23.072 21.3058 23.072 20.7238L23.069 17.9188ZM12.0734 6.79292C12.9284 6.79292 13.6244 7.48792 13.6244 8.34292C13.6244 9.19792 12.9284 9.89392 12.0734 9.89392C11.2184 9.89392 10.5224 9.19792 10.5224 8.34292C10.5224 7.48792 11.2184 6.79292 12.0734 6.79292ZM12.0734 11.1939C13.6454 11.1939 14.9254 9.91492 14.9254 8.34292C14.9254 6.77192 13.6454 5.49292 12.0734 5.49292C10.5014 5.49292 9.2214 6.77192 9.2214 8.34292C9.2214 9.91492 10.5014 11.1939 12.0734 11.1939ZM6.0627 8.80662C6.9167 8.80662 7.6127 9.50262 7.6127 10.3576C7.6127 11.2126 6.9167 11.9076 6.0627 11.9076C5.2077 11.9076 4.5107 11.2126 4.5107 10.3576C4.5107 9.50262 5.2077 8.80662 6.0627 8.80662ZM6.0627 13.2076C7.6337 13.2076 8.9137 11.9296 8.9137 10.3576C8.9137 8.78562 7.6337 7.50662 6.0627 7.50662C4.4907 7.50662 3.2097 8.78562 3.2097 10.3576C3.2097 11.9296 4.4907 13.2076 6.0627 13.2076ZM18.0168 8.80662C18.8708 8.80662 19.5668 9.50262 19.5668 10.3576C19.5668 11.2126 18.8708 11.9076 18.0168 11.9076C17.1618 11.9076 16.4648 11.2126 16.4648 10.3576C16.4648 9.50262 17.1618 8.80662 18.0168 8.80662ZM18.0168 13.2076C19.5878 13.2076 20.8678 11.9296 20.8678 10.3576C20.8678 8.78562 19.5878 7.50662 18.0168 7.50662C16.4448 7.50662 15.1638 8.78562 15.1638 10.3576C15.1638 11.9296 16.4448 13.2076 18.0168 13.2076Z" fill="currentColor"/></svg>
           <span class="label">Guests</span>
         </a>
       </li>
       <li>
         <a class="rail-item" href="#">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2 3 6v2c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M7.5 10l1.8 1.8L13 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg class="rail-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19.0751 2.16896C18.966 1.94179 18.7349 1.79764 18.4817 1.79896H4.74466C4.47048 1.80253 4.22674 1.97339 4.13121 2.22896C3.0954 4.97896 1.34558 9.91003 1.34558 10.61C1.32207 11.6803 1.97853 12.6495 2.98478 13.03V21.4678C2.98478 21.8268 3.27744 22.1178 3.63845 22.1178H20.2316C20.5926 22.1178 20.8852 21.8268 20.8852 21.4678V13.06C21.3754 12.8879 21.8097 12.5873 22.1423 12.19C22.6004 11.5996 22.7565 10.831 22.5647 10.11C22.2127 8.70003 19.3969 2.80896 19.0751 2.16896ZM14.6804 10.5C14.1093 11.4511 13.0791 12.0354 11.9652 12.04C10.7436 11.9899 9.61126 11.3902 8.88791 10.41L9.73265 3.09896H13.8256L14.6804 10.5ZM5.1972 3.09896H8.42531L7.5504 10.61C7.40961 10.98 6.83639 12.04 4.74466 12.04C3.01495 12.04 2.65292 11.26 2.65292 10.64C2.65292 10.02 3.99042 6.39896 5.1972 3.09896ZM19.6081 20.8178H4.32229V13.31C4.46308 13.31 4.59381 13.31 4.74466 13.31C6.13701 13.4157 7.49315 12.8367 8.37503 11.76C9.31736 12.7301 10.609 13.2878 11.9652 13.31C13.2696 13.3196 14.5097 12.7471 15.3441 11.75C15.5026 11.929 15.674 12.0961 15.857 12.25C16.8055 12.9839 17.985 13.3595 19.1857 13.31C19.3365 13.31 19.4673 13.31 19.6081 13.31V20.8178ZM19.1857 12.04C18.2906 12.0846 17.4081 11.8156 16.6917 11.28C16.3948 11.0393 16.1516 10.7395 15.9777 10.4L15.143 3.09896H18.0694C19.2582 5.4173 20.3288 7.9947 21.2774 10.42C21.3909 10.747 21.3385 11.1083 21.1366 11.39C20.6107 11.8758 19.8998 12.1126 19.1857 12.04Z" fill="currentColor"/></svg>
           <span class="label">Vendors</span>
         </a>
       </li>
       <li>
         <a class="rail-item" href="#">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.4"/><path d="M2.5 10H17.5M10 2.5c1.8 2 2.8 4.8 2.8 7.5s-1 5.5-2.8 7.5c-1.8-2-2.8-4.8-2.8-7.5S8.2 4.5 10 2.5z" stroke="currentColor" stroke-width="1.4"/></svg>
+          <svg class="rail-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 4V20H3V4H21ZM3 3C2.44772 3 2 3.44772 2 4V20C2 20.5523 2.44772 21 3 21H21C21.5523 21 22 20.5523 22 20V4C22 3.44772 21.5523 3 21 3H3Z" fill="currentColor"/>
+<path d="M19 8V14H5V8H19ZM4 7V15H20V7H4Z" fill="currentColor"/>
+<path d="M15.7302 17H8V16H15.7302V17Z" fill="currentColor"/>
+<path d="M15.7302 19H8V18H15.7302V19Z" fill="currentColor"/></svg>
           <span class="label">Website</span>
         </a>
       </li>
       <li>
         <a class="rail-item" href="#">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 17s-6.5-4-6.5-8.8A3.7 3.7 0 0 1 10 5.6a3.7 3.7 0 0 1 6.5 2.6C16.5 13 10 17 10 17z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          <svg class="rail-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16.9709 8.69176C17.5723 8.47204 18.1383 8.16546 18.6509 7.78176C19.7585 6.86542 20.1605 5.34595 19.6509 4.00176C19.1134 2.65694 17.8091 1.77681 16.3609 1.78176C15.298 1.74766 14.2818 2.21869 13.6209 3.05176C12.9219 3.94956 12.3901 4.96573 12.0509 6.05176C11.7116 4.96573 11.1798 3.94956 10.4809 3.05176C9.8304 2.22219 8.82461 1.75084 7.77088 1.78176C6.32596 1.77795 5.02374 2.65269 4.48088 3.99176C3.95958 5.33248 4.34958 6.85632 5.45088 7.78176C5.96285 8.16897 6.52888 8.47894 7.13088 8.70176H2.05088C1.69189 8.70176 1.40088 8.99278 1.40088 9.35176V13.1796C1.40088 13.5386 1.69189 13.8296 2.05088 13.8296H2.83088V21.4717C2.83088 21.8307 3.12189 22.1217 3.48088 22.1217H20.6209C20.9799 22.1217 21.2709 21.8307 21.2709 21.4717V13.8296H22.0509C22.4099 13.8296 22.7009 13.5386 22.7009 13.1796V9.34176C22.7009 8.98278 22.4099 8.69176 22.0509 8.69176H16.9709ZM16.2309 3.15176H16.3009C17.2048 3.1467 18.0223 3.68778 18.3709 4.52176C18.6872 5.31731 18.462 6.22593 17.8109 6.78176C16.8809 7.56176 14.3209 8.22176 12.7609 8.54176C12.9947 6.87952 13.6259 5.29816 14.6009 3.93176C14.9891 3.42714 15.5944 3.1375 16.2309 3.15176ZM7.78088 3.10176C8.43132 3.07447 9.05434 3.36546 9.45088 3.88176C10.4277 5.2472 11.059 6.82901 11.2909 8.49176C9.73088 8.17176 7.17088 7.49176 6.29088 6.73176C5.62546 6.18598 5.3838 5.27572 5.69088 4.47176C6.04441 3.63281 6.87054 3.09128 7.78088 3.10176ZM2.70088 12.4796V9.99176H11.4009V12.4796H2.70088ZM4.13088 13.7796H11.4009V20.7617H4.13088V13.7796ZM19.9709 20.7617H12.7009V13.8196H19.9709V20.7617ZM21.4009 12.4796H12.7009V9.99176H21.4009V12.4796Z" fill="currentColor"/></svg>
           <span class="label">Registry</span>
         </a>
       </li>
+    
     </ul>
     <div class="rail-bottom">
       <button class="chat-btn" aria-label="Messages">
@@ -650,15 +657,9 @@
     </div>
   </nav>
   <header id="topbar" aria-label="Wedding summary">
-    <svg id="wordmark" viewBox="0 0 120 36" role="img" aria-label="the bow">
-      <text x="0" y="25" font-family="Figtree" font-weight="800" font-size="21" fill="var(--ink)">the bow</text>
-      <g transform="translate(90,7)" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M11 10 C11 10 4 2 2 6 C0 10 6 15 11 10 Z"/>
-        <path d="M11 10 C11 10 18 2 20 6 C22 10 16 15 11 10 Z"/>
-        <path d="M11 10 L8 17 M11 10 L14 17"/>
-      </g>
-    </svg>
-    <div class="chips">
+    <svg id="wordmark" viewBox="0 0 87 19" role="img" aria-label="the knot" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M34.4041 12.2011L37.2022 12.6738C37.2363 12.6805 37.2636 12.721 37.2499 12.7615C37.1203 13.4367 35.9055 18.9527 30.7119 18.9392C29.6405 18.9325 28.7396 18.6692 27.9957 18.2371C27.0471 18.6894 25.9552 18.9932 24.7267 18.9392C23.0752 18.8717 21.9286 17.9197 21.2393 16.7382C20.6183 15.6782 20.3248 14.3684 20.1815 13.1194C20.1815 13.0856 20.1337 13.0721 20.1201 13.1059L17.2264 18.892C17.2128 18.9122 17.1787 18.9325 17.1514 18.9257L14.1895 18.4261C14.1622 18.4194 14.1349 18.3991 14.1349 18.3653L13.9847 16.0293C13.9779 15.9955 13.9301 15.982 13.9165 16.0158C13.4388 17.0015 12.0192 18.9325 9.50095 18.9325C6.00674 18.9325 4.86702 15.5837 4.58721 14.0916C4.34152 12.7683 4.29375 11.0804 4.37565 9.21695C4.38247 9.18319 4.34835 9.14944 4.31423 9.14944C3.18816 9.12918 1.25679 8.96714 0.0556499 8.83886C0.0215267 8.83211 -0.00577186 8.79835 0.00105278 8.76459C0.0202672 8.57767 0.0815572 8.01762 0.145436 7.43391C0.217688 6.77367 0.293253 6.08317 0.314986 5.86817C0.321811 5.82766 0.355934 5.80065 0.390057 5.8074C1.57072 5.93568 2.98342 6.06396 4.58039 6.11122C4.62133 6.11122 4.64863 6.08422 4.65546 6.05046C4.90797 3.95072 5.25603 1.87798 5.56996 0.0550542C5.57678 0.0212963 5.61091 -0.00571007 5.64503 0.00104151C6.04769 0.0685573 8.14967 0.426391 8.5455 0.493907C8.57963 0.500659 8.60693 0.534416 8.6001 0.568174C8.58712 0.644346 8.57408 0.720782 8.561 0.797473C8.27843 2.45416 7.97562 4.22956 7.75384 6.02345C7.74702 6.06396 7.78114 6.09772 7.82209 6.09772C9.09147 6.05046 10.4291 5.94243 11.8282 5.75339C11.8623 5.75339 11.8964 5.77364 11.9032 5.81415L12.2991 8.69033C12.2991 8.72409 12.2718 8.75784 12.2376 8.76459C10.5724 8.99415 8.57963 9.14268 7.50816 9.15619C7.47403 9.15619 7.44674 9.18319 7.44674 9.21695C7.35119 10.682 7.38531 12.0931 7.54228 13.1261C7.70607 14.2064 8.17697 15.874 9.54873 15.874C11.2412 15.874 13.6913 11.6678 13.4251 4.46384C13.4126 4.11618 13.3827 3.35608 13.3528 2.59428C13.3176 1.69912 13.2824 0.801614 13.275 0.568174C13.275 0.534416 13.2955 0.50741 13.3296 0.500659C13.5487 0.46125 14.363 0.325228 15.0886 0.204037C15.606 0.117602 16.0784 0.0387106 16.2573 0.00779309C16.2983 0.00104151 16.3392 0.0280478 16.3392 0.0685573L16.8989 12.5657C16.8989 12.5995 16.9466 12.613 16.9603 12.5792L20.4886 5.77364C20.4954 5.74664 20.5296 5.73313 20.5569 5.73989C20.9186 5.80065 23.1434 6.17874 23.5597 6.25301C23.5938 6.25976 23.6211 6.30027 23.6143 6.33403C23.3277 7.87339 23.0001 10.601 23.2321 12.6333C23.4778 14.8208 24.0374 15.9078 24.9383 15.9078C25.3887 15.9078 25.6344 15.8132 25.7368 15.766C25.7641 15.7525 25.7777 15.7187 25.7641 15.685C25.0065 14.0781 24.8837 12.1809 25.1362 10.7563C25.4024 9.25746 26.8492 5.42256 30.1455 5.8074C33.4896 6.19899 33.4486 9.78408 33.2575 11.0871C32.9231 13.3354 31.2033 15.4959 30.9235 15.8403C30.903 15.8605 30.9167 15.8943 30.944 15.8943C33.4213 16.1373 34.2198 12.7615 34.329 12.2552C34.3358 12.2147 34.3699 12.1944 34.4041 12.2011ZM28.4462 14.0646C29.0467 13.4704 29.8111 11.9378 29.9817 11.4112C30.3093 10.3985 30.4117 8.90638 29.7565 8.82536C29.0058 8.72409 28.3028 10.2027 28.1459 11.3032C28.0367 12.0796 28.064 13.1396 28.3916 14.0511C28.3984 14.0781 28.4257 14.0848 28.4462 14.0646Z" fill="var(--ink)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M84.067 12.1877L86.9607 12.6603C86.9948 12.667 87.0221 12.7008 86.9743 12.7683C86.6877 14.3077 85.0429 18.9865 81.2211 18.9865C78.7301 18.9865 77.4608 16.7112 77.0718 14.9693C76.7305 13.4299 76.6213 11.5192 76.6418 9.55454C76.6418 9.53428 76.6282 9.52078 76.6077 9.52078C75.5089 9.52078 74.4443 9.48702 73.4274 9.43976C73.4001 9.43976 73.3865 9.47352 73.4001 9.49377C74.9493 11.4787 75.2837 14.0443 75.038 15.3676C74.7855 16.7585 73.6526 18.9932 71.4482 18.9932C68.9777 18.9932 67.6879 17.0893 67.3193 16.4749C67.3057 16.4547 67.2716 16.4547 67.2579 16.4817C67.0668 16.9138 66.1114 19 63.6409 19C59.901 19 59.3823 14.7465 59.2731 13.3759C59.2663 13.3422 59.2185 13.3287 59.2048 13.3624L56.4409 18.9527C56.4272 18.9797 56.3931 18.9932 56.3658 18.9865L53.4312 18.4869C53.3971 18.4801 53.3766 18.4531 53.3766 18.4194L53.3698 16.5154C53.3698 16.4817 53.3288 16.4682 53.3084 16.4952C51.923 18.2843 49.8141 19.0068 48.1762 18.9865C46.4359 18.9595 44.7844 18.0008 43.3512 16.6369C43.3307 16.6167 43.2966 16.6302 43.2966 16.6572L43.1192 18.9122C43.1123 18.9527 43.0782 18.9797 43.0373 18.973L40.1027 18.4801C40.0686 18.4734 40.0481 18.4396 40.0481 18.4059C40.0798 17.9672 40.2992 15.3233 40.416 13.9167C40.4502 13.5047 40.4756 13.1988 40.4849 13.0856C40.4849 13.0519 40.478 13.0248 40.4576 12.9978C39.5567 11.7285 37.8983 8.85237 37.2159 7.44804C37.2022 7.42104 37.2159 7.38728 37.2431 7.36702C37.5707 7.16448 39.3929 6.01671 39.7137 5.81416C39.741 5.80066 39.7819 5.80066 39.8024 5.82766C40.1573 6.22601 40.5941 6.71212 40.9353 7.01594C40.9558 7.0362 40.9899 7.02269 40.9899 6.99569L41.5631 0.0955709C41.57 0.0550614 41.6041 0.0280551 41.645 0.0348067L44.5319 0.514169C44.566 0.520921 44.5865 0.554679 44.5865 0.588436L43.9722 8.27849C43.9722 8.29199 43.9859 8.31225 43.9995 8.31225C47.2481 8.94689 48.5652 6.86066 48.9884 5.07824C49.002 5.03773 49.0361 5.01747 49.0703 5.02423L51.9571 5.5576C51.998 5.56435 52.0185 5.59811 52.0117 5.63862C51.3156 8.40677 50.0257 9.6018 48.8177 10.439C47.1662 11.5868 44.566 11.6475 42.894 11.1682C42.8667 11.1547 42.8462 11.1884 42.8598 11.2154C43.8494 12.7008 46.1493 15.955 48.5857 15.9078C52.4949 15.8286 53.0589 8.72427 53.2736 6.02083C53.2785 5.95856 53.2833 5.89863 53.2879 5.84117C53.2947 5.80066 53.3288 5.77365 53.3698 5.7804L56.3521 6.27327C56.3863 6.28002 56.4067 6.30703 56.4067 6.34078V8.1097L56.4272 11.9378C56.4272 11.9716 56.4818 11.9851 56.4955 11.9513L59.5666 5.80741C59.5802 5.78715 59.6143 5.7669 59.6416 5.77365L62.583 6.25977C62.6172 6.25977 62.6376 6.29352 62.6376 6.32728C62.6303 6.42968 62.6188 6.58012 62.6044 6.76807C62.4983 8.15394 62.236 11.5789 62.3442 12.8156L62.3497 12.878C62.4522 14.0312 62.616 15.874 63.675 15.874C64.5008 15.874 64.9034 14.2401 65.0945 13.2206C65.504 11.0804 65.8043 6.44206 65.8384 5.84117C65.8384 5.80741 65.8725 5.78715 65.9066 5.78715C68.4386 6.04372 73.6253 6.50957 76.7783 6.46231C76.7919 6.46231 76.8056 6.44881 76.8056 6.43531C76.9694 4.09926 77.256 1.81722 77.5358 0.0820678C77.5427 0.0415583 77.5768 0.0213035 77.6109 0.0280551C77.8999 0.0782153 79.1382 0.284893 79.9208 0.415522C80.1916 0.46072 80.4079 0.496813 80.5114 0.514169C80.5455 0.520921 80.5728 0.554679 80.566 0.588436C80.3135 2.16831 80.0541 4.20053 79.8972 6.32053C79.8972 6.34078 79.9108 6.35429 79.9313 6.35429C81.5487 6.24626 83.2139 6.11123 84.8928 5.77365C84.9337 5.7669 84.9679 5.79391 84.9747 5.82766L85.5616 8.67008C85.5684 8.71059 85.5411 8.74435 85.507 8.7511C83.5688 9.13594 81.6443 9.29798 79.7811 9.406C79.7607 9.406 79.747 9.41951 79.747 9.43976C79.7197 11.3167 79.8153 13.0248 80.1019 14.2874C80.2384 14.895 80.6001 15.8875 81.2416 15.8875C82.8317 15.8875 83.794 13.2544 83.9851 12.2417C83.9919 12.2079 84.0329 12.1809 84.067 12.1877ZM69.2917 13.5852C69.6192 14.5305 70.5269 16.2454 71.537 15.8943C72.4446 15.5769 72.001 13.1666 71.5301 12.1944C70.9569 11.0399 70.0014 10.0001 68.8071 9.32498C68.7798 9.31148 68.7525 9.32498 68.7525 9.35199C68.7593 10.8036 68.8481 12.3092 69.2917 13.5852Z" fill="var(--ink)"/></svg>
+    <div class="chips" data-story-anchor="context-chips">
       <button type="button" class="hchip hchip-btn" id="chip-date" aria-label="Wedding date details"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg> 9/20/26</button><button type="button" class="hchip hchip-btn hchip-guests" id="chip-guests" aria-label="Guest count"><svg class="i i-blue" aria-hidden="true"><use href="#i-people"/></svg> <span id="chip-guests-num">125</span>&nbsp;guests</button>
       <button type="button" class="hchip hchip-btn hchip-location" id="chip-location" aria-label="Location details"><svg class="i i-red" aria-hidden="true"><use href="#i-pin"/></svg> Columbus, OH</button>
       <button type="button" class="hchip hchip-btn" id="chip-budget" aria-label="Open budget overview"><svg class="i i-pink" aria-hidden="true"><use href="#i-piggy"/></svg> <b id="chip-spent">$17.5k</b> <small>spent</small> | <b id="chip-goal">$40k</b> <small>budget</small></button>
@@ -842,14 +843,14 @@
     <aside id="panel" hidden aria-label="Details panel"></aside>
     <div id="interstitial" hidden></div>
   </main>
-  <div id="concept-pill"><span class="pill-text">Concept prototype — not affiliated with any marketplace · </span><span class="pill-short" aria-hidden="true">Concept · </span><button id="restart">Restart</button></div>
+  <div id="concept-pill"><span class="pill-text">Concept prototype · </span><span class="pill-short" aria-hidden="true">Concept · </span><button id="restart">Restart</button></div>
   <script type="module">
     // the bow — model layer for the agentic wedding-marketplace concept.
 // Whitelabeled: never reference the real client's brand anywhere in this file.
 
 const BRAND = {
   name: 'the bow',
-  disclaimer: 'Concept prototype — not affiliated with any marketplace',
+  disclaimer: 'Concept prototype',
   cream: '#FBF1E6', ink: '#171719', card: '#FFFFFF',
   pink: '#FF3EB4',        // decorative pink — chips/segments/gradients only, NOT for white text fills
   // pinkCTA: #FF3EB4 darkened (HSL lightness 62.16% → 44.16%, -18 pts in 1-pt
@@ -1529,7 +1530,12 @@ const PHOTOS = {
     const chipGoalEl = document.getElementById('chip-goal');
     const statVendorsEl = document.getElementById('stat-vendors');
 
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // reducedMotion is a `let`: story-mode seeks (see the story-hook section at
+    // the bottom) temporarily force it on to reuse the engine's instant render
+    // path, then restore the OS preference. All beat logic reads it live.
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let reducedMotion = prefersReducedMotion;
+    let storyInstant = false; // true only while a story seek is replaying beats
     const wait = ms => new Promise(r => setTimeout(r, reducedMotion ? 0 : ms));
 
     // ---- state ---------------------------------------------------------------
@@ -1627,7 +1633,16 @@ const PHOTOS = {
       streamEl.replaceChildren(t.el);
       return t;
     }
-    function scrollStreamToBottom() {
+    // Stick-to-bottom, chat-app style: follow the stream only when the reader
+    // is already at (or near) the bottom. If a block renderer anchored the view
+    // higher up (reply cards) or the user scrolled back, new content streaming
+    // in below must not yank the view down. force=true is for beat starts
+    // (user bubble / typing indicator), where jumping to the action is correct.
+    function scrollStreamToBottom(force = false) {
+      if (!force) {
+        const dist = streamEl.scrollHeight - streamEl.scrollTop - streamEl.clientHeight;
+        if (dist > 160) return;
+      }
       streamEl.scrollTop = streamEl.scrollHeight;
     }
 
@@ -1684,7 +1699,7 @@ const PHOTOS = {
         setTimeout(() => { btn.style.opacity = '1'; }, i * 40);
       });
       host.appendChild(group);
-      scrollStreamToBottom();
+      scrollStreamToBottom(); // no-op if the reader has scrolled up (guard built in)
     }
     // ---- shared focus-trap helper (panel + reply modal) ------------------
     function getFocusable(container) {
@@ -2050,6 +2065,7 @@ const PHOTOS = {
       container.appendChild(p0);
 
       const ol = document.createElement('ol');
+      ol.dataset.storyAnchor = 'composer-draft'; // case-study anchor: the gap-targeted questions
       COMPOSER.body.slice(1, 6).forEach(line => {
         const li = document.createElement('li');
         li.textContent = liveText(line.replace(/^\d+\.\s*/, ''));
@@ -2091,6 +2107,7 @@ const PHOTOS = {
       const sendBtn = document.createElement('button');
       sendBtn.type = 'button';
       sendBtn.className = 'composer-send';
+      sendBtn.dataset.storyAnchor = 'approval-send'; // case-study anchor: the human-approval boundary
 
       // recipients + send pinned to the panel bottom; the message scrolls above
       // (author 2026-07-17) — footer is a sibling of the scrolling body
@@ -2592,7 +2609,7 @@ const PHOTOS = {
       el.className = 'msg msg-user';
       el.textContent = liveText(text); // always textContent — never render user input as markup
       container.appendChild(el);
-      scrollStreamToBottom();
+      scrollStreamToBottom(true); // beat start — always jump to the new exchange
     }
 
     async function showTyping(container) {
@@ -2601,6 +2618,9 @@ const PHOTOS = {
       el.className = 'msg msg-agent typing';
       el.innerHTML = '<span></span><span></span><span></span>';
       container.appendChild(el);
+      // not forced: on user-initiated beats the bubble above already jumped the
+      // view (guard passes); on autoGoto tails (e.g. recommendation after the
+      // reply cards) the indicator must not yank an anchored reader down
       scrollStreamToBottom();
       await wait(600);
       el.remove();
@@ -2677,6 +2697,7 @@ const PHOTOS = {
       VENUES.forEach(v => {
         const card = document.createElement('div');
         card.className = 'carousel-card';
+        if (VENUES.indexOf(v) === 0) card.dataset.storyAnchor = 'venue-card'; // case-study anchor: the structured comparison surface
         card.tabIndex = 0;
         card.setAttribute('role', 'button');
         card.setAttribute('aria-label', `Open ${v.name}`);
@@ -2881,9 +2902,11 @@ const PHOTOS = {
 
     async function renderReplyCards(container) {
       const replied = VENUES.filter(v => v.replied);
+      const cards = [];
       for (const v of replied) {
         const card = document.createElement('div');
         card.className = 'reply-card';
+        cards.push(card);
         // left: photo + meta
         const left = document.createElement('div');
         left.className = 'reply-meta-col';
@@ -2909,6 +2932,9 @@ const PHOTOS = {
 
         const accessRow = document.createElement('div');
         accessRow.className = 'access-row reply-line';
+        // story anchor: the card whose reply REFUTED the listing (no elevator) is
+        // the case study's evidence exhibit — verified answers vs assumed data
+        if (v.access === 'none') accessRow.dataset.storyAnchor = 'access-evidence';
         const accessLabel = document.createElement('strong');
         accessLabel.textContent = 'Accessibility Overview: ';
         accessRow.appendChild(accessLabel);
@@ -2928,6 +2954,7 @@ const PHOTOS = {
         viewBtn.type = 'button';
         viewBtn.className = 'btn-outline';
         viewBtn.textContent = 'View full reply';
+        if (v.id === 'willow') viewBtn.dataset.storyAnchor = 'reply-source'; // case-study anchor: sources one click away
         viewBtn.addEventListener('click', () => { replyPanelVenue = v; lastChipTrigger = viewBtn; applyPanel('reply'); });
         actions.appendChild(viewBtn);
 
@@ -2946,8 +2973,18 @@ const PHOTOS = {
         card.appendChild(right);
         container.appendChild(card);
       }
-      scrollStreamToBottom();
-      await wait(0);
+      // reveal: DON'T jump to the bottom of the list — anchor the reading
+      // position at its start (summary text + first card), then stagger the
+      // cards in below; the reader scrolls down through them at their own pace
+      // (author 2026-07-20)
+      if (reducedMotion) { cards.forEach(c => c.classList.add('show')); return; }
+      await wait(0); // let the opacity:0 state paint before transitioning
+      cards[0]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      for (const card of cards) {
+        card.classList.add('show');
+        await wait(140);
+      }
+      await wait(360); // let the last card's fade settle before chips render
     }
 
     // ---- recommendationHeading ---------------------------------------------
@@ -3323,28 +3360,25 @@ const PHOTOS = {
           break;
         }
         case 'interstitial':
-          showInterstitial(eff.variant); // fire-and-forget; overlay blocks input meanwhile
+          // story seeks pose the target state — time-passing overlays are noise there
+          if (!storyInstant) showInterstitial(eff.variant); // fire-and-forget; overlay blocks input meanwhile
           break;
       }
     }
 
     // ---- booking-finale wordmark payoff --------------------------------------
-    // The header wordmark's hand-drawn bow glyph (the <g> of 3 paths appended
-    // after the "the bow" text) redraws itself once via a stroke-dasharray
-    // draw-on, timed to the booked-finale beat's first text block appearing.
-    // Single play only — this is called once, from go()'s fresh-render path.
+    // The header logo wipes itself on left-to-right (a clip-path inset reveal),
+    // timed to the booked-finale beat's first text block appearing. Single play
+    // only — called once from go()'s fresh-render path. (The filled logo can't
+    // stroke-draw like the old hand-drawn glyph, so the reveal is a wipe.)
     function playWordmarkRedraw() {
       if (reducedMotion) return;
-      const bowPaths = document.querySelectorAll('#wordmark g path');
-      bowPaths.forEach(p => {
-        const len = p.getTotalLength();
-        p.style.transition = 'none';
-        p.style.strokeDasharray = String(len);
-        p.style.strokeDashoffset = String(len);
-        p.getBoundingClientRect(); // force reflow so the 0% state paints before transitioning
-        p.style.transition = 'stroke-dashoffset .8s ease';
-        p.style.strokeDashoffset = '0';
-      });
+      const wm = document.getElementById('wordmark');
+      wm.style.transition = 'none';
+      wm.style.clipPath = 'inset(0 100% 0 0)'; // hidden, clipped from the right edge
+      wm.getBoundingClientRect(); // force reflow so the clipped state paints first
+      wm.style.transition = 'clip-path .9s ease';
+      wm.style.clipPath = 'inset(0 0 0 0)'; // wipe open to full width
     }
 
     // ---- go() — the single entry point --------------------------------------
@@ -3361,6 +3395,10 @@ const PHOTOS = {
 
       const gen = ++currentGen; // this navigation supersedes any in-flight chain
       const stale = () => gen !== currentGen;
+
+      // story hook: when embedded (case-study page), announce every navigation
+      // so the parent can keep its stage indicator in sync with free interaction
+      if (window.parent !== window) window.parent.postMessage({ bowStory: 'beat', id }, '*');
 
       if (!beat.thread) {
         // home-type beat (home, home-responded): no chat thread to render
@@ -3385,7 +3423,11 @@ const PHOTOS = {
 
       if (already) {
         const node = t.beatNodes.get(id);
-        node?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+        // story seeks: element-level scroll only — scrollIntoView in a same-
+        // origin iframe also scrolls the PARENT page (the case-study reader)
+        if (storyInstant) {
+          if (node) streamEl.scrollTop = node.getBoundingClientRect().top - streamEl.getBoundingClientRect().top + streamEl.scrollTop - 8;
+        } else node?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
         // chips are already inline in the transcript node — nothing to redo
         applyPanelForBeat(beat);
         // if this beat's autoGoto tail was invalidated before its target rendered
@@ -3403,6 +3445,7 @@ const PHOTOS = {
       const wrap = document.createElement('div');
       wrap.className = 'beat';
       wrap.dataset.beatId = id;
+      wrap.dataset.storyAnchor = 'beat-' + id; // case-study anchor: whole exchange is ring-able
       t.el.appendChild(wrap);
       t.beatNodes.set(id, wrap);
 
@@ -3439,7 +3482,7 @@ const PHOTOS = {
       // interstitial covers it (author 2026-07-17). Real timer, not wait(), so
       // the read beat holds even under reduced motion — it paces content, not
       // motion — mirroring the interstitial's own reduced-motion hold.
-      if ((beat.effects ?? []).some(e => e.e === 'interstitial')) {
+      if (!storyInstant && (beat.effects ?? []).some(e => e.e === 'interstitial')) {
         await new Promise(r => setTimeout(r, INTERSTITIAL_READ_MS));
         if (stale()) return;
       }
@@ -3574,14 +3617,13 @@ const PHOTOS = {
       interstitialEl.hidden = true;
       document.querySelector('.chat-badge')?.classList.remove('pulse');
       suggestionsEl.classList.remove('open');
-      // cancel an in-flight finale bow redraw: clearing the inline styles with
-      // transition:'none' snaps the wordmark back to its resting state instantly;
-      // playWordmarkRedraw() re-sets all of these from scratch on the next run
-      document.querySelectorAll('#wordmark g path').forEach(p => {
-        p.style.transition = 'none';
-        p.style.strokeDasharray = '';
-        p.style.strokeDashoffset = '';
-      });
+      // cancel an in-flight finale wordmark wipe: snap it back to fully-shown
+      // instantly (transition:'none'); playWordmarkRedraw() re-arms it next run
+      {
+        const wm = document.getElementById('wordmark');
+        wm.style.transition = 'none';
+        wm.style.clipPath = '';
+      }
       state = freshState();
       window.__bowRecipients = state.composerRecipients.length;
       prevBudgetAmounts = {};
@@ -3604,6 +3646,48 @@ const PHOTOS = {
       streamEl.setAttribute('aria-busy', 'false');
       showHomeView();
     });
+
+    // ---- story hooks (case-study embed) --------------------------------------
+    // When the-bow-story.html embeds this app in a same-origin iframe, it drives
+    // the scenario by posting {bowStory:'seek', path:[beatIds]}. A seek restarts
+    // the app and replays the path through the engine's instant path (the same
+    // one reduced-motion uses), so the target state lands posed and deterministic.
+    // Presentation logic stays in the story page; this is the only control hook.
+    let storySeekToken = 0; // newest seek wins; superseded replays abandon silently
+    let storyLastPath = null; // last COMPLETED seek path; null = state unknown → full replay
+    async function storySeek(path, panel) {
+      const tok = ++storySeekToken;
+      storyInstant = true;
+      reducedMotion = true;
+      // forward-scroll fast path: when the new path purely extends the last
+      // completed one, play only the new suffix — adjacent story beats flow
+      // without a restart flash. Anything else replays from a clean restart.
+      const isExtension = Array.isArray(storyLastPath)
+        && path.length >= storyLastPath.length
+        && storyLastPath.every((id, i) => path[i] === id);
+      const suffix = isExtension ? path.slice(storyLastPath.length) : path;
+      if (!isExtension) restartBtn.click(); // full deterministic reset (state, panels, transcripts)
+      for (const id of suffix) {
+        if (tok !== storySeekToken) { storyLastPath = null; return; }
+        await go(id); // autoGoto tails (home-responded, recommendation…) replay inside
+      }
+      if (tok !== storySeekToken) { storyLastPath = null; return; }
+      storyLastPath = path.slice();
+      // optional posed panel: the case study may show a panel the interactive
+      // flow opens via direct manipulation (e.g. the venue profile a card
+      // click opens) alongside the chat answer — a pose, not a flow claim
+      if (panel) applyPanel(panel);
+      reducedMotion = prefersReducedMotion;
+      storyInstant = false;
+      window.parent.postMessage({ bowStory: 'seek-done', beat: state.beat }, '*');
+    }
+    if (window.parent !== window) {
+      window.addEventListener('message', e => {
+        const d = e.data;
+        if (d && d.bowStory === 'seek' && Array.isArray(d.path)) storySeek(d.path, d.panel);
+      });
+      window.parent.postMessage({ bowStory: 'ready' }, '*');
+    }
 
     // ---- init -----------------------------------------------------------------
     window.__bowRecipients = state.composerRecipients.length;
