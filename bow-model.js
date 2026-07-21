@@ -501,7 +501,7 @@ export const SCRIPT = {
 
   'booked-finale': {
     thread: 'Willow Shore Lodge — contract & booking',
-    blocks: [{ t: 'text', md: 'It’s official — **Willow Shore Lodge is yours for September 20, 2026.** \u{1F389}\n\nYour deposit is in, the balance is split into two reminders I’ll surface when they’re due, and the rehearsal hour is on the calendar.\n\nHere’s what I’m watching next: catering tasting dates, the tent contingency if the forecast shifts, and your photographer shortlist. Go celebrate — I’ve got the rest.' }],
+    blocks: [{ t: 'text', md: 'It’s official — **Willow Shore Lodge is yours for September 20, 2026.** \u{1F389}\n\nYour deposit is in, the balance is split into two reminders I’ll surface when they’re due, and the rehearsal hour is on the calendar.\n\nHere’s what I’m watching next: catering tasting dates, the tent contingency if the forecast shifts, and your photographer shortlist.\n\nFirst up: I’ve already asked Maya for tasting dates — you’ll have options waiting the next time you stop by. Go celebrate — I’ve got the rest.' }],
     panel: 'budget',
     chips: [{ label: 'Start over from the beginning', goto: 'home' }],
     match: [],
