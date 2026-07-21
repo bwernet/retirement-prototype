@@ -129,16 +129,22 @@
   .rail .sys-anno.show{opacity:1;transform:none}
   @media (prefers-reduced-motion: reduce){ .rail .sys-anno{transition:none;transform:none} }
 
-  /* ---- tutorial tap-dot: marks the click a beat demonstrates ---- */
+  /* ---- tutorial tap-dot: marks the click a beat demonstrates ----
+     The dot rides an invisible HIT AREA sized to the marked element —
+     clicking it advances the story (scrolls to the next beat, so the
+     scroll machinery stays the single driver). ---- */
   .overlay{position:absolute;inset:0;pointer-events:none}
-  .tap-dot{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--pink-cta);box-shadow:0 0 0 3px rgba(255,255,255,.85), 0 2px 8px -1px rgba(22,29,36,.4);transform:translate(-50%,-50%)}
+  .tap-hit{position:absolute;pointer-events:auto;cursor:pointer;background:none;border:0;padding:0;border-radius:10px;opacity:0;transition:opacity .3s ease}
+  .tap-hit.show{opacity:1}
+  .tap-hit:focus-visible{outline:2px solid var(--pink-cta);outline-offset:2px}
+  .tap-dot{position:absolute;top:0;right:0;width:14px;height:14px;border-radius:50%;background:var(--pink-cta);box-shadow:0 0 0 3px rgba(255,255,255,.85), 0 2px 8px -1px rgba(22,29,36,.4);transform:translate(50%,-50%);transition:transform .2s ease}
+  .tap-hit:hover .tap-dot{transform:translate(50%,-50%) scale(1.2)}
   .tap-dot::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(225,0,138,.55);animation:tap-glow 1.9s ease-out infinite}
   @keyframes tap-glow{0%{transform:scale(.55);opacity:.9}70%{transform:scale(1.3);opacity:0}100%{transform:scale(1.3);opacity:0}}
-  .tap-dot.fade{opacity:0;transition:opacity .3s ease}
-  .tap-dot.fade.show{opacity:1}
   @media (prefers-reduced-motion: reduce){
     .tap-dot::after{animation:none;transform:scale(1);opacity:.45}
-    .tap-dot.fade{transition:none}
+    .tap-hit{transition:none}
+    .tap-dot{transition:none}
   }
 
   /* ---- prototype frame: passive exhibit ---- */
@@ -190,7 +196,7 @@
              The interactive version is the full-screen link above. -->
         <iframe id="proto" src="dist/the-bow.html" title="the bow prototype, posed at the current story beat (non-interactive exhibit)" tabindex="-1"></iframe>
       </div>
-      <div class="overlay" id="overlay" aria-hidden="true"></div>
+      <div class="overlay" id="overlay"></div>
     </div>
     <div class="rail" id="rail"></div>
     <div class="m-panel" id="m-panel"></div>
@@ -577,8 +583,20 @@
         a = a.parentElement;
       }
     }
-    dotEl = document.createElement('span');
-    dotEl.className = 'tap-dot fade';
+    dotEl = document.createElement('button');
+    dotEl.type = 'button';
+    dotEl.className = 'tap-hit';
+    dotEl.setAttribute('aria-label', 'Advance to the next story step');
+    const dot = document.createElement('span');
+    dot.className = 'tap-dot';
+    dot.setAttribute('aria-hidden', 'true');
+    dotEl.appendChild(dot);
+    // tapping the marked element advances the story — the scroll to the next
+    // beat's section triggers the seek exactly as reader-scrolling would
+    dotEl.addEventListener('click', () => {
+      const next = Math.min(idx + 1, BEATS.length - 1);
+      sections[next].scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' });
+    });
     overlay.appendChild(dotEl);
     positionTapDot(idx);
     // setTimeout, not rAF: throttled/embedded panes starve rAF entirely
@@ -608,8 +626,10 @@
     }
     if (!visible) { dotEl.style.display = 'none'; return; }
     dotEl.style.display = '';
-    dotEl.style.left = (px * scale) + 'px';
-    dotEl.style.top = (py * scale) + 'px';
+    dotEl.style.left = (r.left * scale) + 'px';
+    dotEl.style.top = (r.top * scale) + 'px';
+    dotEl.style.width = (r.width * scale) + 'px';
+    dotEl.style.height = (r.height * scale) + 'px';
   }
 
   /* ---- scroll-linked scrub: the prototype follows the reader ----
