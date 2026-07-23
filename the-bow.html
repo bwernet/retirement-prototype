@@ -94,7 +94,7 @@
      .askrow/.left/.right flatten via display:contents so the existing markup
      joins the flex row; order pulls the + in front of the input. */
   .askbox{background:#fff;border-radius:20px;padding:8px 12px;display:flex;align-items:center;gap:10px}
-  #ask,#ask-thread{flex:1;min-width:0;order:0;border:0;resize:none;font-size:17px;outline:none;font-family:'Figtree';background:transparent;height:26px;min-height:26px;line-height:26px}
+  #ask,#ask-thread{flex:1;min-width:0;order:0;border:0;resize:none;overflow:hidden;font-size:17px;outline:none;font-family:'Figtree';background:transparent;height:26px;min-height:26px;line-height:26px}
   #ask::placeholder,#ask-thread::placeholder{color:#9B9B9B}
   .askrow,.askrow .left,.askrow .right{display:contents}
   .askrow .left .icon-btn{order:-1}
@@ -549,14 +549,17 @@
     #canvas{grid-column:1;padding:10px 12px calc(56px + 16px)}
     #canvas,#canvas.panel-open{grid-template-columns:minmax(0,1fr) 0px}
     #home{padding:24px 18px}
-    /* hero: compact stats (2-up wrap, no chevrons) + smaller headers */
+    /* hero: stats become a single line of chips (scrolls if it must,
+       centers when it fits) + smaller headers */
     .days{font-size:10.5px;margin-bottom:12px}
-    .stats{gap:6px 16px;margin-bottom:22px}
+    .stats{flex-wrap:nowrap;gap:6px;margin-bottom:22px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+    .stats::-webkit-scrollbar{display:none}
     .stats .chevron{display:none}
-    .stat{gap:5px}
-    .stat .val{font-size:15px}
-    .stat .lbl{font-size:11.5px}
-    .stat .i{width:15px;height:15px}
+    .stats{justify-content:safe center}
+    .stat{flex:0 0 auto;align-items:center;gap:5px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+    .stat .val{font-size:13.5px}
+    .stat .lbl{font-size:10.5px;white-space:nowrap}
+    .stat .i{width:14px;height:14px}
     h1{font-size:25px}
     #home h2{font-size:16.5px}
     .cards{grid-template-columns:1fr}
