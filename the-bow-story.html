@@ -617,6 +617,9 @@
     });
     overlay.appendChild(dotEl);
     positionTapDot(idx);
+    // second pass after the panel slide-in (0.42s): a dot whose anchor was
+    // mid-transition at settle (e.g. the composer send button) lands correctly
+    setTimeout(() => { if (idx === shownBeat) positionTapDot(idx); }, 650);
     // setTimeout, not rAF: throttled/embedded panes starve rAF entirely
     setTimeout(() => dotEl?.classList.add('show'), 30);
   }

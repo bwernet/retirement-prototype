@@ -1514,7 +1514,9 @@
       renderRecipients();
       window.__bowRecipients = state.composerRecipients.length;
 
-      sendBtn.addEventListener('click', () => go('messages-sent'));
+      // sending completes the composer's job — close it so the confirmation
+      // streams full-width instead of looking stuck behind the panel
+      sendBtn.addEventListener('click', () => { applyPanel(null); go('messages-sent'); });
     }
 
     // ---- panel: budget (Task 9) ------------------------------------------------
