@@ -417,11 +417,15 @@ customInput.addEventListener('change', e => {
    Above the mobile breakpoint the whole composition scales down uniformly
    (CSS zoom) to fit BOTH the frame's width and height, so it never crops in
    a fixed-height iframe. At/below the breakpoint we drop the zoom and let the
-   stacked mobile layout (see the max-width:860px media query) scroll. */
+   stacked mobile layout (see the max-width:860px media query) scroll — except
+   the phone, which keeps its fixed design width and zooms down when the
+   viewport is too narrow for it (its internals never reflow). */
 const DESIGN_W = 1120;  // .wrap natural width (max-width)
 const DESIGN_H = 858;   // .wrap natural height at DESIGN_W
 const MOBILE_BP = 860;  // matches the CSS media query — mobile at <= this width
 const PAD_X = 48, PAD_Y = 36;  // body padding (24*2 horizontal, 20+16 vertical)
+const PHONE_W = 336;    // #phone fixed width
+const MOBILE_PAD_X = 32;  // mobile body padding (16*2, see media query)
 const wrapEl = document.querySelector('.wrap');
 
 function fitScale() {
@@ -430,9 +434,13 @@ function fitScale() {
     const availH = window.innerHeight - PAD_Y;
     wrapEl.style.width = DESIGN_W + 'px';  // fixed design width; zoom does the shrinking
     wrapEl.style.zoom = Math.min(1, availW / DESIGN_W, availH / DESIGN_H);
+    phone.style.zoom = '';
   } else {
     wrapEl.style.width = '';  // revert to CSS (max-width + mobile rules), no zoom
     wrapEl.style.zoom = '';
+    // clientWidth, not innerWidth: excludes any scrollbar, so the phone
+    // never overlaps the right body padding
+    phone.style.zoom = Math.min(1, (document.documentElement.clientWidth - MOBILE_PAD_X) / PHONE_W);
   }
 }
 
