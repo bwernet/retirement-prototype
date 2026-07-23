@@ -599,7 +599,7 @@
         // scrub only the tail of the scroller, starting at this anchor — the
         // beat reads ITS OWN exchange end-to-end instead of rewinding the thread
         const el = doc.querySelector(`[data-story-anchor="${b.scrubFrom}"]`);
-        if (el) scrubFromPx = Math.max(0, el.getBoundingClientRect().top - scrubScroller.getBoundingClientRect().top + scrubScroller.scrollTop - 10);
+        if (el) scrubFromPx = Math.max(0, el.getBoundingClientRect().top - scrubScroller.getBoundingClientRect().top + scrubScroller.scrollTop - 18);
       }
       scrubTick(); // sync to current progress (the follower eases the catch-up)
     }
@@ -722,7 +722,7 @@
       const doc = scrubScroller.ownerDocument;
       const el = doc.querySelector(`[data-story-anchor="${b.scrubFrom}"]`);
       if (!el) return;
-      scrubFromPx = Math.max(0, el.getBoundingClientRect().top - scrubScroller.getBoundingClientRect().top + scrubScroller.scrollTop - 10);
+      scrubFromPx = Math.max(0, el.getBoundingClientRect().top - scrubScroller.getBoundingClientRect().top + scrubScroller.scrollTop - 18);
       scrubFromResolved = true;
     }
     const [g0, g1] = SCRUB_GROUP[shownBeat];
@@ -735,7 +735,11 @@
     // around p≈0.78 and cut off the conversation's ending.
     const mid = window.scrollY + window.innerHeight / 2;
     const reachableEnd = Math.min(top + height, document.documentElement.scrollHeight - window.innerHeight / 2);
-    const p = Math.min(1, Math.max(0, (mid - top) / Math.max(1, reachableEnd - top)));
+    let p = Math.min(1, Math.max(0, (mid - top) / Math.max(1, reachableEnd - top)));
+    // scrubFrom beats: hold the question in place (just under the thread
+    // title) through the first stretch of the section, so activating a beat
+    // never scrolls the question up under the header — then read on
+    if (b.scrubFrom) p = Math.max(0, (p - 0.22) / 0.78);
     const max = scrubScroller.scrollHeight - scrubScroller.clientHeight;
     if (max <= 0) return;
     scrubTargetPx = scrubFromPx + p * Math.max(0, max - scrubFromPx);
