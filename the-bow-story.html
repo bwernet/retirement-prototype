@@ -535,6 +535,7 @@
     overlay.replaceChildren();
     renderBeatPanel(idx);
     scrubTargetPx = null; scrubFromPx = 0;
+    scrubFromResolved = !BEATS[idx].scrubFrom;
     clearTimeout(followTimer); followTimer = null;
     scrubScroller = (protoReady && BEATS[idx].scrub)
       ? proto.contentDocument?.querySelector(BEATS[idx].scrubTarget ?? '#stream') ?? null
@@ -578,6 +579,7 @@
     if (b.scrub) {
       scrubScroller = doc?.querySelector(b.scrubTarget ?? '#stream') ?? null; // cached for the beat
       scrubFromPx = 0;
+      scrubFromResolved = true;
       if (b.scrubFrom && scrubScroller) {
         // scrub only the tail of the scroller, starting at this anchor — the
         // beat reads ITS OWN exchange end-to-end instead of rewinding the thread
@@ -684,6 +686,7 @@
   });
   let scrubScroller = null;
   let scrubFromPx = 0;
+  let scrubFromResolved = true; // false while a scrubFrom anchor hasn't streamed in yet
   let scrubTargetPx = null;
   let followTimer = null;
   function scrubTick() {
@@ -694,6 +697,17 @@
     // stick-to-bottom yields whenever the reader isn't at the bottom.)
     // Restart replays still gate: no scrubbing a mid-rebuild transcript.
     if (seeking && !seekForward) return;
+    // scrubFrom beats: the range starts at the beat's own exchange. Until that
+    // anchor exists in the DOM (its wrap is created at stream start), HOLD the
+    // current position — computing with from=0 eased the view to the top of
+    // the thread and back, the reported bounce (author 2026-07-21).
+    if (!scrubFromResolved) {
+      const doc = scrubScroller.ownerDocument;
+      const el = doc.querySelector(`[data-story-anchor="${b.scrubFrom}"]`);
+      if (!el) return;
+      scrubFromPx = Math.max(0, el.getBoundingClientRect().top - scrubScroller.getBoundingClientRect().top + scrubScroller.scrollTop - 10);
+      scrubFromResolved = true;
+    }
     const b = BEATS[shownBeat];
     if (!b.scrub) return;
     const [g0, g1] = SCRUB_GROUP[shownBeat];
