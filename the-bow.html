@@ -2769,21 +2769,6 @@
       }
     }
 
-    // ---- booking-finale wordmark payoff --------------------------------------
-    // The header logo wipes itself on left-to-right (a clip-path inset reveal),
-    // timed to the booked-finale beat's first text block appearing. Single play
-    // only — called once from go()'s fresh-render path. (The filled logo can't
-    // stroke-draw like the old hand-drawn glyph, so the reveal is a wipe.)
-    function playWordmarkRedraw() {
-      if (reducedMotion) return;
-      const wm = document.getElementById('wordmark');
-      wm.style.transition = 'none';
-      wm.style.clipPath = 'inset(0 100% 0 0)'; // hidden, clipped from the right edge
-      wm.getBoundingClientRect(); // force reflow so the clipped state paints first
-      wm.style.transition = 'clip-path .9s ease';
-      wm.style.clipPath = 'inset(0 0 0 0)'; // wipe open to full width
-    }
-
     // ---- go() — the single entry point --------------------------------------
     function isRendered(id) {
       const b = SCRIPT[id];
@@ -2872,10 +2857,6 @@
 
       await showTyping(wrap);
       if (stale()) return abort();
-
-      // finale payoff: the wordmark's bow glyph redraws itself once, synced
-      // to this beat's first text block appearing (single play, first visit only)
-      if (id === 'booked-finale') playWordmarkRedraw();
 
       for (const block of beat.blocks ?? []) {
         await renderBlock(wrap, block, stale, beat);
@@ -3024,13 +3005,6 @@
       interstitialEl.hidden = true;
       document.querySelector('.chat-badge')?.classList.remove('pulse');
       suggestionsEl.classList.remove('open');
-      // cancel an in-flight finale wordmark wipe: snap it back to fully-shown
-      // instantly (transition:'none'); playWordmarkRedraw() re-arms it next run
-      {
-        const wm = document.getElementById('wordmark');
-        wm.style.transition = 'none';
-        wm.style.clipPath = '';
-      }
       state = freshState();
       bookingCelebrated = false;
       window.__bowRecipients = state.composerRecipients.length;
