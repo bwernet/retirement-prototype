@@ -62,13 +62,13 @@
 
   /* ---- intro: slim link row only — the embedding page supplies its own
      title and framing copy (author 2026-07-21) ---- */
-  .intro{max-width:1560px;margin:0 auto;padding:10px 20px 4px;display:flex;justify-content:flex-end}
+  .intro{max-width:1400px;margin:0 auto;padding:10px 20px 4px;display:flex;justify-content:flex-end}
   .intro .fullscreen-link{font-size:13px;font-weight:600;color:var(--gray);text-decoration:underline;text-underline-offset:3px}
   .intro .fullscreen-link:hover{color:var(--ink)}
 
   /* ---- chapter bar (nav + progress, spans both columns) ---- */
   .stage-bar{position:sticky;top:0;z-index:50;background:var(--canvas);height:var(--bar-h)}
-  .stage-bar .bar-inner{max-width:1560px;margin:0 auto;padding:0 16px;height:100%;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none}
+  .stage-bar .bar-inner{max-width:1400px;margin:0 auto;padding:0 16px;height:100%;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none}
   .stage-bar .bar-inner::-webkit-scrollbar{display:none}
   .stage-pill{flex:0 0 auto;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 11px 5px 6px;font-size:12px;font-weight:600;color:var(--gray);background:var(--card);transition:all .3s ease;white-space:nowrap}
   .stage-pill .dot{width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:var(--soft);color:var(--gray);flex-shrink:0}
@@ -84,7 +84,7 @@
   @media (prefers-reduced-motion: reduce){ .stage-pill{transition:none} }
 
   /* ---- layout: prototype LEFT, narrative RIGHT ---- */
-  .story{max-width:1560px;margin:0 auto;padding:20px 20px 120px;display:grid;grid-template-columns:1fr minmax(230px,300px);gap:32px;align-items:start}
+  .story{max-width:1400px;margin:0 auto;padding:20px 20px 120px;display:grid;grid-template-columns:1fr minmax(230px,300px);gap:32px;align-items:start}
   .narrative{min-width:0}
   .stage-col{min-width:0;position:sticky;top:calc(var(--bar-h) + 16px)}
 
