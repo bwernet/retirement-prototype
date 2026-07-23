@@ -527,6 +527,19 @@
 
   let seekWatchdog = null;
   let seekForward = true; // forward seeks stream (scrub stays available); restarts pose
+  // scrubTick normally runs on scroll events — but the PIN (question to the
+  // top of the chat window) must engage the moment a beat activates, even if
+  // the reader stops scrolling. A light ticker drives it through activation
+  // and streaming, and stops once the beat is settled and pinned.
+  let pinTicker = null;
+  function startPinTicker() {
+    clearInterval(pinTicker);
+    pinTicker = setInterval(() => {
+      if (shownBeat < 0 || !BEATS[shownBeat].scrub) { clearInterval(pinTicker); pinTicker = null; return; }
+      scrubTick();
+      if (scrubFromResolved && !seeking) { clearInterval(pinTicker); pinTicker = null; }
+    }, 200);
+  }
   function showBeat(idx) {
     const prev = shownBeat;
     shownBeat = idx;
@@ -536,6 +549,7 @@
     renderBeatPanel(idx);
     scrubTargetPx = null; scrubFromPx = 0;
     scrubFromResolved = !BEATS[idx].scrubFrom;
+    if (BEATS[idx].scrub) startPinTicker();
     clearTimeout(followTimer); followTimer = null;
     scrubScroller = (protoReady && BEATS[idx].scrub)
       ? proto.contentDocument?.querySelector(BEATS[idx].scrubTarget ?? '#stream') ?? null
@@ -578,6 +592,7 @@
     }
     if (b.scrub) {
       scrubScroller = doc?.querySelector(b.scrubTarget ?? '#stream') ?? null; // cached for the beat
+      if (b.scrubFrom) setTimeout(() => { if (idx === shownBeat && !seeking) { scrubFromResolved = false; scrubTick(); } }, 900); // late re-sync: recompute the from-anchor once layout is final
       scrubFromPx = 0;
       scrubFromResolved = true;
       if (b.scrubFrom && scrubScroller) {
@@ -697,6 +712,8 @@
     // stick-to-bottom yields whenever the reader isn't at the bottom.)
     // Restart replays still gate: no scrubbing a mid-rebuild transcript.
     if (seeking && !seekForward) return;
+    const b = BEATS[shownBeat];
+    if (!b.scrub) return;
     // scrubFrom beats: the range starts at the beat's own exchange. Until that
     // anchor exists in the DOM (its wrap is created at stream start), HOLD the
     // current position — computing with from=0 eased the view to the top of
@@ -708,8 +725,6 @@
       scrubFromPx = Math.max(0, el.getBoundingClientRect().top - scrubScroller.getBoundingClientRect().top + scrubScroller.scrollTop - 10);
       scrubFromResolved = true;
     }
-    const b = BEATS[shownBeat];
-    if (!b.scrub) return;
     const [g0, g1] = SCRUB_GROUP[shownBeat];
     const m = metrics();
     const top = m[g0].top, height = (m[g1].top + m[g1].height) - top;

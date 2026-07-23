@@ -3760,9 +3760,30 @@ const PHOTOS = {
       // interstitial transitions (the overlay IS the transition), and long
       // jumps (suffix > 2 — chapter-pill navigation shouldn't take a minute).
       const streamSuffix = isExtension && !interstitial && suffix.length <= 2;
+      const baseLen = path.length - suffix.length;
       if (streamSuffix) { reducedMotion = prefersReducedMotion; storyInstant = false; }
       for (let i = 0; i < suffix.length; i++) {
-        if (tok !== storySeekToken) { storyLastPath = null; reducedMotion = true; storyInstant = true; return; }
+        if (tok !== storySeekToken) {
+          // superseded mid-replay: remember the beats that COMPLETED so the
+          // next seek continues from here as a suffix — nulling this caused
+          // hidden restart replays whenever the reader advanced while a beat
+          // was still streaming (i.e. at normal reading pace)
+          storyLastPath = path.slice(0, baseLen + i);
+          reducedMotion = true; storyInstant = true;
+          return;
+        }
+        // if this beat is STILL STREAMING from a superseded seek, go() would
+        // no-op — and the very next go() bumps the generation and aborts it,
+        // deleting the half-rendered beat from the transcript for good.
+        // Supersede it deliberately, wait for its abort to drop the partial
+        // wrap, then go() re-renders it cleanly under THIS seek.
+        if (inFlight.has(suffix[i])) {
+          currentGen++;
+          while (inFlight.has(suffix[i])) {
+            if (tok !== storySeekToken) { storyLastPath = path.slice(0, baseLen + i); reducedMotion = true; storyInstant = true; return; }
+            await new Promise(r => setTimeout(r, 80));
+          }
+        }
         await go(suffix[i]); // autoGoto tails (home-responded, recommendation…) replay inside
       }
       if (streamSuffix) { reducedMotion = true; storyInstant = true; }
@@ -3772,7 +3793,7 @@ const PHOTOS = {
       // until every in-flight beat finishes, so the story page never un-gates
       // its scrub against a running stream
       while (inFlight.size) {
-        if (tok !== storySeekToken) { storyLastPath = null; return; }
+        if (tok !== storySeekToken) { storyLastPath = path.slice(); return; } // all beats requested; content settled by the drain of the NEXT seek
         await new Promise(r => setTimeout(r, 120));
       }
       storyLastPath = path.slice();
