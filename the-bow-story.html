@@ -543,7 +543,7 @@
       seekForward = isForward(prev, idx);
       if (!seekForward) box.classList.add('masking'); // dim the restart replay
       seeking = true;
-      proto.contentWindow.postMessage({ bowStory: 'seek', path: BEATS[idx].path, panel: BEATS[idx].panel, interstitial: BEATS[idx].interstitial }, '*');
+      proto.contentWindow.postMessage({ bowStory: 'seek', path: BEATS[idx].path, panel: BEATS[idx].panel, interstitial: BEATS[idx].interstitial, ownScroll: !!BEATS[idx].scrub }, '*');
       // watchdog: a lost seek-done must never freeze the scrub/rail — live
       // beats stream for ~10s, so they get a much longer leash
       clearTimeout(seekWatchdog);
