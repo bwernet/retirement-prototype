@@ -549,17 +549,15 @@
     #canvas{grid-column:1;padding:10px 12px calc(56px + 16px)}
     #canvas,#canvas.panel-open{grid-template-columns:minmax(0,1fr) 0px}
     #home{padding:24px 18px}
-    /* hero: stats become a single line of chips (scrolls if it must,
-       centers when it fits) + smaller headers */
+    /* hero: stats reduce to icon + bold number on one centered line —
+       no labels, no outlines (author 2026-07-21) + smaller headers */
     .days{font-size:10.5px;margin-bottom:12px}
-    .stats{flex-wrap:nowrap;gap:6px;margin-bottom:22px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-    .stats::-webkit-scrollbar{display:none}
+    .stats{flex-wrap:nowrap;gap:20px;margin-bottom:22px;justify-content:center}
     .stats .chevron{display:none}
-    .stats{justify-content:safe center}
-    .stat{flex:0 0 auto;align-items:center;gap:5px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
-    .stat .val{font-size:13.5px}
-    .stat .lbl{font-size:10.5px;white-space:nowrap}
-    .stat .i{width:14px;height:14px}
+    .stats .lbl{display:none}
+    .stat{flex:0 0 auto;align-items:center;gap:6px}
+    .stat .val{font-size:16px}
+    .stat .i{width:16px;height:16px}
     h1{font-size:25px}
     #home h2{font-size:16.5px}
     .cards{grid-template-columns:1fr}
