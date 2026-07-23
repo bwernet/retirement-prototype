@@ -119,12 +119,22 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
 
 /* ---------- responsive ----------
    Above 700px the whole composition scales uniformly (CSS zoom, set in
-   app.js) instead of reflowing; below 700px it stacks, controls under
-   the phone. */
+   app.js) instead of reflowing; below 700px the phone sits on top and the
+   cards become one horizontal snap carousel beneath it. The carousel holds
+   its own copy of every card (rendered in app.js); values stay in sync
+   because updates target every [data-val] copy. */
+.carousel{display:none}
 @media (max-width:700px){
   .stage{grid-template-columns:minmax(0,440px);}
   .phone-wrap{order:0}
-  .rail{order:1;margin-top:0}
+  .rail{display:none}
+  .carousel{order:1;display:flex;align-items:flex-start;gap:16px;
+    overflow-x:auto;scroll-snap-type:x mandatory;
+    margin:0 -32px;padding:8px 32px 24px;   /* bleed to the viewport edge */
+    scroll-padding-left:32px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .carousel::-webkit-scrollbar{display:none}
+  .carousel .card{flex:0 0 84%;max-width:340px;scroll-snap-align:start;}
 }
 </style>
 </head>
@@ -178,6 +188,7 @@ body{font-family:var(--font);font-weight:400;background:var(--page-bg);color:var
     </div></div></div>
   </div>
   <div class="rail rail-right" id="rail-right"></div>
+  <div class="carousel" id="carousel" aria-label="Retirement inputs"></div>
 </main>
 <script type="module" src="app.js"></script>
 </body>

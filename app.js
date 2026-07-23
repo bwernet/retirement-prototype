@@ -88,6 +88,9 @@ function cardHTML(card) {
 
 document.getElementById('rail-left').innerHTML = RAILS.left.map(cardHTML).join('');
 document.getElementById('rail-right').innerHTML = RAILS.right.map(cardHTML).join('');
+// Mobile carousel gets its own copy of every card; only one set is visible at
+// a time (CSS), and value updates hit every copy.
+document.getElementById('carousel').innerHTML = [...RAILS.left, ...RAILS.right].map(cardHTML).join('');
 document.getElementById('sheet').innerHTML = cardHTML(SHEET_CARD);
 
 function updateInputs() {
