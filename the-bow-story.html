@@ -538,7 +538,7 @@
       if (shownBeat < 0 || !BEATS[shownBeat].scrub) { clearInterval(pinTicker); pinTicker = null; return; }
       scrubTick();
       if (scrubFromResolved && !seeking) { clearInterval(pinTicker); pinTicker = null; }
-    }, 200);
+    }, 100);
   }
   function showBeat(idx) {
     const prev = shownBeat;

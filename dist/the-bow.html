@@ -3540,6 +3540,14 @@ const PHOTOS = {
       const userText = opts.userText ?? beat.userBubble;
       if (userText) appendUserBubble(wrap, userText);
 
+      // case-study choreography: when the story page owns scrolling, the
+      // question glides to the top of the chat FIRST — hold here so that
+      // motion completes before the typing indicator and reply begin below
+      if (storyParentScroll && !storyInstant && userText) {
+        await wait(750);
+        if (stale()) return abort();
+      }
+
       await showTyping(wrap);
       if (stale()) return abort();
 
