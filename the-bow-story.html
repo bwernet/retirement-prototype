@@ -273,7 +273,7 @@
         ] },
     ]},
     { chapter: 'The missing answer', beats: [
-      { id: 'gap', path: P3, live: true, panel: 'none', tapDot: 'draft-preview', // the exchange streams in; the draft leads into the composer
+      { id: 'gap', path: P3, panel: 'none', tapDot: 'draft-preview', // chat full-focus; the draft leads into the composer
         text: 'One question remains unresolved: whether Carmella’s family can access every part of the venue. The agent treats the missing information as uncertainty rather than filling in the gap.',
         annotations: [
           { layer: 'human', lead: 'User-provided context', body: 'The accessibility requirement comes directly from the couple and cannot be inferred from listing data.' },
@@ -292,7 +292,7 @@
         annotations: [
           { layer: 'interface', lead: 'Relevant updates resurfaced', body: 'The dashboard highlights new replies without requiring the couple to restart the search.' },
         ] },
-      { id: 'replies', path: P5, scrub: true, live: true, // conversation streams in before scrub takes over
+      { id: 'replies', path: P5, scrub: true,
         text: 'Four replies are organized into the same structure: quote, capacity, rain plan, and accessibility, with each venue’s original response still available.',
         annotations: [
           { layer: 'interface', lead: 'Evidence organized', body: 'Responses are presented in a consistent format while preserving access to the original sources.' },
@@ -526,6 +526,7 @@
   }
 
   let seekWatchdog = null;
+  let seekForward = true; // forward seeks stream (scrub stays available); restarts pose
   function showBeat(idx) {
     const prev = shownBeat;
     shownBeat = idx;
@@ -539,15 +540,16 @@
       ? proto.contentDocument?.querySelector(BEATS[idx].scrubTarget ?? '#stream') ?? null
       : null;
     if (protoReady) {
-      if (!isForward(prev, idx)) box.classList.add('masking'); // dim the restart replay
+      seekForward = isForward(prev, idx);
+      if (!seekForward) box.classList.add('masking'); // dim the restart replay
       seeking = true;
-      proto.contentWindow.postMessage({ bowStory: 'seek', path: BEATS[idx].path, panel: BEATS[idx].panel, live: BEATS[idx].live, interstitial: BEATS[idx].interstitial }, '*');
+      proto.contentWindow.postMessage({ bowStory: 'seek', path: BEATS[idx].path, panel: BEATS[idx].panel, interstitial: BEATS[idx].interstitial }, '*');
       // watchdog: a lost seek-done must never freeze the scrub/rail — live
       // beats stream for ~10s, so they get a much longer leash
       clearTimeout(seekWatchdog);
       seekWatchdog = setTimeout(() => {
         if (seeking) { seeking = false; settleBeat(shownBeat); }
-      }, BEATS[idx].live ? 30000 : 8000);
+      }, seekForward ? 30000 : 8000);
     }
   }
 
@@ -686,11 +688,12 @@
   let followTimer = null;
   function scrubTick() {
     if (shownBeat < 0 || !protoReady || !scrubScroller) return;
-    // live scrub beats stay scrubbable WHILE the conversation streams in —
-    // the growing scrollHeight advances the target continuously, so there is
-    // no post-stream jump and no wait to start reading. (The engine's own
+    // scrub beats stay scrubbable WHILE forward content streams in — the
+    // growing scrollHeight advances the target continuously, so there is no
+    // post-stream jump and no wait to start reading. (The engine's own
     // stick-to-bottom yields whenever the reader isn't at the bottom.)
-    if (seeking && !BEATS[shownBeat].live) return;
+    // Restart replays still gate: no scrubbing a mid-rebuild transcript.
+    if (seeking && !seekForward) return;
     const b = BEATS[shownBeat];
     if (!b.scrub) return;
     const [g0, g1] = SCRUB_GROUP[shownBeat];

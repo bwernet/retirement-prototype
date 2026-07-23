@@ -3728,7 +3728,7 @@ const PHOTOS = {
     // Presentation logic stays in the story page; this is the only control hook.
     let storySeekToken = 0; // newest seek wins; superseded replays abandon silently
     let storyLastPath = null; // last COMPLETED seek path; null = state unknown → full replay
-    async function storySeek(path, panel, live, interstitial) {
+    async function storySeek(path, panel, interstitial) {
       const tok = ++storySeekToken;
       storyInstant = true;
       reducedMotion = true;
@@ -3748,17 +3748,18 @@ const PHOTOS = {
       // replay) and lifts onto the changed state — fire-and-forget, full
       // motion unless the reader prefers reduced motion
       if (interstitial) showInterstitial(interstitial, !prefersReducedMotion);
+      // EVERY forward continuation types in — each new exchange streams the
+      // way it would live (author 2026-07-21: no more some-type-some-pop).
+      // Instant poses remain for: restarts (rewinds of already-read content),
+      // interstitial transitions (the overlay IS the transition), and long
+      // jumps (suffix > 2 — chapter-pill navigation shouldn't take a minute).
+      const streamSuffix = isExtension && !interstitial && suffix.length <= 2;
+      if (streamSuffix) { reducedMotion = prefersReducedMotion; storyInstant = false; }
       for (let i = 0; i < suffix.length; i++) {
-        if (tok !== storySeekToken) { storyLastPath = null; return; }
-        // live:true → the FINAL beat of the seek streams in real time (typing,
-        // staggered cards) while everything before it stays instant; seek-done
-        // fires only after the stream completes, so the story page holds its
-        // scrub until the conversation has fully arrived
-        const playLive = live && i === suffix.length - 1;
-        if (playLive) { reducedMotion = prefersReducedMotion; storyInstant = false; }
+        if (tok !== storySeekToken) { storyLastPath = null; reducedMotion = true; storyInstant = true; return; }
         await go(suffix[i]); // autoGoto tails (home-responded, recommendation…) replay inside
-        if (playLive) { reducedMotion = true; storyInstant = true; }
       }
+      if (streamSuffix) { reducedMotion = true; storyInstant = true; }
       if (tok !== storySeekToken) { storyLastPath = null; return; }
       // a same-path seek can land while an earlier live stream is still
       // rendering (go() re-entry is a no-op on inFlight beats) — hold seek-done
@@ -3780,7 +3781,7 @@ const PHOTOS = {
     if (window.parent !== window) {
       window.addEventListener('message', e => {
         const d = e.data;
-        if (d && d.bowStory === 'seek' && Array.isArray(d.path)) storySeek(d.path, d.panel, d.live, d.interstitial);
+        if (d && d.bowStory === 'seek' && Array.isArray(d.path)) storySeek(d.path, d.panel, d.interstitial);
       });
       window.parent.postMessage({ bowStory: 'ready' }, '*');
     }
