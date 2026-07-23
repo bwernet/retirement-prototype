@@ -253,7 +253,9 @@
         ] },
       { id: 'gathered', path: [], scrub: true, scrubTarget: '#home', scrubGroup: 'dashboard', size: 's', tapDot: 'home-venue-cta',
         text: 'As they scroll, the dashboard explains what changed while they were away: chefs shortlisted, décor gathered, $1,200 saved, and five lake-view venues screened for capacity, accessibility, and availability.',
-        annotations: [] },
+        annotations: [
+          { layer: 'agent', lead: 'Work between sessions', body: 'Searching, shortlisting, and a $1,200 catering renegotiation happened without a prompt. Each card reports completed work, not a suggestion.' },
+        ] },
     ]},
     { chapter: 'The findings', beats: [
       { id: 'findings', path: P1, scrub: true, tapDot: 'venue-card',
@@ -334,10 +336,14 @@
         ] },
       { id: 'flag', path: P8f, scrub: true, size: 's', scrubFrom: 'beat-contract-flag', tapDot: 'chip-negotiate',
         text: 'One issue appears before signing: a $250 peak-Saturday fee that was not included in the original quote. The agent recommends asking for it to be removed and waits for the couple’s approval.',
-        annotations: [] },
+        annotations: [
+          { layer: 'human', lead: 'Approval is scoped', body: 'The earlier yes covered sending questions, not negotiating money. Recommending the fee’s removal is as far as the agent goes alone.' },
+        ] },
       { id: 'contract', path: P8n, panel: 'contract', scrub: true, size: 's', scrubFrom: 'beat-negotiate', tapDot: 'chip-book',
         text: 'The venue agrees to honor the original $7,200 quote. The corrected contract and negotiation history remain in the thread, while the full terms open alongside it. Once everything is available for review, the couple can book.',
-        annotations: [] },
+        annotations: [
+          { layer: 'context', lead: 'A documented record', body: 'The original quote, the added fee, and the venue’s correction all remain in the thread, so the booking references a written $7,200.' },
+        ] },
       { id: 'booked', path: P9, loop: true, scrub: true, scrubFrom: 'beat-book',
         text: 'The venue is booked. The deposit is recorded, reminders are scheduled, and the rehearsal is added to the calendar. The decision also updates the wider planning system: budget, vendor status, checklist, and future recommendations now reflect the new reality.',
         annotations: [
