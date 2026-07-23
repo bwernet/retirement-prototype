@@ -527,19 +527,6 @@
 
   let seekWatchdog = null;
   let seekForward = true; // forward seeks stream (scrub stays available); restarts pose
-  // scrubTick normally runs on scroll events — but the PIN (question to the
-  // top of the chat window) must engage the moment a beat activates, even if
-  // the reader stops scrolling. A light ticker drives it through activation
-  // and streaming, and stops once the beat is settled and pinned.
-  let pinTicker = null;
-  function startPinTicker() {
-    clearInterval(pinTicker);
-    pinTicker = setInterval(() => {
-      if (shownBeat < 0 || !BEATS[shownBeat].scrub) { clearInterval(pinTicker); pinTicker = null; return; }
-      scrubTick();
-      if (scrubFromResolved && !seeking) { clearInterval(pinTicker); pinTicker = null; }
-    }, 100);
-  }
   function showBeat(idx) {
     const prev = shownBeat;
     shownBeat = idx;
@@ -547,13 +534,11 @@
     rail.replaceChildren(); // cards + tap-dot re-render once the seek settles
     overlay.replaceChildren();
     renderBeatPanel(idx);
-    scrubTargetPx = null; scrubFromPx = 0;
-    scrubFromResolved = !BEATS[idx].scrubFrom;
-    if (BEATS[idx].scrub) startPinTicker();
-    clearTimeout(followTimer); followTimer = null;
+    resetPin();
     scrubScroller = (protoReady && BEATS[idx].scrub)
       ? proto.contentDocument?.querySelector(BEATS[idx].scrubTarget ?? '#stream') ?? null
       : null;
+    if (BEATS[idx].scrub && BEATS[idx].scrubFrom) startPin(idx);
     if (protoReady) {
       seekForward = isForward(prev, idx);
       if (!seekForward) box.classList.add('masking'); // dim the restart replay
@@ -592,16 +577,7 @@
     }
     if (b.scrub) {
       scrubScroller = doc?.querySelector(b.scrubTarget ?? '#stream') ?? null; // cached for the beat
-      if (b.scrubFrom) setTimeout(() => { if (idx === shownBeat && !seeking) { scrubFromResolved = false; scrubTick(); } }, 900); // late re-sync: recompute the from-anchor once layout is final
-      scrubFromPx = 0;
-      scrubFromResolved = true;
-      if (b.scrubFrom && scrubScroller) {
-        // scrub only the tail of the scroller, starting at this anchor — the
-        // beat reads ITS OWN exchange end-to-end instead of rewinding the thread
-        const el = doc.querySelector(`[data-story-anchor="${b.scrubFrom}"]`);
-        if (el) scrubFromPx = Math.max(0, el.getBoundingClientRect().top - scrubScroller.getBoundingClientRect().top + scrubScroller.scrollTop - 18);
-      }
-      scrubTick(); // sync to current progress (the follower eases the catch-up)
+      scrubTick(); // no-op on question beats until the pin glide has run
     }
     renderRail(idx);          // annotation cards, below the frame — never over it
     renderTapDot(idx);        // glowing marker on the click this beat demonstrates
@@ -699,65 +675,78 @@
     let e0 = i; while (e0 < BEATS.length - 1 && BEATS[e0 + 1].scrub && BEATS[e0 + 1].scrubGroup === g) e0++;
     return [s0, e0];
   });
+  /* ---- SIMPLE scroll model (author 2026-07-21, replacing the follower/
+     ticker/grace-zone stack that fought itself):
+     — scrubTick writes scrollTop DIRECTLY from page-scroll position: one
+       writer, bidirectional, live. Scrolling back rewinds the transcript so
+       the reader can re-orient; the older conversation is always above.
+     — question beats (scrubFrom) run ONE glide on activation: the question
+       moves to the top of the window (older chat scrolling up, retained),
+       then the reply streams in below it. After the glide, scroll below the
+       activation point reads the reply; scroll above it rewinds history. */
   let scrubScroller = null;
-  let scrubFromPx = 0;
-  let scrubFromResolved = true; // false while a scrubFrom anchor hasn't streamed in yet
-  let scrubTargetPx = null;
-  let followTimer = null;
-  function scrubTick() {
-    if (shownBeat < 0 || !protoReady || !scrubScroller) return;
-    // scrub beats stay scrubbable WHILE forward content streams in — the
-    // growing scrollHeight advances the target continuously, so there is no
-    // post-stream jump and no wait to start reading. (The engine's own
-    // stick-to-bottom yields whenever the reader isn't at the bottom.)
-    // Restart replays still gate: no scrubbing a mid-rebuild transcript.
-    if (seeking && !seekForward) return;
-    const b = BEATS[shownBeat];
-    if (!b.scrub) return;
-    // scrubFrom beats: the range starts at the beat's own exchange. Until that
-    // anchor exists in the DOM (its wrap is created at stream start), HOLD the
-    // current position — computing with from=0 eased the view to the top of
-    // the thread and back, the reported bounce (author 2026-07-21).
-    if (!scrubFromResolved) {
-      const doc = scrubScroller.ownerDocument;
-      const el = doc.querySelector(`[data-story-anchor="${b.scrubFrom}"]`);
-      if (!el) return;
-      scrubFromPx = Math.max(0, el.getBoundingClientRect().top - scrubScroller.getBoundingClientRect().top + scrubScroller.scrollTop - 18);
-      scrubFromResolved = true;
-    }
+  let pinInfo = null;   // { from, pEntry } once the question is pinned
+  let pinTween = null;  // the one-shot glide
+  let pinPoll = null;   // waits for the question's wrap to exist
+  function resetPin() {
+    clearInterval(pinPoll); pinPoll = null;
+    clearTimeout(pinTween); pinTween = null;
+    pinInfo = null;
+  }
+  function sectionP() {
     const [g0, g1] = SCRUB_GROUP[shownBeat];
     const m = metrics();
     const top = m[g0].top, height = (m[g1].top + m[g1].height) - top;
-    // progress through the scrub group (viewport center as the read head).
-    // The span is clamped to what the center can actually REACH — near the
-    // end of the page the center stops innerHeight/2 short of the last
-    // section's bottom, which silently made the final scrub beat top out
-    // around p≈0.78 and cut off the conversation's ending.
+    // span clamps to what the viewport center can actually reach, so the
+    // final section still maps to a full 0..1
     const mid = window.scrollY + window.innerHeight / 2;
     const reachableEnd = Math.min(top + height, document.documentElement.scrollHeight - window.innerHeight / 2);
-    let p = Math.min(1, Math.max(0, (mid - top) / Math.max(1, reachableEnd - top)));
-    // scrubFrom beats: hold the question in place (just under the thread
-    // title) through the first stretch of the section, so activating a beat
-    // never scrolls the question up under the header — then read on
-    if (b.scrubFrom) p = Math.max(0, (p - 0.22) / 0.78);
+    return Math.min(1, Math.max(0, (mid - top) / Math.max(1, reachableEnd - top)));
+  }
+  function scrubTick() {
+    if (shownBeat < 0 || !protoReady || !scrubScroller) return;
+    const b = BEATS[shownBeat];
+    if (!b.scrub) return;
+    if (seeking && !seekForward) return; // no scrubbing a mid-rebuild transcript
+    if (pinTween || pinPoll) return;     // the glide owns the motion until done
+    if (b.scrubFrom && !pinInfo) return; // question not pinned yet — hold
     const max = scrubScroller.scrollHeight - scrubScroller.clientHeight;
     if (max <= 0) return;
-    scrubTargetPx = scrubFromPx + p * Math.max(0, max - scrubFromPx);
-    if (RM) { scrubScroller.scrollTop = scrubTargetPx; positionTapDot(shownBeat); return; } // no added motion under reduced motion
-    ensureFollower();
+    const p = sectionP();
+    let target;
+    if (pinInfo) {
+      const { from, pEntry } = pinInfo;
+      target = p >= pEntry
+        ? from + (pEntry >= 1 ? 1 : (p - pEntry) / (1 - pEntry)) * Math.max(0, max - from)
+        : (pEntry <= 0 ? from : (p / pEntry) * from); // above the entry point: rewind through history
+    } else {
+      target = p * max;
+    }
+    scrubScroller.scrollTop = target;
+    positionTapDot(shownBeat); // same write — the dot never lags the content
   }
-  function ensureFollower() {
-    if (followTimer) return;
-    const step = () => {
-      followTimer = null;
-      if (scrubTargetPx == null || !scrubScroller) return;
-      const d = scrubTargetPx - scrubScroller.scrollTop;
-      if (Math.abs(d) < 0.75) { scrubScroller.scrollTop = scrubTargetPx; positionTapDot(shownBeat); return; }
-      scrubScroller.scrollTop += d * 0.22;
-      positionTapDot(shownBeat); // lockstep — the dot moves in the same frame as the content
-      followTimer = setTimeout(step, 16);
-    };
-    followTimer = setTimeout(step, 16);
+  function startPin(idx) {
+    let tries = 0;
+    pinPoll = setInterval(() => {
+      if (idx !== shownBeat) { clearInterval(pinPoll); pinPoll = null; return; }
+      const doc = proto.contentDocument;
+      const el = doc?.querySelector(`[data-story-anchor="${BEATS[idx].scrubFrom}"]`);
+      if (!el || !scrubScroller) { if (++tries > 40) { clearInterval(pinPoll); pinPoll = null; } return; }
+      clearInterval(pinPoll); pinPoll = null;
+      const from = Math.max(0, el.getBoundingClientRect().top - scrubScroller.getBoundingClientRect().top + scrubScroller.scrollTop - 18);
+      if (RM) { scrubScroller.scrollTop = from; pinInfo = { from, pEntry: sectionP() }; positionTapDot(idx); return; }
+      const start = scrubScroller.scrollTop, dist = from - start, t0 = Date.now();
+      const step = () => {
+        if (idx !== shownBeat) { pinTween = null; return; }
+        const k = Math.min(1, (Date.now() - t0) / 450);
+        const e = 1 - Math.pow(1 - k, 3); // ease-out
+        scrubScroller.scrollTop = start + dist * e;
+        positionTapDot(idx);
+        if (k < 1) pinTween = setTimeout(step, 16);
+        else { pinTween = null; pinInfo = { from, pEntry: sectionP() }; }
+      };
+      step();
+    }, 90);
   }
 
   /* ---- prototype messages ---- */
