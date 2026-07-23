@@ -548,8 +548,17 @@
        desktop panel column stays collapsed (panel is fixed, out of flow) */
     #canvas{grid-column:1;padding:10px 12px calc(56px + 16px)}
     #canvas,#canvas.panel-open{grid-template-columns:minmax(0,1fr) 0px}
-    #home{padding:28px 20px}
-    h1{font-size:32px}
+    #home{padding:24px 18px}
+    /* hero: compact stats (2-up wrap, no chevrons) + smaller headers */
+    .days{font-size:10.5px;margin-bottom:12px}
+    .stats{gap:6px 16px;margin-bottom:22px}
+    .stats .chevron{display:none}
+    .stat{gap:5px}
+    .stat .val{font-size:15px}
+    .stat .lbl{font-size:11.5px}
+    .stat .i{width:15px;height:15px}
+    h1{font-size:25px}
+    #home h2{font-size:16.5px}
     .cards{grid-template-columns:1fr}
 
     /* panel becomes a full-screen overlay sliding in from the right */
