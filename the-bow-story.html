@@ -187,7 +187,7 @@
 <header class="intro">
   <p class="kicker">Experiment · agentic planning</p>
   <h1>What happens when the planner works for you</h1>
-  <p>A scripted prototype of an agent-led wedding marketplace, followed start to finish: one couple, one venue decision, and an agent that searches, asks, negotiates, and books — with the humans holding every meaningful yes.</p>
+  <p>A scripted prototype following one couple through a single venue decision, showing how an AI agent searches, researches, coordinates, negotiates, and prepares work while the couple stays in control of every meaningful decision.</p>
   <a class="fullscreen-link" href="dist/the-bow.html" target="_blank" rel="noopener">Try the full interactive prototype ↗</a>
 </header>
 
@@ -246,7 +246,7 @@
   const CHAPTERS = [
     { chapter: 'While you were away', beats: [
       { id: 'home', path: [], scrub: true, scrubTarget: '#home', scrubGroup: 'dashboard', size: 's',
-        text: 'Tony & Carmella come back to a dashboard that has been busy without them — every card already shaped by constraints the agent knows.',
+        text: 'Tony and Carmella return to a dashboard that has been working in the background. Every recommendation reflects the planning context the agent already knows.',
         constraints: [
           ['Location', 'Columbus, OH'], ['Wedding date', 'September, next year'],
           ['Guest count', '125'], ['Budget', '$40k'],
@@ -256,97 +256,97 @@
           { layer: 'context', lead: 'Context retained', body: 'Planning constraints persist beyond the conversation and shape search, outreach, and later budget decisions.', anchor: 'context-chips' },
         ] },
       { id: 'gathered', path: [], scrub: true, scrubTarget: '#home', scrubGroup: 'dashboard', size: 's', tapDot: 'home-venue-cta',
-        text: 'Scroll on and the dashboard tells it itself: chefs shortlisted, décor pulled, $1,200 already saved — and the card that starts this story: five lake-view venues, screened for their guest list and wheelchair access, still free on their date.',
+        text: 'As they scroll, the dashboard explains what changed while they were away: chefs shortlisted, décor gathered, $1,200 saved, and five lake-view venues screened for capacity, accessibility, and availability.',
         annotations: [] },
     ]},
     { chapter: 'The findings', beats: [
       { id: 'findings', path: P1, scrub: true, tapDot: 'venue-card',
-        text: 'Ask about the venues and the agent walks you through what it found — five lake-view spots, ranked and screened for capacity, accessibility, and a rain plan. Keep scrolling to read the response the way the couple does.',
+        text: 'The couple asks about the venues, and the agent explains what it found: five lake-view options screened for capacity, accessibility, and rain plans. The response unfolds in the same sequence the couple sees.',
         annotations: [
-          { layer: 'agent', lead: 'Screening, not just searching', body: 'Screens venue options against the couple’s existing constraints.' },
-          { layer: 'interface', lead: 'From chat to comparison', body: 'Moves from conversation into a structured surface for comparison.', anchor: 'venue-card' },
+          { layer: 'agent', lead: 'Existing context applied', body: 'Uses the couple’s planning context to narrow the search before presenting results.' },
+          { layer: 'interface', lead: 'Adaptive interface', body: 'The conversation opens a structured comparison workspace instead of keeping the decision inside chat.', anchor: 'venue-card' },
         ] },
       { id: 'willow', path: P2, panel: 'venue', scrub: true, size: 's', scrubFrom: 'beat-willow-detail',
-        text: 'The top match gets a closer look: the agent explains why Willow Shore fits them in the thread, and the full profile — photos, pricing, availability — opens beside it without losing the conversation.',
+        text: 'The top match gets a closer look. The agent explains why Willow Shore fits, while its photos, pricing, and availability open alongside the conversation.',
         annotations: [
-          { layer: 'interface', lead: 'Detail in context', body: 'Exploring a result opens beside the thread — the conversation never resets.' },
+          { layer: 'interface', lead: 'Progressive disclosure', body: 'Venue details open alongside the thread so the planning context remains visible.' },
         ] },
     ]},
     { chapter: 'The missing answer', beats: [
       { id: 'gap', path: P3, live: true, panel: 'none', tapDot: 'draft-preview', // the exchange streams in; the draft leads into the composer
-        text: 'One thing no listing really answers: whether Carmella’s family can actually get everywhere on the day. The couple asks — and the agent treats the missing answers as missing, not as fine print to assume away.',
+        text: 'One question remains unresolved: whether Carmella’s family can access every part of the venue. The agent treats the missing information as uncertainty rather than filling in the gap.',
         annotations: [
-          { layer: 'human', lead: 'Lived knowledge', body: 'The accessibility requirement comes from the couple — context the system could never infer on its own.' },
-          { layer: 'agent', lead: 'Evidence gap', body: 'Accessibility has not been verified for every venue — missing evidence is treated as missing, not as fact.', anchor: 'beat-accessibility-draft' },
+          { layer: 'human', lead: 'User-provided context', body: 'The accessibility requirement comes directly from the couple and cannot be inferred from listing data.' },
+          { layer: 'agent', lead: 'Evidence gap', body: 'Accessibility has not been verified for every venue, so the agent marks it as unconfirmed.', anchor: 'beat-accessibility-draft' },
         ] },
       { id: 'approval', path: P3, panel: 'composer', focusAnchor: 'approval-send', tapDot: 'approval-send',
-        text: 'The agent drafts five personalized messages targeting exactly those gaps — and then stops. Recipients visible, message editable. Nothing is sent without a yes.',
+        text: 'The agent drafts five personalized messages focused on the missing accessibility details, then stops for review. The recipients are visible, the message is editable, and nothing is sent until the couple approves it.',
         annotations: [
-          { layer: 'agent', lead: 'Prepared by the agent', body: 'Drafts targeted questions using the known information gaps.', anchor: 'composer-draft' },
-          { layer: 'human', lead: 'Requires approval', body: 'The couple can inspect recipients, edit the message, and approve sending.', anchor: 'approval-send' },
+          { layer: 'agent', lead: 'Draft generated', body: 'Drafts targeted questions using the known information gaps.', anchor: 'composer-draft' },
+          { layer: 'human', lead: 'Human review required', body: 'The couple can inspect recipients, edit the message, and approve sending.', anchor: 'approval-send' },
         ] },
     ]},
     { chapter: 'Three days later', beats: [
       { id: 'returned', path: P4, interstitial: 'sent', tapDot: 'responded-cta', focusAnchor: 'responded-cta', // '3 days later' plays WITH the beat, lifting onto the responded dashboard
-        text: 'The messages go out; days pass. When the couple comes back, the dashboard leads with what changed while they were gone: four venues answered the accessibility question.',
+        text: 'The messages go out. Three days later, the dashboard highlights what changed while the couple was away: four venues answered the accessibility question.',
         annotations: [
-          { layer: 'interface', lead: 'Proactive by design', body: 'The dashboard resurfaces what changed — replies — without being asked.' },
+          { layer: 'interface', lead: 'Relevant updates resurfaced', body: 'The dashboard highlights new replies without requiring the couple to restart the search.' },
         ] },
       { id: 'replies', path: P5, scrub: true, live: true, // conversation streams in before scrub takes over
-        text: 'Four replies, normalized into the same comparable shape — quote, capacity, rain plan, and accessibility in each venue’s own words. Scroll through them the way the couple would.',
+        text: 'Four replies are organized into the same structure: quote, capacity, rain plan, and accessibility, with each venue’s original response still available.',
         annotations: [
-          { layer: 'interface', lead: 'Structured synthesis', body: 'Responses are normalized into comparable criteria without hiding their sources.' },
-          { layer: 'context', lead: 'Sources kept', body: 'Vendor replies and supporting details remain available.', anchor: 'reply-source' },
-          { layer: 'agent', lead: 'Verified, not assumed', body: 'This status comes from the venue’s own reply — which contradicted its listing. The refuting answer stays visible.', anchor: 'access-evidence' },
+          { layer: 'interface', lead: 'Evidence organized', body: 'Responses are presented in a consistent format while preserving access to the original sources.' },
+          { layer: 'context', lead: 'Source evidence retained', body: 'Vendor replies and supporting details remain available.', anchor: 'reply-source' },
+          { layer: 'agent', lead: 'Listing data corrected', body: 'The venue’s reply contradicts its listing, so the verified response replaces the assumption while remaining visible as evidence.', anchor: 'access-evidence' },
         ] },
       { id: 'recommendation', path: P5, focusAnchor: 'beat-recommendation', tapDot: 'chip-hold-willow',
-        text: 'Then a recommendation with the reasons attached: Willow Shore for the setting and full access, Blue Horizon as the weather-proof runner-up. Advice, not a leaderboard.',
+        text: 'The agent recommends Willow Shore for its setting and full accessibility, with Blue Horizon as the weather-proof alternative. The rationale remains visible alongside the recommendation.',
         annotations: [
-          { layer: 'human', lead: 'The call stays theirs', body: 'A recommendation with the reasons attached — the couple decides with the evidence in view.' },
+          { layer: 'human', lead: 'Recommendation with rationale', body: 'The agent explains its reasoning while the couple makes the final decision with the evidence in view.' },
         ] },
     ]},
     { chapter: 'Making the call', beats: [
       { id: 'quote', path: P6, scrub: true, scrubFrom: 'beat-hold-willow', tapDot: 'chip-budget-added',
-        text: 'A free five-day hold on Willow Shore buys time to decide — and the agent gives the honest cost picture: the $7,200 quote is venue-only. With catering and service fees, the real number is about $27,300. Keep scrolling through the breakdown.',
+        text: 'A free five-day hold on Willow Shore gives the couple time to decide. The agent also shows the full cost picture: the $7,200 quote covers only the venue, while catering and service fees bring the estimated total to about $27,300.',
         annotations: [
-          { layer: 'agent', lead: 'Honest math', body: 'The quote is venue-only; the agent adds catering and service estimates so the decision uses the real total.' },
+          { layer: 'agent', lead: 'Full cost projection', body: 'The venue quote is combined with catering and service estimates so the decision reflects the projected total.' },
         ] },
       { id: 'added', path: P6a, scrub: true, size: 's', scrubFrom: 'beat-budget-added', tapDot: 'chip-rebalance',
-        text: 'They add it to the budget — and the plan tips over: $51,300 projected against a $40k goal. $11,300 over, shown plainly, not softened.',
+        text: 'They add the venue to the budget. The projection updates immediately to $51,300 against a $40,000 goal, revealing an $11,300 overage.',
         annotations: [
-          { layer: 'product-state', lead: 'The moment of truth, instantly', body: 'Adding the quote recomputes the whole plan on the spot — $51,300 projected, itemized, the moment it becomes true.' },
-          { layer: 'human', lead: 'No compounding surprise', body: 'The couple always knows their real position — the overage surfaces while there’s still room to act, not after ten more decisions.' },
+          { layer: 'product-state', lead: 'Budget impact calculated', body: 'Adding the venue recomputes the full plan immediately and shows the updated projection item by item.' },
+          { layer: 'human', lead: 'Overage surfaced early', body: 'The overage appears while the couple can still reconsider the venue, budget, or remaining priorities.' },
         ] },
       { id: 'rebalance', path: P6b, scrub: true, size: 's', scrubFrom: 'beat-rebalance', tapDot: 'chip-goal-increase',
-        text: 'The agent rebalances what it can — the catering package, the dress, stationery, cake — finding $6,900 in trims. And it is honest about the limit: trims can’t close the last $4,400.',
+        text: 'The agent identifies $6,900 in possible reductions across catering, the dress, stationery, and cake. The remaining $4,400 still requires a larger decision.',
         annotations: [
-          { layer: 'agent', lead: 'Options, not ultimatums', body: 'Specific trims, each tied to a number, none touching what’s already booked — and an honest limit: trims alone can’t close the last $4,400.' },
-          { layer: 'interface', lead: 'Every trim visible', body: 'Each adjustment lands in the budget panel as it’s proposed — the couple watches the plan change instead of trusting a summary.' },
+          { layer: 'agent', lead: 'Trade-offs made explicit', body: 'Each proposed reduction is tied to a specific amount and avoids already-booked items. The interface also shows that these changes do not fully close the gap.' },
+          { layer: 'interface', lead: 'Budget changes shown in context', body: 'Each proposed adjustment appears in the budget as it is considered, so the couple can see its effect on the full plan.' },
         ] },
       { id: 'goal', path: P7, scrub: true, size: 's', scrubFrom: 'beat-goal-increase', tapDot: 'chip-tour-offer',
-        text: 'So the couple makes the call themselves: goal up to $45k, keeping the venue they actually want. Landing: $600 under, eyes open.',
+        text: 'The couple chooses to raise the goal to $45,000 and keep the venue they want. The revised plan lands $600 under the new target.',
         annotations: [
-          { layer: 'human', lead: 'The trade-off is theirs', body: 'Raise the goal or walk away from the venue — the agent frames both honestly, and the couple chooses. $45k, eyes open, $600 under.' },
-          { layer: 'product-state', lead: 'Live budget math', body: 'The projection recomputes as quotes replace estimates — the trade-offs are visible, not narrated.' },
+          { layer: 'human', lead: 'Final trade-off chosen by the couple', body: 'The agent presents the available options, and the couple chooses to raise the goal to $45,000. The revised projection is $600 under.' },
+          { layer: 'product-state', lead: 'Connected planning state', body: 'As quotes replace estimates, the budget updates automatically so the trade-offs remain visible.' },
         ] },
     ]},
     { chapter: 'Booked', beats: [
       { id: 'contract-arrives', path: P8, interstitial: 'toured', tapDot: 'contract-cta', focusAnchor: 'contract-cta', // 'Two weeks later' plays WITH the beat; dashboard centers the contract card
-        text: 'A tour with the venue coordinator seals it. Two weeks later the dashboard leads with news: Willow Shore sent the contract — and the agent read it first.',
+        text: 'A tour with the venue coordinator confirms the choice. Two weeks later, the dashboard shows that Willow Shore has sent the contract and the agent has already reviewed it.',
         annotations: [
-          { layer: 'agent', lead: 'Watchful between moments', body: 'Tour booked, calendar synced — and the incoming contract is reviewed before the couple opens it.' },
+          { layer: 'agent', lead: 'Background monitoring', body: 'The agent tracks the scheduled tour and reviews the incoming contract before the couple opens it.' },
         ] },
       { id: 'flag', path: P8f, scrub: true, size: 's', scrubFrom: 'beat-contract-flag', tapDot: 'chip-negotiate',
-        text: 'One flag before signing: a $250 “peak Saturday fee” that wasn’t in the quote. The agent asks permission before doing anything about it — negotiating costs nothing, but it’s the couple’s call.',
+        text: 'One issue appears before signing: a $250 peak-Saturday fee that was not included in the original quote. The agent recommends asking for it to be removed and waits for the couple’s approval.',
         annotations: [] },
       { id: 'contract', path: P8n, panel: 'contract', scrub: true, size: 's', scrubFrom: 'beat-negotiate', tapDot: 'chip-book',
-        text: 'Asking works — the venue honors the original $7,200, with the paper trail kept. The corrected contract sits in the thread and the full terms open beside it. Only now, with everything inspectable, comes the option to book.',
+        text: 'The venue agrees to honor the original $7,200 quote. The corrected contract and negotiation history remain in the thread, while the full terms open alongside it. Once everything is available for review, the couple can book.',
         annotations: [] },
       { id: 'booked', path: P9, loop: true, scrub: true, scrubFrom: 'beat-book',
-        text: 'Booked — deposit in, reminders scheduled, rehearsal hour on the calendar. And the decision doesn’t stay in the chat: budget, vendor status, and the plan itself all update, feeding richer context into every decision after.',
+        text: 'The venue is booked. The deposit is recorded, reminders are scheduled, and the rehearsal is added to the calendar. The decision also updates the wider planning system: budget, vendor status, checklist, and future recommendations now reflect the new reality.',
         annotations: [
           { layer: 'product-state', lead: 'Decision recorded', body: 'The selected venue becomes part of the shared planning state.', anchor: 'context-chips' },
-          { layer: 'product-state', lead: 'Connected updates', body: 'Budget, vendor status, checklist, and future recommendations can now reflect the decision.' },
+          { layer: 'product-state', lead: 'Connected updates', body: 'Budget, vendor status, checklist, and future recommendations now reflect the confirmed decision.' },
         ] },
     ]},
   ];
@@ -449,7 +449,7 @@
     }
     if (b.scrub && idx === FIRST_SCRUB) {
       const hint = document.createElement('p'); hint.className = 'scrub-hint';
-      hint.innerHTML = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M4 10l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Keep scrolling — the screen scrolls with you</span>';
+      hint.innerHTML = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M4 10l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Keep scrolling. The screen scrolls with you.</span>';
       body.appendChild(hint);
     }
     if (withAnnos) b.annotations.forEach(a => { const c = annoCard(a); c.classList.add('show'); body.appendChild(c); });
